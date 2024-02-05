@@ -1,38 +1,3 @@
-asgiref==3.3.4
-certifi==2021.5.30
-cffi==1.15.0
-chardet==4.0.0
-cryptography==36.0.2
-dj-database-url==0.5.0
-Django==3.2
-django-cors-headers==3.11.0
-django-heroku==0.3.1
-django-jet-reboot==1.1.1
-django-modeltranslation==0.17.5
-django-paypal==1.1.1
-django-rest-knox==4.2.0
-djangorestframework==3.12.4
-docx==0.2.4
-feedparser==6.0.8
-gunicorn==20.1.0
-idna==2.10
-lxml==4.6.3
-Pillow==9.0.1
-psycopg2==2.9.1
-pycparser==2.21
-PyMySQL==1.0.2
-python-docx==0.8.10
-pytz==2019.3
-reportlab==3.5.67
-requests==2.25.1
-sgmllib3k==1.0.0
-SimpleQIWI==0.7
-six==1.16.0
-sqlparse==0.3.1
-typing-extensions==3.10.0.0
-urllib3==1.26.5
-uuid==1.30
-whitenoise==5.2.0
 
 protected void Page_Load(object sender, EventArgs e)
 {
@@ -44,9 +9,8 @@ protected void Page_Load(object sender, EventArgs e)
         {
             MenuItem menuItem = new MenuItem();
             menuItem.Text = row["MenuItemText"].ToString();
-            menuItem.Value = row["Value"].ToString(); // Установка значения Value
             menuItem.NavigateUrl = "javascript:void(0)"; // Если NavigateUrl не требуется
-            // menuItem.ParentId = row["ParentID"].ToString(); // Добавление ParentId не поддерживается в этой версии
+            menuItem.Attributes["ID"] = row["ID"].ToString(); // Установка атрибута ID
 
             // Добавляем пункт меню в корень, если у него нет родительского элемента
             if (string.IsNullOrEmpty(row["ParentID"].ToString()))
@@ -71,7 +35,7 @@ private MenuItem FindMenuItemByID(MenuItemCollection items, string id)
 {
     foreach (MenuItem item in items)
     {
-        if (item.Value == id)
+        if (item.Attributes["ID"] == id)
         {
             return item;
         }
@@ -85,4 +49,3 @@ private MenuItem FindMenuItemByID(MenuItemCollection items, string id)
     }
     return null;
 }
-

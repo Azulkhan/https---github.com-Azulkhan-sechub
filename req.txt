@@ -1,8 +1,46 @@
 
-<dx:ASPxComboBox ID="ASPxComboBox1" runat="server" DataSourceID="ObjectDataSource1" TextField="MenuItemText" ValueField="Value" ParentField="ParentID">
-    <Columns>
-        <dx:ListBoxColumn FieldName="MenuItemText" />
-    </Columns>
-</dx:ASPxComboBox>
+protected void Page_Load(object sender, EventArgs e)
+{
+    if (!IsPostBack)
+    {
+        DataSet menuData = YourClassName.GetMenuItems(); // Получение данных из БД
 
-<asp:ObjectDataSource ID="ObjectDataSource1" runat="server" TypeName="YourNamespace.YourClassName" SelectMethod="GetMenuItems"></asp:ObjectDataSource>
+        foreach (DataRow row in menuData.Tables[0].Rows)
+        {
+            MenuItem menuItem = new MenuItem();
+            menuItem.Text = row["MenuItemText"].ToString();
+            menuItem.NavigateUrl = "javascript:void(0)"; // Если NavigateUrl не требуется
+
+            string parentId = row["ParentID"].ToString();
+            if (string.IsNullOrEmpty(parentId)) // Если нет родительского элемента, добавляем в корень меню
+            {
+                ASPxMenu1.Items.Add(menuItem);
+            }
+            else // Иначе находим родительский элемент и добавляем текущий пункт как его дочерний
+            {
+                AddChildItem(ASPxMenu1.Items, menuItem, parentId);
+            }
+        }
+
+        // Установка вертикальной ориентации и автоматического генерирования пунктов
+        ASPxMenu1.Orientation = Orientation.Vertical;
+        ASPxMenu1.AutoGenerateItems = true;
+    }
+}
+
+private void AddChildItem(MenuItemCollection items, MenuItem childItem, string parentId)
+{
+    foreach (MenuItem item in items)
+    {
+        if (item.Value == parentId) // Найден родительский элемент, добавляем дочерний пункт
+        {
+            item.Items.Add(childItem);
+            return;
+        }
+        // Рекурсивно ищем в подменю
+        if (item.Items.Count > 0)
+        {
+            AddChildItem(item.Items, childItem, parentId);
+        }
+    }
+}

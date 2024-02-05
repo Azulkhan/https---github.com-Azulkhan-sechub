@@ -1,24 +1,22 @@
 
+
 protected void Page_Load(object sender, EventArgs e)
 {
     if (!IsPostBack)
     {
         DataSet menuData = YourClassName.GetMenuItems(); // Получение данных из БД
 
+        // Добавляем пункты меню в корень
         foreach (DataRow row in menuData.Tables[0].Rows)
         {
             MenuItem menuItem = new MenuItem();
             menuItem.Text = row["MenuItemText"].ToString();
             menuItem.NavigateUrl = "javascript:void(0)"; // Если NavigateUrl не требуется
 
-            string parentId = row["ParentID"].ToString();
-            if (string.IsNullOrEmpty(parentId)) // Если нет родительского элемента, добавляем в корень меню
+            if (row["ParentID"].ToString() == "0") // Если родительский ID равен 0, добавляем в корень меню
             {
                 ASPxMenu1.Items.Add(menuItem);
-            }
-            else // Иначе находим родительский элемент и добавляем текущий пункт как его дочерний
-            {
-                AddChildItem(ASPxMenu1.Items, menuItem, parentId);
+                AddChildItems(menuData.Tables[0], menuItem, row["ID"].ToString());
             }
         }
 
@@ -27,19 +25,17 @@ protected void Page_Load(object sender, EventArgs e)
     }
 }
 
-private void AddChildItem(MenuItemCollection items, MenuItem childItem, string parentId)
+private void AddChildItems(DataTable menuData, MenuItem parentItem, string parentId)
 {
-    foreach (MenuItem item in items)
+    foreach (DataRow row in menuData.Rows)
     {
-        if (item.Text == parentId) // Найден родительский элемент, добавляем дочерний пункт
+        if (row["ParentID"].ToString() == parentId)
         {
-            item.Items.Add(childItem);
-            return;
-        }
-        // Рекурсивно ищем в подменю
-        if (item.Items.Count > 0)
-        {
-            AddChildItem(item.Items, childItem, parentId);
+            MenuItem menuItem = new MenuItem();
+            menuItem.Text = row["MenuItemText"].ToString();
+            menuItem.NavigateUrl = "javascript:void(0)"; // Если NavigateUrl не требуется
+            parentItem.Items.Add(menuItem);
+            AddChildItems(menuData, menuItem, row["ID"].ToString()); // Рекурсивно добавляем дочерние элементы
         }
     }
 }

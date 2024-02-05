@@ -1,12 +1,15 @@
 
-
 protected void Page_Load(object sender, EventArgs e)
 {
     if (!IsPostBack)
     {
         DataSet menuData = YourClassName.GetMenuItems(); // Получение данных из БД
 
-        // Добавляем пункты меню в корень
+        MenuItem rootMenuItem = new MenuItem();
+        rootMenuItem.Text = "Главное меню"; // Текст для первого уровня меню
+        ASPxMenu1.Items.Add(rootMenuItem);
+
+        // Добавляем пункты меню во вложенные уровни
         foreach (DataRow row in menuData.Tables[0].Rows)
         {
             MenuItem menuItem = new MenuItem();
@@ -15,7 +18,7 @@ protected void Page_Load(object sender, EventArgs e)
 
             if (row["ParentID"].ToString() == "0") // Если родительский ID равен 0, добавляем в корень меню
             {
-                ASPxMenu1.Items.Add(menuItem);
+                rootMenuItem.Items.Add(menuItem);
                 AddChildItems(menuData.Tables[0], menuItem, row["ID"].ToString());
             }
         }

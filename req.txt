@@ -22,9 +22,8 @@ protected void Page_Load(object sender, EventArgs e)
             }
         }
 
-        // Установка вертикальной ориентации и автоматического генерирования пунктов
+        // Установка вертикальной ориентации
         ASPxMenu1.Orientation = Orientation.Vertical;
-        ASPxMenu1.AutoGenerateItems = true;
     }
 }
 
@@ -32,7 +31,7 @@ private void AddChildItem(MenuItemCollection items, MenuItem childItem, string p
 {
     foreach (MenuItem item in items)
     {
-        if (item.Value == parentId) // Найден родительский элемент, добавляем дочерний пункт
+        if (item.Text == parentId) // Найден родительский элемент, добавляем дочерний пункт
         {
             item.Items.Add(childItem);
             return;

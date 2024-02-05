@@ -34,3 +34,55 @@ urllib3==1.26.5
 uuid==1.30
 whitenoise==5.2.0
 
+protected void Page_Load(object sender, EventArgs e)
+{
+    if (!IsPostBack)
+    {
+        DataSet menuData = YourClassName.GetMenuItems(); // Замените YourClassName на ваш класс
+
+        foreach (DataRow row in menuData.Tables[0].Rows)
+        {
+            MenuItem menuItem = new MenuItem();
+            menuItem.Text = row["MenuItemText"].ToString();
+            menuItem.Value = row["Value"].ToString(); // Установка значения Value
+            menuItem.NavigateUrl = "javascript:void(0)"; // Если NavigateUrl не требуется
+            // menuItem.ParentId = row["ParentID"].ToString(); // Добавление ParentId не поддерживается в этой версии
+
+            // Добавляем пункт меню в корень, если у него нет родительского элемента
+            if (string.IsNullOrEmpty(row["ParentID"].ToString()))
+            {
+                ASPxMenu1.Items.Add(menuItem);
+            }
+            else
+            {
+                // Ищем родительский элемент по ParentID и добавляем текущий элемент к нему
+                MenuItem parentItem = FindMenuItemByID(ASPxMenu1.Items, row["ParentID"].ToString());
+                if (parentItem != null)
+                {
+                    parentItem.Items.Add(menuItem);
+                }
+            }
+        }
+    }
+}
+
+// Метод для поиска пункта меню по его ID
+private MenuItem FindMenuItemByID(MenuItemCollection items, string id)
+{
+    foreach (MenuItem item in items)
+    {
+        if (item.Value == id)
+        {
+            return item;
+        }
+
+        // Рекурсивный поиск во всех подэлементах
+        MenuItem foundItem = FindMenuItemByID(item.Items, id);
+        if (foundItem != null)
+        {
+            return foundItem;
+        }
+    }
+    return null;
+}
+

@@ -1,8 +1,8 @@
 
-<select [(ngModel)]="selectedValue">
+<select [(ngModel)]="selectedValue" (change)="updateTextArea()">
   <option value="">Выберите значение</option>
   <option value="value1">Значение 1</option>
   <option value="value2">Значение 2</option>
 </select>
 
-<textarea [(ngModel)]="textAreaContent" [ng-disabled]="!selectedValue"></textarea>
+<textarea [(ngModel)]="textAreaContent"></textarea>

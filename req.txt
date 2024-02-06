@@ -1,44 +1,8 @@
 
-protected void Page_Load(object sender, EventArgs e)
-{
-    if (!IsPostBack)
-    {
-        DataSet menuData = YourClassName.GetMenuItems(); // Получение данных из БД
+<select [(ngModel)]="selectedValue">
+  <option value="">Выберите значение</option>
+  <option value="value1">Значение 1</option>
+  <option value="value2">Значение 2</option>
+</select>
 
-        MenuItem rootMenuItem = new MenuItem();
-        rootMenuItem.Text = "Главное меню"; // Текст для первого уровня меню
-        ASPxMenu1.Items.Add(rootMenuItem);
-
-        // Добавляем пункты меню во вложенные уровни
-        foreach (DataRow row in menuData.Tables[0].Rows)
-        {
-            MenuItem menuItem = new MenuItem();
-            menuItem.Text = row["MenuItemText"].ToString();
-            menuItem.NavigateUrl = "javascript:void(0)"; // Если NavigateUrl не требуется
-
-            if (row["ParentID"].ToString() == "0") // Если родительский ID равен 0, добавляем в корень меню
-            {
-                rootMenuItem.Items.Add(menuItem);
-                AddChildItems(menuData.Tables[0], menuItem, row["ID"].ToString());
-            }
-        }
-
-        // Установка вертикальной ориентации
-        ASPxMenu1.Orientation = Orientation.Vertical;
-    }
-}
-
-private void AddChildItems(DataTable menuData, MenuItem parentItem, string parentId)
-{
-    foreach (DataRow row in menuData.Rows)
-    {
-        if (row["ParentID"].ToString() == parentId)
-        {
-            MenuItem menuItem = new MenuItem();
-            menuItem.Text = row["MenuItemText"].ToString();
-            menuItem.NavigateUrl = "javascript:void(0)"; // Если NavigateUrl не требуется
-            parentItem.Items.Add(menuItem);
-            AddChildItems(menuData, menuItem, row["ID"].ToString()); // Рекурсивно добавляем дочерние элементы
-        }
-    }
-}
+<textarea [(ngModel)]="textAreaContent" [ng-disabled]="!selectedValue"></textarea>

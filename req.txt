@@ -6,3 +6,20 @@
 </select>
 
 <textarea [(ngModel)]="textAreaContent"></textarea>
+
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-your-component',
+  templateUrl: './your-component.component.html',
+  styleUrls: ['./your-component.component.css']
+})
+export class YourComponent {
+  selectedValue: string = '';
+  textAreaContent: string = '';
+
+  updateTextArea() {
+    this.textAreaContent = this.selectedValue;
+  }
+}

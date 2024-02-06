@@ -1,25 +1,16 @@
 
-<select [(ngModel)]="selectedValue" (change)="updateTextArea()">
-  <option value="">Выберите значение</option>
-  <option value="value1">Значение 1</option>
-  <option value="value2">Значение 2</option>
+<select ng-model="selectModel" ng-change="updateTextArea()">
+    <option value="value1">Value 1</option>
+    <option value="value2">Value 2</option>
+    <option value="value3">Value 3</option>
 </select>
 
-<textarea [(ngModel)]="textAreaContent"></textarea>
+<textarea ng-model="textAreaModel" ng-disabled="selectModel === 'value1'"></textarea>
 
+$scope.selectModel = ''; // модель для <select>
+$scope.textAreaModel = ''; // модель для <textarea>
 
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-your-component',
-  templateUrl: './your-component.component.html',
-  styleUrls: ['./your-component.component.css']
-})
-export class YourComponent {
-  selectedValue: string = '';
-  textAreaContent: string = '';
-
-  updateTextArea() {
-    this.textAreaContent = this.selectedValue;
-  }
-}
+$scope.updateTextArea = function() {
+    // Обновляем значение в <textarea> при изменении <select>
+    $scope.textAreaModel = $scope.selectModel;
+};

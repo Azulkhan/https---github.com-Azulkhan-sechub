@@ -1,16 +1,11 @@
 
-<select ng-model="selectModel" ng-change="updateTextArea()">
-    <option value="value1">Value 1</option>
-    <option value="value2">Value 2</option>
-    <option value="value3">Value 3</option>
-</select>
-
-<textarea ng-model="textAreaModel" ng-disabled="selectModel === 'value1'"></textarea>
-
-$scope.selectModel = ''; // модель для <select>
-$scope.textAreaModel = ''; // модель для <textarea>
-
-$scope.updateTextArea = function() {
-    // Обновляем значение в <textarea> при изменении <select>
-    $scope.textAreaModel = $scope.selectModel;
-};
+SELECT 
+    employee_id,
+    CASE 
+        WHEN year = 2000 THEN 
+            (SELECT LISTAGG(name, ', ') WITHIN GROUP (ORDER BY name) 
+             FROM names 
+             WHERE uname = 'Drovga')
+        ELSE NULL -- или любое другое значение по умолчанию
+    END AS concatenated_names
+FROM your_table;

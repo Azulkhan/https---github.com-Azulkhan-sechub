@@ -1,5 +1,5 @@
 
-<select ng-model="selectedOption">
+<select id="mySelect">
   <option value="value1">Option 1</option>
   <option value="value2">Option 2</option>
   <option value="value3">Option 3</option>
@@ -7,9 +7,12 @@
 
 <textarea ng-model="textAreaModel"></textarea>
 
-$scope.selectedOption = ''; // инициализация выбранной опции
-$scope.textAreaModel = ''; // инициализация модели textarea
+// Получить элементы
+var selectElement = document.getElementById("mySelect");
+var textareaElement = document.querySelector("[ng-model='textAreaModel']");
 
-$scope.updateTextArea = function() {
-  $scope.textAreaModel = $scope.selectedOption;
-};
+// Установить значение textarea
+textareaElement.value = selectElement.value;
+
+// Установить модель ng-model
+angular.element(textareaElement).triggerHandler('input');

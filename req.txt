@@ -1,9 +1,15 @@
 
-// Получить значение выбранной опции
-var selectedOption = document.getElementById("mySelect").value;
+<select ng-model="selectedOption">
+  <option value="value1">Option 1</option>
+  <option value="value2">Option 2</option>
+  <option value="value3">Option 3</option>
+</select>
 
-// Найти элемент textarea
-var textarea = document.getElementById("myTextarea");
+<textarea ng-model="textAreaModel"></textarea>
 
-// Присвоить значение textarea
-textarea.value = selectedOption;
+$scope.selectedOption = ''; // инициализация выбранной опции
+$scope.textAreaModel = ''; // инициализация модели textarea
+
+$scope.updateTextArea = function() {
+  $scope.textAreaModel = $scope.selectedOption;
+};

@@ -1,11 +1,9 @@
 
-SELECT 
-    employee_id,
-    CASE 
-        WHEN year = 2000 THEN 
-            (SELECT LISTAGG(name, ', ') WITHIN GROUP (ORDER BY name) 
-             FROM names 
-             WHERE uname = 'Drovga')
-        ELSE NULL -- или любое другое значение по умолчанию
-    END AS concatenated_names
-FROM your_table;
+// Получить значение выбранной опции
+var selectedOption = document.getElementById("mySelect").value;
+
+// Найти элемент textarea
+var textarea = document.getElementById("myTextarea");
+
+// Присвоить значение textarea
+textarea.value = selectedOption;

@@ -1,22 +1,79 @@
 
-<select ng-model="selectedOption">
-  <option value="value1">Option 1</option>
-  <option value="value2">Option 2</option>
-  <option value="value3">Option 3</option>
-</select>
+angular.module('myApp').service('ECSService', function() {
+    var crypto = window.crypto || window.msCrypto;
+    var subtleCrypto = crypto.subtle || crypto.webkitSubtle;
 
-<textarea ng-model="textAreaModel"></textarea>
-
-angular.module('myApp', [])
-  .controller('myController', function($scope) {
-    // Инициализация значения selectedOption
-    $scope.selectedOption = 'value1';
-
-    // Функция для обновления значения textarea при изменении выбранной опции
-    $scope.updateTextArea = function() {
-      $scope.textAreaModel = $scope.selectedOption;
+    // Генерация ключей ЭЦП
+    this.generateKeys = async function() {
+        try {
+            var keys = await subtleCrypto.generateKey(
+                { name: "ECDSA", namedCurve: "P-256" },
+                true,
+                ["sign", "verify"]
+            );
+            return keys;
+        } catch (error) {
+            console.error('Ошибка при генерации ключей:', error);
+            throw error;
+        }
     };
 
-    // Вызываем функцию updateTextArea для установки значения textarea
-    $scope.updateTextArea();
-  });
+    // Подпись данных
+    this.signData = async function(privateKey, data) {
+        try {
+            var signature = await subtleCrypto.sign(
+                { name: "ECDSA", hash: { name: "SHA-256" } },
+                privateKey,
+                new TextEncoder().encode(data)
+            );
+            return new Uint8Array(signature);
+        } catch (error) {
+            console.error('Ошибка при подписи данных:', error);
+            throw error;
+        }
+    };
+
+    // Проверка подписи
+    this.verifySignature = async function(publicKey, signature, data) {
+        try {
+            var result = await subtleCrypto.verify(
+                { name: "ECDSA", hash: { name: "SHA-256" } },
+                publicKey,
+                signature,
+                new TextEncoder().encode(data)
+            );
+            return result;
+        } catch (error) {
+            console.error('Ошибка при проверке подписи:', error);
+            throw error;
+        }
+    };
+});
+
+
+angular.module('myApp').controller('MyController', function($scope, ECSService) {
+    $scope.dataToSign = 'Some data to sign';
+    $scope.signature = '';
+
+    ECSService.generateKeys().then(function(keys) {
+        // Подписываем данные
+        ECSService.signData(keys.privateKey, $scope.dataToSign).then(function(signature) {
+            $scope.signature = signature;
+        }).catch(function(error) {
+            console.error('Ошибка при подписи данных:', error);
+        });
+
+        // Проверяем подпись
+        ECSService.verifySignature(keys.publicKey, $scope.signature, $scope.dataToSign).then(function(result) {
+            if (result) {
+                console.log('Подпись верна');
+            } else {
+                console.log('Подпись не верна');
+            }
+        }).catch(function(error) {
+            console.error('Ошибка при проверке подписи:', error);
+        });
+    }).catch(function(error) {
+        console.error('Ошибка при генерации ключей:', error);
+    });
+});

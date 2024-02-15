@@ -77,3 +77,6 @@ angular.module('myApp').controller('MyController', function($scope, ECSService) 
         console.error('Ошибка при генерации ключей:', error);
     });
 });
+
+
+1cb85e3b-61f0-4b65-9efa-1a95b37b2593

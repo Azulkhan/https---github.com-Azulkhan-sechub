@@ -1,82 +1,41 @@
 
-angular.module('myApp').service('ECSService', function() {
-    var crypto = window.crypto || window.msCrypto;
-    var subtleCrypto = crypto.subtle || crypto.webkitSubtle;
+Вот пример полной инструкции по подписанию ЭЦП в AngularJS:Шаг 1: Установка библиотек Установите необходимые библиотеки для работы с ЭЦП в AngularJS, например, crypto-pro и @angular/http:npm install crypto-pro
+npm install @angular/httpШаг 2: Создание сервиса для работы с ЭЦП Создайте сервис, который будет взаимодействовать с библиотекой для работы с ЭЦП. Например, можете создать файл signature.service.ts:import { Injectable } from '@angular/core';
+import * as crypto from 'crypto-pro';
 
-    // Генерация ключей ЭЦП
-    this.generateKeys = async function() {
-        try {
-            var keys = await subtleCrypto.generateKey(
-                { name: "ECDSA", namedCurve: "P-256" },
-                true,
-                ["sign", "verify"]
-            );
-            return keys;
-        } catch (error) {
-            console.error('Ошибка при генерации ключей:', error);
-            throw error;
-        }
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class SignatureService {
 
-    // Подпись данных
-    this.signData = async function(privateKey, data) {
-        try {
-            var signature = await subtleCrypto.sign(
-                { name: "ECDSA", hash: { name: "SHA-256" } },
-                privateKey,
-                new TextEncoder().encode(data)
-            );
-            return new Uint8Array(signature);
-        } catch (error) {
-            console.error('Ошибка при подписи данных:', error);
-            throw error;
-        }
-    };
+  constructor() { }
 
-    // Проверка подписи
-    this.verifySignature = async function(publicKey, signature, data) {
-        try {
-            var result = await subtleCrypto.verify(
-                { name: "ECDSA", hash: { name: "SHA-256" } },
-                publicKey,
-                signature,
-                new TextEncoder().encode(data)
-            );
-            return result;
-        } catch (error) {
-            console.error('Ошибка при проверке подписи:', error);
-            throw error;
-        }
-    };
-});
+  async signData(data: string): Promise<string> {
+    try {
+      const signature = await crypto.sign(data);
+      return signature;
+    } catch (error) {
+      console.error('Error signing data:', error);
+      throw error;
+    }
+  }
+}Шаг 3: Использование сервиса в компоненте Используйте созданный сервис в компоненте AngularJS для подписания данных. Например, можете создать файл app.component.ts:import { Component } from '@angular/core';
+import { SignatureService } from './signature.service';
 
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  constructor(private signatureService: SignatureService) {}
 
-angular.module('myApp').controller('MyController', function($scope, ECSService) {
-    $scope.dataToSign = 'Some data to sign';
-    $scope.signature = '';
-
-    ECSService.generateKeys().then(function(keys) {
-        // Подписываем данные
-        ECSService.signData(keys.privateKey, $scope.dataToSign).then(function(signature) {
-            $scope.signature = signature;
-        }).catch(function(error) {
-            console.error('Ошибка при подписи данных:', error);
-        });
-
-        // Проверяем подпись
-        ECSService.verifySignature(keys.publicKey, $scope.signature, $scope.dataToSign).then(function(result) {
-            if (result) {
-                console.log('Подпись верна');
-            } else {
-                console.log('Подпись не верна');
-            }
-        }).catch(function(error) {
-            console.error('Ошибка при проверке подписи:', error);
-        });
-    }).catch(function(error) {
-        console.error('Ошибка при генерации ключей:', error);
-    });
-});
-
-
-1cb85e3b-61f0-4b65-9efa-1a95b37b2593
+  async signData(data: string) {
+    try {
+      const signature = await this.signatureService.signData(data);
+      console.log('Signature:', signature);
+    } catch (error) {
+      console.error('Error signing data:', error);
+    }
+  }
+}Шаг 4: Использование в шаблоне компонента Используйте метод signData в шаблоне компонента для подписания данных. Например, в файле app.component.html:<button (click)="signData('Your data to sign')">Sign Data</button>Это основные шаги для создания и использования сервиса подписи ЭЦП в AngularJS. Обратите внимание, что код представлен в качестве примера и может потребовать доработок в зависимости от конкретных требований вашего проекта.

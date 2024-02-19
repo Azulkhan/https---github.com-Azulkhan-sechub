@@ -11,12 +11,31 @@
 </head>
 <body>
     <form id="form1" runat="server">
-        <dx:ASPxMenu ID="ASPxMenu1" runat="server" DataSourceID="sqlDataSource" KeyField="ID" ParentKeyField="ParentID"
+        <dx:ASPxMenu ID="ASPxMenu1" runat="server" DataSourceID="objectDataSource" KeyField="ID" ParentKeyField="ParentID"
             TextField="Name" NavigateUrlField="URL">
         </dx:ASPxMenu>
-        <asp:SqlDataSource ID="sqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:YourConnectionString %>"
-            SelectCommand="SELECT [ID], [ParentID], [Name], [URL] FROM [YourTable]">
-        </asp:SqlDataSource>
+        <asp:ObjectDataSource ID="objectDataSource" runat="server" TypeName="YourNamespace.YourDataSourceClass"
+            SelectMethod="GetData">
+        </asp:ObjectDataSource>
     </form>
 </body>
 </html>
+
+namespace YourNamespace
+{
+    public class YourDataSourceClass
+    {
+        public List<YourDataItem> GetData()
+        {
+            // Ваш код для получения данных из БД или другого источника
+        }
+    }
+    
+    public class YourDataItem
+    {
+        public int ID { get; set; }
+        public int ParentID { get; set; }
+        public string Name { get; set; }
+        public string URL { get; set; }
+    }
+}

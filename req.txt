@@ -1,41 +1,22 @@
 
-Вот пример полной инструкции по подписанию ЭЦП в AngularJS:Шаг 1: Установка библиотек Установите необходимые библиотеки для работы с ЭЦП в AngularJS, например, crypto-pro и @angular/http:npm install crypto-pro
-npm install @angular/httpШаг 2: Создание сервиса для работы с ЭЦП Создайте сервис, который будет взаимодействовать с библиотекой для работы с ЭЦП. Например, можете создать файл signature.service.ts:import { Injectable } from '@angular/core';
-import * as crypto from 'crypto-pro';
+<%@ Page Language="C#" %>
+<%@ Register Assembly="DevExpress.Web.v21.2, Version=21.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a"
+    Namespace="DevExpress.Web" TagPrefix="dx" %>
 
-@Injectable({
-  providedIn: 'root'
-})
-export class SignatureService {
+<!DOCTYPE html>
 
-  constructor() { }
-
-  async signData(data: string): Promise<string> {
-    try {
-      const signature = await crypto.sign(data);
-      return signature;
-    } catch (error) {
-      console.error('Error signing data:', error);
-      throw error;
-    }
-  }
-}Шаг 3: Использование сервиса в компоненте Используйте созданный сервис в компоненте AngularJS для подписания данных. Например, можете создать файл app.component.ts:import { Component } from '@angular/core';
-import { SignatureService } from './signature.service';
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
-})
-export class AppComponent {
-  constructor(private signatureService: SignatureService) {}
-
-  async signData(data: string) {
-    try {
-      const signature = await this.signatureService.signData(data);
-      console.log('Signature:', signature);
-    } catch (error) {
-      console.error('Error signing data:', error);
-    }
-  }
-}Шаг 4: Использование в шаблоне компонента Используйте метод signData в шаблоне компонента для подписания данных. Например, в файле app.component.html:<button (click)="signData('Your data to sign')">Sign Data</button>Это основные шаги для создания и использования сервиса подписи ЭЦП в AngularJS. Обратите внимание, что код представлен в качестве примера и может потребовать доработок в зависимости от конкретных требований вашего проекта.
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>DevExpress ASP.NET Example</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <dx:ASPxMenu ID="ASPxMenu1" runat="server" DataSourceID="sqlDataSource" KeyField="ID" ParentKeyField="ParentID"
+            TextField="Name" NavigateUrlField="URL">
+        </dx:ASPxMenu>
+        <asp:SqlDataSource ID="sqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:YourConnectionString %>"
+            SelectCommand="SELECT [ID], [ParentID], [Name], [URL] FROM [YourTable]">
+        </asp:SqlDataSource>
+    </form>
+</body>
+</html>

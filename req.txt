@@ -1,25 +1,22 @@
 
-Приношу извинения за путаницу. Давайте поправим это. В ASPxComboBox вы не можете добавить элементы прямо через метод Add, как в стандартном выпадающем списке (ComboBox). Вместо этого, вы должны использовать свойство `Items` и добавлять элементы в него. Вот исправленный код для заполнения ASPxComboBox:
-
-```csharp
-protected void PopulateMultiLevelComboBox()
+public class UserModel
 {
-    // Создаем корневой элемент
-    ListEditItem rootItem = new ListEditItem("Root", "1");
-    multiLevelComboBox.Items.Add(rootItem);
-
-    // Создаем дочерние элементы
-    ListEditItem childItem1 = new ListEditItem("Child 1", "2");
-    ListEditItem childItem2 = new ListEditItem("Child 2", "3");
-    multiLevelComboBox.Items[0].Items.Add(childItem1);
-    multiLevelComboBox.Items[0].Items.Add(childItem2);
-
-    // Создаем вложенные элементы
-    ListEditItem subChildItem1 = new ListEditItem("Sub Child 1", "4");
-    ListEditItem subChildItem2 = new ListEditItem("Sub Child 2", "5");
-    multiLevelComboBox.Items[0].Items[0].Items.Add(subChildItem1);
-    multiLevelComboBox.Items[0].Items[0].Items.Add(subChildItem2);
+    public string Name { get; set; }
+    public int Age { get; set; }
+    // Другие свойства модели
 }
-```
 
-Этот код добавляет корневой элемент и дочерние элементы к нему. Дочерние элементы также добавляются в корневой элемент. Пожалуйста, попробуйте этот код и сообщите, если у вас возникнут дополнительные вопросы.
+public partial class MyPage : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        // Создание экземпляра модели
+        UserModel user = new UserModel();
+        user.Name = "John";
+        user.Age = 30;
+
+        // Использование модели
+        // Например, передача модели в представление
+        // или обработка входящих данных
+    }
+}

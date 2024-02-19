@@ -1,41 +1,30 @@
 
-<%@ Page Language="C#" %>
-<%@ Register Assembly="DevExpress.Web.v21.2, Version=21.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a"
-    Namespace="DevExpress.Web" TagPrefix="dx" %>
+CREATE PROCEDURE GetHierarchicalData
+AS
+BEGIN
+    WITH RecursiveCTE AS (
+        SELECT ID, ParentID, Name, URL
+        FROM YourTable
+        WHERE ParentID IS NULL -- Выбираем корневые элементы
+        UNION ALL
+        SELECT t.ID, t.ParentID, t.Name, t.URL
+        FROM YourTable t
+        INNER JOIN RecursiveCTE r ON t.ParentID = r.ID -- Рекурсивно выбираем дочерние элементы
+    )
+    SELECT ID, ParentID, Name, URL
+    FROM RecursiveCTE
+    ORDER BY ID; -- Можно выбирать и сортировать данные по необходимому полю
+END;
 
-<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head runat="server">
-    <title>DevExpress ASP.NET Example</title>
-</head>
-<body>
-    <form id="form1" runat="server">
-        <dx:ASPxMenu ID="ASPxMenu1" runat="server" DataSourceID="objectDataSource" KeyField="ID" ParentKeyField="ParentID"
-            TextField="Name" NavigateUrlField="URL">
-        </dx:ASPxMenu>
-        <asp:ObjectDataSource ID="objectDataSource" runat="server" TypeName="YourNamespace.YourDataSourceClass"
-            SelectMethod="GetData">
-        </asp:ObjectDataSource>
-    </form>
-</body>
-</html>
+using System.Collections;
+using System.Web.UI;
 
 namespace YourNamespace
 {
-    public class YourDataSourceClass
+    public class YourDataSourceClass : IHierarchicalDataSource
     {
-        public List<YourDataItem> GetData()
-        {
-            // Ваш код для получения данных из БД или другого источника
-        }
-    }
-    
-    public class YourDataItem
-    {
-        public int ID { get; set; }
-        public int ParentID { get; set; }
-        public string Name { get; set; }
-        public string URL { get; set; }
+        // Реализация методов интерфейса IHierarchicalDataSource
+        // ...
     }
 }

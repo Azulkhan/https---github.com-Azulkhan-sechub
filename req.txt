@@ -1,77 +1,25 @@
 
-Для реализации многоуровневого иерархического списка типа dropdownlist на веб-странице с использованием библиотеки DevExpress в версии 11.1.6, вы можете воспользоваться элементом управления `ASPxComboBox`. Вот пример, как это можно сделать на ASP.NET странице с использованием C#:
+Приношу извинения за путаницу. Давайте поправим это. В ASPxComboBox вы не можете добавить элементы прямо через метод Add, как в стандартном выпадающем списке (ComboBox). Вместо этого, вы должны использовать свойство `Items` и добавлять элементы в него. Вот исправленный код для заполнения ASPxComboBox:
 
 ```csharp
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="YourPage.aspx.cs" Inherits="YourNamespace.YourPage" %>
-<%@ Register Assembly="DevExpress.Web.v11.1, Version=11.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a"
-    Namespace="DevExpress.Web.ASPxEditors" TagPrefix="dx" %>
-
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head runat="server">
-    <title></title>
-</head>
-<body>
-    <form id="form1" runat="server">
-        <dx:ASPxComboBox ID="multiLevelComboBox" runat="server" DropDownStyle="DropDown" DropDownWidth="300px"
-            EnableSynchronization="True" IncrementalFilteringMode="Contains" OnSelectedIndexChanged="multiLevelComboBox_SelectedIndexChanged">
-        </dx:ASPxComboBox>
-    </form>
-</body>
-</html>
-```
-
-В коде вашей страницы C# вы можете добавить логику для заполнения и обработки выбора элементов в ASPxComboBox:
-
-```csharp
-using System;
-using DevExpress.Web.ASPxEditors;
-using System.Collections.Generic;
-using System.Web.UI.WebControls;
-
-namespace YourNamespace
+protected void PopulateMultiLevelComboBox()
 {
-    public partial class YourPage : System.Web.UI.Page
-    {
-        protected void Page_Load(object sender, EventArgs e)
-        {
-            if (!IsPostBack)
-            {
-                // Заполнение данными при первой загрузке страницы
-                PopulateMultiLevelComboBox();
-            }
-        }
+    // Создаем корневой элемент
+    ListEditItem rootItem = new ListEditItem("Root", "1");
+    multiLevelComboBox.Items.Add(rootItem);
 
-        protected void PopulateMultiLevelComboBox()
-        {
-            // Здесь вы можете получить данные из вашей базы данных или другого источника
-            // Просто для примера, я добавлю статические данные
-            List<ListItem> items = new List<ListItem>();
-            items.Add(new ListItem("Root", "1"));
-            items.Add(new ListItem("Child 1", "2"));
-            items.Add(new ListItem("Child 2", "3"));
-            items.Add(new ListItem("Sub Child 1", "4"));
-            items.Add(new ListItem("Sub Child 2", "5"));
+    // Создаем дочерние элементы
+    ListEditItem childItem1 = new ListEditItem("Child 1", "2");
+    ListEditItem childItem2 = new ListEditItem("Child 2", "3");
+    multiLevelComboBox.Items[0].Items.Add(childItem1);
+    multiLevelComboBox.Items[0].Items.Add(childItem2);
 
-            // Заполнение ASPxComboBox данными
-            foreach (ListItem item in items)
-            {
-                multiLevelComboBox.Items.Add(item);
-            }
-        }
-
-        protected void multiLevelComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            // Обработка выбора элемента
-            string selectedValue = multiLevelComboBox.SelectedItem.Value;
-            string selectedText = multiLevelComboBox.SelectedItem.Text;
-
-            // Дополнительная логика в зависимости от выбранного элемента
-            // Например, обновление других элементов на странице или перенаправление пользователя
-            // Response.Redirect("YourPage.aspx?selectedValue=" + selectedValue);
-        }
-    }
+    // Создаем вложенные элементы
+    ListEditItem subChildItem1 = new ListEditItem("Sub Child 1", "4");
+    ListEditItem subChildItem2 = new ListEditItem("Sub Child 2", "5");
+    multiLevelComboBox.Items[0].Items[0].Items.Add(subChildItem1);
+    multiLevelComboBox.Items[0].Items[0].Items.Add(subChildItem2);
 }
 ```
 
-Это пример того, как вы можете использовать ASPxComboBox для создания многоуровневого иерархического списка на веб-странице с использованием DevExpress в версии 11.1.6. Вы можете адаптировать этот пример под ваши конкретные потребности и источники данных.
+Этот код добавляет корневой элемент и дочерние элементы к нему. Дочерние элементы также добавляются в корневой элемент. Пожалуйста, попробуйте этот код и сообщите, если у вас возникнут дополнительные вопросы.

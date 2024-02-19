@@ -1,30 +1,108 @@
 
-CREATE PROCEDURE GetHierarchicalData
-AS
-BEGIN
-    WITH RecursiveCTE AS (
-        SELECT ID, ParentID, Name, URL
-        FROM YourTable
-        WHERE ParentID IS NULL -- Выбираем корневые элементы
-        UNION ALL
-        SELECT t.ID, t.ParentID, t.Name, t.URL
-        FROM YourTable t
-        INNER JOIN RecursiveCTE r ON t.ParentID = r.ID -- Рекурсивно выбираем дочерние элементы
-    )
-    SELECT ID, ParentID, Name, URL
-    FROM RecursiveCTE
-    ORDER BY ID; -- Можно выбирать и сортировать данные по необходимому полю
-END;
+Конечно, давайте создадим пример базы данных, таблицы и процедуры для извлечения иерархических данных, а также класс источника данных для использования с компонентом `ASPxMenu`.
 
+1. **Создание таблицы для хранения иерархических данных**:
 
-using System.Collections;
-using System.Web.UI;
+   ```sql
+   CREATE TABLE MenuItem (
+       ID INT PRIMARY KEY,
+       ParentID INT,
+       Name NVARCHAR(100),
+       URL NVARCHAR(200)
+   );
 
-namespace YourNamespace
-{
-    public class YourDataSourceClass : IHierarchicalDataSource
-    {
-        // Реализация методов интерфейса IHierarchicalDataSource
-        // ...
-    }
-}
+   -- Добавление данных примера
+   INSERT INTO MenuItem (ID, ParentID, Name, URL) VALUES (1, NULL, 'Главная', '/');
+   INSERT INTO MenuItem (ID, ParentID, Name, URL) VALUES (2, NULL, 'О нас', '/about');
+   INSERT INTO MenuItem (ID, ParentID, Name, URL) VALUES (3, 1, 'Услуги', '/services');
+   INSERT INTO MenuItem (ID, ParentID, Name, URL) VALUES (4, 1, 'Контакты', '/contacts');
+   INSERT INTO MenuItem (ID, ParentID, Name, URL) VALUES (5, 2, 'История', '/about/history');
+   INSERT INTO MenuItem (ID, ParentID, Name, URL) VALUES (6, 2, 'Команда', '/about/team');
+   ```
+
+2. **Создание хранимой процедуры для извлечения иерархических данных**:
+
+   ```sql
+   CREATE PROCEDURE GetMenuItems
+   AS
+   BEGIN
+       WITH RecursiveCTE AS (
+           SELECT ID, ParentID, Name, URL
+           FROM MenuItem
+           WHERE ParentID IS NULL -- Выбираем корневые элементы
+           UNION ALL
+           SELECT t.ID, t.ParentID, t.Name, t.URL
+           FROM MenuItem t
+           INNER JOIN RecursiveCTE r ON t.ParentID = r.ID -- Рекурсивно выбираем дочерние элементы
+       )
+       SELECT ID, ParentID, Name, URL
+       FROM RecursiveCTE
+       ORDER BY ID; -- Можно выбирать и сортировать данные по необходимому полю
+   END;
+   ```
+
+3. **Создание класса источника данных для использования с `ObjectDataSource`**:
+
+   ```csharp
+   using System;
+   using System.Collections;
+   using System.Web.UI;
+   
+   namespace YourNamespace
+   {
+       public class MenuItemDataSource : IHierarchicalDataSource
+       {
+           // Реализация метода GetHierarchicalView
+           public HierarchicalDataSourceView GetHierarchicalView(string viewPath)
+           {
+               // Получение данных из базы данных
+               // Здесь вы можете использовать ваш механизм доступа к данным, например, Entity Framework или ADO.NET
+               // В нашем примере мы просто воспользуемся SqlConnection и SqlCommand
+               string connectionString = "YourConnectionString";
+               using (var connection = new SqlConnection(connectionString))
+               {
+                   connection.Open();
+                   SqlCommand command = new SqlCommand("GetMenuItems", connection);
+                   command.CommandType = CommandType.StoredProcedure;
+                   SqlDataReader reader = command.ExecuteReader();
+
+                   // Создаем объект HierarchicalDataSourceView и заполняем его данными
+                   HierarchicalDataSourceView view = new HierarchicalDataSourceView();
+                   while (reader.Read())
+                   {
+                       int id = (int)reader["ID"];
+                       int parentId = reader["ParentID"] == DBNull.Value ? -1 : (int)reader["ParentID"];
+                       string name = (string)reader["Name"];
+                       string url = (string)reader["URL"];
+
+                       MenuItem item = new MenuItem(id, parentId, name, url);
+                       view.Add(item);
+                   }
+                   return view;
+               }
+           }
+
+           // Реализация остальных методов интерфейса IHierarchicalDataSource
+           // ...
+
+           // Пример внутреннего класса для представления элемента меню
+           private class MenuItem
+           {
+               public int ID { get; private set; }
+               public int ParentID { get; private set; }
+               public string Name { get; private set; }
+               public string URL { get; private set; }
+
+               public MenuItem(int id, int parentId, string name, string url)
+               {
+                   ID = id;
+                   ParentID = parentId;
+                   Name = name;
+                   URL = url;
+               }
+           }
+       }
+   }
+   ```
+
+Это пример реализации всех пунктов: создание таблицы с данными, хранимой процедуры для извлечения иерархических данных из базы данных, а также класса источника данных для использования с компонентом `ASPxMenu`. Помните, что вы должны адаптировать этот пример под свои конкретные требования и структуру данных.

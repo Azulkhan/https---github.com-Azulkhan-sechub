@@ -1,75 +1,77 @@
 
-Хорошо, вот примерный подход к созданию многоуровневого иерархического списка типа dropdownlist с использованием пользовательского контроля и библиотеки DevExpress:
-
-1. Создайте пользовательский контрол, например, наследуясь от класса `DropDownButton`.
+Для реализации многоуровневого иерархического списка типа dropdownlist на веб-странице с использованием библиотеки DevExpress в версии 11.1.6, вы можете воспользоваться элементом управления `ASPxComboBox`. Вот пример, как это можно сделать на ASP.NET странице с использованием C#:
 
 ```csharp
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="YourPage.aspx.cs" Inherits="YourNamespace.YourPage" %>
+<%@ Register Assembly="DevExpress.Web.v11.1, Version=11.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a"
+    Namespace="DevExpress.Web.ASPxEditors" TagPrefix="dx" %>
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <dx:ASPxComboBox ID="multiLevelComboBox" runat="server" DropDownStyle="DropDown" DropDownWidth="300px"
+            EnableSynchronization="True" IncrementalFilteringMode="Contains" OnSelectedIndexChanged="multiLevelComboBox_SelectedIndexChanged">
+        </dx:ASPxComboBox>
+    </form>
+</body>
+</html>
+```
+
+В коде вашей страницы C# вы можете добавить логику для заполнения и обработки выбора элементов в ASPxComboBox:
+
+```csharp
+using System;
+using DevExpress.Web.ASPxEditors;
 using System.Collections.Generic;
-using System.Windows.Forms;
-using DevExpress.XtraEditors;
+using System.Web.UI.WebControls;
 
-public class MultiLevelDropDown : DropDownButton
+namespace YourNamespace
 {
-    private TreeView treeView;
-
-    public MultiLevelDropDown()
+    public partial class YourPage : System.Web.UI.Page
     {
-        InitializeTreeView();
-    }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                // Заполнение данными при первой загрузке страницы
+                PopulateMultiLevelComboBox();
+            }
+        }
 
-    private void InitializeTreeView()
-    {
-        treeView = new TreeView();
-        treeView.Dock = DockStyle.Fill;
-        treeView.AfterSelect += TreeView_AfterSelect;
-        PopupControl.Controls.Add(treeView);
-    }
+        protected void PopulateMultiLevelComboBox()
+        {
+            // Здесь вы можете получить данные из вашей базы данных или другого источника
+            // Просто для примера, я добавлю статические данные
+            List<ListItem> items = new List<ListItem>();
+            items.Add(new ListItem("Root", "1"));
+            items.Add(new ListItem("Child 1", "2"));
+            items.Add(new ListItem("Child 2", "3"));
+            items.Add(new ListItem("Sub Child 1", "4"));
+            items.Add(new ListItem("Sub Child 2", "5"));
 
-    public void SetDataSource(List<TreeNode> nodes)
-    {
-        treeView.Nodes.Clear();
-        treeView.Nodes.AddRange(nodes.ToArray());
-    }
+            // Заполнение ASPxComboBox данными
+            foreach (ListItem item in items)
+            {
+                multiLevelComboBox.Items.Add(item);
+            }
+        }
 
-    private void TreeView_AfterSelect(object sender, TreeViewEventArgs e)
-    {
-        // Handle selection logic here
-        MessageBox.Show($"Selected Node: {e.Node.Text}");
+        protected void multiLevelComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Обработка выбора элемента
+            string selectedValue = multiLevelComboBox.SelectedItem.Value;
+            string selectedText = multiLevelComboBox.SelectedItem.Text;
+
+            // Дополнительная логика в зависимости от выбранного элемента
+            // Например, обновление других элементов на странице или перенаправление пользователя
+            // Response.Redirect("YourPage.aspx?selectedValue=" + selectedValue);
+        }
     }
 }
 ```
 
-2. Используйте этот контрол в вашей форме и установите данные для отображения:
-
-```csharp
-// Пример использования контрола в форме
-var multiLevelDropDown = new MultiLevelDropDown();
-multiLevelDropDown.SetDataSource(GetTreeNodes()); // Предполагается, что у вас есть метод для получения узлов дерева
-Controls.Add(multiLevelDropDown);
-```
-
-3. Метод `GetTreeNodes()` может выглядеть примерно так, создавая узлы дерева с разными уровнями:
-
-```csharp
-private List<TreeNode> GetTreeNodes()
-{
-    var nodes = new List<TreeNode>();
-
-    var rootNode = new TreeNode("Root");
-    var childNode1 = new TreeNode("Child 1");
-    var childNode2 = new TreeNode("Child 2");
-    var subChildNode1 = new TreeNode("Sub Child 1");
-    var subChildNode2 = new TreeNode("Sub Child 2");
-
-    rootNode.Nodes.Add(childNode1);
-    rootNode.Nodes.Add(childNode2);
-    childNode1.Nodes.Add(subChildNode1);
-    childNode1.Nodes.Add(subChildNode2);
-
-    nodes.Add(rootNode);
-
-    return nodes;
-}
-```
-
-Это простой пример того, как можно создать многоуровневый иерархический список с помощью пользовательского контроля и библиотеки DevExpress. Вы можете доработать этот пример в соответствии с вашими конкретными требованиями и стилем приложения.
+Это пример того, как вы можете использовать ASPxComboBox для создания многоуровневого иерархического списка на веб-странице с использованием DevExpress в версии 11.1.6. Вы можете адаптировать этот пример под ваши конкретные потребности и источники данных.

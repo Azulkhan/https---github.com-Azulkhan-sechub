@@ -1,22 +1,16 @@
 
-public class UserModel
-{
-    public string Name { get; set; }
-    public int Age { get; set; }
-    // Другие свойства модели
-}
-
-public partial class MyPage : System.Web.UI.Page
-{
-    protected void Page_Load(object sender, EventArgs e)
-    {
-        // Создание экземпляра модели
-        UserModel user = new UserModel();
-        user.Name = "John";
-        user.Age = 30;
-
-        // Использование модели
-        // Например, передача модели в представление
-        // или обработка входящих данных
-    }
-}
+$scope.signDocument = function(document) {
+    // Здесь должен быть код для подписания документа с использованием ЭЦП
+    // Например, вызов API для подписания документа
+    
+    // После успешного подписания, выполнить какие-то действия, например, отправить подписанный документ на сервер
+    $http.post('/api/signDocument', { signedDocument: signedDocument })
+        .then(function(response) {
+            // Обработка успешного ответа от сервера
+            console.log("Документ успешно подписан и отправлен на сервер.");
+        })
+        .catch(function(error) {
+            // Обработка ошибки
+            console.error("Ошибка при отправке подписанного документа на сервер:", error);
+        });
+};

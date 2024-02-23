@@ -1,45 +1,56 @@
 
-Конечно, вот пример частичной версии подписания ЭЦП в AngularJS:
+Понял, вам нужно подписать данные из PDF-файла с помощью ЭЦП в AngularJS. Вот общий подход:
 
-HTML:
-```html
-<!DOCTYPE html>
-<html ng-app="myApp">
-<head>
-    <title>ЭЦП в AngularJS</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
-    <script src="script.js"></script>
-</head>
-<body ng-controller="MyCtrl">
-    <div>
-        <button ng-click="signDocument()">Подписать документ</button>
-        <p ng-show="signedDocument">Документ успешно подписан.</p>
-    </div>
-</body>
-</html>
-```
+1. **Загрузка PDF**: Создайте функционал для загрузки PDF-файла с сервера. Можете использовать `$http` сервис AngularJS для выполнения запроса к серверу.
 
-JavaScript (script.js):
+2. **Подпись данных**: После загрузки PDF-файла, вы должны получить данные из этого файла и подписать их с помощью ЭЦП. Это может потребовать использования специализированных библиотек для работы с PDF и криптографией.
+
+3. **Отправка подписанных данных на сервер**: После успешной подписи отправьте подписанные данные на сервер.
+
+4. **Сохранение подписанного PDF**: На сервере можно обработать подписанные данные и создать новый PDF-файл, который уже будет содержать вашу ЭЦП.
+
+Примерный код для AngularJS:
+
 ```javascript
+// Контроллер AngularJS
 angular.module('myApp', [])
-.controller('MyCtrl', function($scope) {
-    $scope.signedDocument = false;
+.controller('MyCtrl', function($scope, $http) {
+    $scope.uploadedFile = null;
+
+    $scope.uploadFile = function(files) {
+        var fd = new FormData();
+        // Формируем FormData с выбранным файлом
+        fd.append("file", files[0]);
+
+        $http.post('/upload', fd, {
+            transformRequest: angular.identity,
+            headers: {'Content-Type': undefined}
+        })
+        .then(function(response) {
+            // Обработка успешной загрузки файла
+            $scope.uploadedFile = response.data;
+        }, function(error) {
+            // Обработка ошибки загрузки файла
+            console.error('Ошибка загрузки файла:', error);
+        });
+    };
 
     $scope.signDocument = function() {
-        // Ваш код для подписи документа с помощью ЭЦП
-        // Пример:
-        // var signedData = signData(documentData, privateKey);
-        
-        // Предположим, что signedData содержит подписанные данные
-        var signedData = "signedData";
+        // Подпись данных
+        // Не забудьте реализовать логику подписи с использованием ЭЦП
+        var signedData = signData($scope.uploadedFile);
 
-        if (signedData) {
-            $scope.signedDocument = true;
-        } else {
-            alert('Не удалось подписать документ.');
-        }
+        // Отправка подписанных данных на сервер
+        $http.post('/sign', { signedData: signedData })
+        .then(function(response) {
+            // Обработка успешной отправки подписанных данных
+            console.log('Подписанные данные успешно отправлены на сервер:', response.data);
+        }, function(error) {
+            // Обработка ошибки отправки подписанных данных
+            console.error('Ошибка отправки подписанных данных:', error);
+        });
     };
 });
 ```
 
-Этот пример демонстрирует кнопку для подписания документа. Когда пользователь нажимает кнопку, вызывается функция `signDocument()`, которая должна содержать вашу логику подписи документа с использованием ЭЦП. После успешной подписи переменная `signedDocument` устанавливается в true, и появляется сообщение об успешной подписи.
+Этот код предполагает, что у вас есть серверный эндпоинт для загрузки файла (`/upload`) и для подписи данных (`/sign`). Не забудьте реализовать соответствующий серверный код для обработки запросов.

@@ -1,1 +1,82 @@
 
+Хорошо, вот пример полной реализации функции подписания ЭЦП с использованием AngularJS, Express.js и MongoDB:
+
+### AngularJS (клиентская сторона):
+```html
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+  <title>ЭЦП</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/1.0.2/forge.min.js"></script>
+</head>
+<body>
+  <div ng-controller="MyController">
+    <input type="text" ng-model="message">
+    <button ng-click="signMessage()">Подписать сообщение</button>
+    <p>Подпись: {{ signature }}</p>
+  </div>
+
+  <script>
+    angular.module('myApp', [])
+      .controller('MyController', function($scope, $http) {
+        $scope.message = '';
+        $scope.signature = '';
+
+        // Функция подписания сообщения
+        $scope.signMessage = function() {
+          $http.post('/sign', { message: $scope.message })
+            .then(function(response) {
+              $scope.signature = response.data.signature;
+            })
+            .catch(function(error) {
+              console.error('Ошибка:', error);
+            });
+        };
+      });
+  </script>
+</body>
+</html>
+```
+
+### Express.js (серверная сторона):
+```javascript
+const express = require('express');
+const bodyParser = require('body-parser');
+const forge = require('node-forge');
+
+const app = express();
+const port = 3000;
+
+app.use(bodyParser.json());
+
+// Подписание сообщения
+app.post('/sign', (req, res) => {
+  const message = req.body.message;
+
+  // Генерация нового ключа для подписи (можно использовать существующий ключ)
+  const privateKey = forge.pki.rsa.generateKeyPair({ bits: 2048 }).privateKey;
+
+  // Преобразование сообщения в бинарный формат
+  const md = forge.md.sha256.create();
+  md.update(message, 'utf8');
+  const digest = md.digest();
+
+  // Подписание сообщения
+  const signature = privateKey.sign(md);
+
+  // Преобразование подписи в строку Base64
+  const signatureBase64 = forge.util.encode64(signature);
+
+  res.json({ signature: signatureBase64 });
+});
+
+app.listen(port, () => {
+  console.log(`Сервер запущен на порту ${port}`);
+});
+```
+
+### MongoDB (хранение подписанных сообщений):
+Вам нужно создать коллекцию в MongoDB для хранения подписанных сообщений. В примере выше не включена интеграция с базой данных, поскольку она зависит от ваших конкретных потребностей. Вы можете использовать любую библиотеку для работы с MongoDB, такую как Mongoose, для сохранения и извлечения данных из базы данных.
+
+Примечание: Убедитесь, что перед запуском кода серверной стороны у вас установлены зависимости, указанные в файле `package.json`, с помощью команды `npm install`.

@@ -1,16 +1,45 @@
 
-$scope.signDocument = function(document) {
-    // Здесь должен быть код для подписания документа с использованием ЭЦП
-    // Например, вызов API для подписания документа
-    
-    // После успешного подписания, выполнить какие-то действия, например, отправить подписанный документ на сервер
-    $http.post('/api/signDocument', { signedDocument: signedDocument })
-        .then(function(response) {
-            // Обработка успешного ответа от сервера
-            console.log("Документ успешно подписан и отправлен на сервер.");
-        })
-        .catch(function(error) {
-            // Обработка ошибки
-            console.error("Ошибка при отправке подписанного документа на сервер:", error);
-        });
-};
+Конечно, вот пример частичной версии подписания ЭЦП в AngularJS:
+
+HTML:
+```html
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+    <title>ЭЦП в AngularJS</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="script.js"></script>
+</head>
+<body ng-controller="MyCtrl">
+    <div>
+        <button ng-click="signDocument()">Подписать документ</button>
+        <p ng-show="signedDocument">Документ успешно подписан.</p>
+    </div>
+</body>
+</html>
+```
+
+JavaScript (script.js):
+```javascript
+angular.module('myApp', [])
+.controller('MyCtrl', function($scope) {
+    $scope.signedDocument = false;
+
+    $scope.signDocument = function() {
+        // Ваш код для подписи документа с помощью ЭЦП
+        // Пример:
+        // var signedData = signData(documentData, privateKey);
+        
+        // Предположим, что signedData содержит подписанные данные
+        var signedData = "signedData";
+
+        if (signedData) {
+            $scope.signedDocument = true;
+        } else {
+            alert('Не удалось подписать документ.');
+        }
+    };
+});
+```
+
+Этот пример демонстрирует кнопку для подписания документа. Когда пользователь нажимает кнопку, вызывается функция `signDocument()`, которая должна содержать вашу логику подписи документа с использованием ЭЦП. После успешной подписи переменная `signedDocument` устанавливается в true, и появляется сообщение об успешной подписи.

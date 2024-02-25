@@ -1,24 +1,21 @@
-
 protected void Page_Load(object sender, EventArgs e)
 {
     if (!IsPostBack)
     {
-        // Предполагается, что у вас есть метод GetMenuData(), который возвращает данные для меню
-        var menuData = GetMenuData();
-        InitializeMenu(menuData);
+        // Получаем DataSet из вашего класса, который взаимодействует с базой данных
+        DataSet ds = YourClassWithMethods.CSA_BLOCK_PARENT_FULL();
+
+        // Используем DataSet для инициализации меню
+        InitializeMenu(ds);
     }
 }
 
-private void InitializeMenu(IEnumerable<MenuDataItem> menuData)
+private void InitializeMenu(DataSet ds)
 {
-    foreach (var item in menuData)
+    foreach (DataRow row in ds.Tables[0].Rows)
     {
         DevExpress.Web.MenuItem menuItem = new DevExpress.Web.MenuItem();
-        menuItem.Text = item.Name; // item.Name должен быть заменен на имя поля из ваших данных
+        menuItem.Text = row["YourColumnName"].ToString(); // Используйте имя колонки из вашего DataSet
         ASPxMenu1.Items.Add(menuItem);
     }
 }
-
-<dx:ASPxMenu ID="ASPxMenu1" runat="server">
-    <!-- Элементы будут добавлены динамически -->
-</dx:ASPxMenu>

@@ -1,23 +1,42 @@
+<dx:ASPxDropDownEdit ID="dropDownEdit" runat="server" Width="200px">
+    <DropDownWindowTemplate>
+        <dx:ASPxTreeView ID="treeView" runat="server" ShowCheckBoxes="True" AllowSelectNode="True">
+            <%-- Код для заполнения древовидного списка --%>
+        </dx:ASPxTreeView>
+    </DropDownWindowTemplate>
+</dx:ASPxDropDownEdit>
+
+
 protected void Page_Load(object sender, EventArgs e)
 {
     if (!IsPostBack)
     {
-        InitializeComboBox();
+        InitializeTreeView();
     }
 }
 
-private void InitializeComboBox()
+private void InitializeTreeView()
 {
+    ASPxTreeView treeView = dropDownEdit.FindControl("treeView") as ASPxTreeView;
     DataSet ds = GetMenuDataSet(); // Получаем DataSet
-    DataTable dt = ds.Tables[0]; // Предполагаем, что данные находятся в первой таблице
+    DataTable dt = ds.Tables[0];
 
-    // Настраиваем ASPxComboBox
-    ASPxComboBox1.ValueType = typeof(int); // Устанавливаем тип значения
-    ASPxComboBox1.TextField = "NAME"; // Имя поля, которое будет отображаться
-    ASPxComboBox1.ValueField = "ID"; // Имя поля со значением, которое будет использоваться
+    // Используем рекурсивный метод для заполнения древовидного списка
+    PopulateTreeViewNodes(treeView.Nodes, dt, 0);
+}
 
-    ASPxComboBox1.DataSource = dt; // Устанавливаем источник данных
-    ASPxComboBox1.DataBind(); // Привязываем данные
+private void PopulateTreeViewNodes(TreeViewNodeCollection nodesCollection, DataTable dataTable, int parentID)
+{
+    foreach (DataRow dataRow in dataTable.Select($"BLOK_ID = {parentID}"))
+    {
+        TreeViewNode node = new TreeViewNode();
+        node.Name = dataRow["ID"].ToString();
+        node.Text = dataRow["NAME"].ToString();
+        nodesCollection.Add(node);
+
+        // Рекурсивно заполняем дочерние узлы
+        PopulateTreeViewNodes(node.Nodes, dataTable, Convert.ToInt32(dataRow["ID"]));
+    }
 }
 
 private DataSet GetMenuDataSet()

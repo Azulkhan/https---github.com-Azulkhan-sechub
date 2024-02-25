@@ -50,3 +50,6 @@ private DataSet GetMenuDataSet()
 {
     // Ваш код для получения DataSet из базы данных
 }
+
+if (row["Block_ID"] == DBNull.Value ? parentId == null : row["Block_ID"].Equals(parentId))
+        {

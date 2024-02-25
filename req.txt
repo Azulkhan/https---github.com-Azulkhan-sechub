@@ -3,25 +3,33 @@ protected void Page_Load(object sender, EventArgs e)
     if (!IsPostBack)
     {
         DataSet ds = YourDataAccessClass.GetMenuData();
-        PopulateMenuItems(ASPxMenu1.Items, ds.Tables[0], null);
+        PopulateMenuItems(ds.Tables[0], null, 0);
     }
 }
 
-private void PopulateMenuItems(MenuItemCollection itemsCollection, DataTable menuTable, object parentId)
+private void PopulateMenuItems(DataTable dataTable, DevExpress.Web.ASPxMenu.MenuItem parentItem, int parentId)
 {
-    foreach (DataRow row in menuTable.Rows)
+    foreach (DataRow row in dataTable.Rows)
     {
-        if (row["Block_ID"] == DBNull.Value ? parentId == null : row["Block_ID"].Equals(parentId))
+        if (Convert.ToInt32(row["BLOK_ID"]) == parentId)
         {
-            MenuItem menuItem = new MenuItem();
-            menuItem.Text = row["Name"].ToString();
-            menuItem.NavigateUrl = row["NavigateUrl"].ToString(); // Если у вас есть URL
-            menuItem.Value = row["ID"].ToString(); // Используйте ID как значение элемента меню
+            DevExpress.Web.ASPxMenu.MenuItem newItem = new DevExpress.Web.ASPxMenu.MenuItem();
+            newItem.Text = row["Name"].ToString();
+            newItem.NavigateUrl = row["Url"].ToString(); // Используйте подходящий столбец для URL, если есть
+            // Если свойства Value нет, можно использовать Name или другой атрибут для хранения ID
+            newItem.Name = row["ID"].ToString();
 
-            itemsCollection.Add(menuItem);
+            if (parentItem == null)
+            {
+                ASPxMenu1.Items.Add(newItem);
+            }
+            else
+            {
+                parentItem.Items.Add(newItem);
+            }
 
-            // Рекурсивно добавляем подменю для текущего пункта меню
-            PopulateMenuItems(menuItem.Items, menuTable, row["ID"]);
+            // Рекурсивно добавляем подменю
+            PopulateMenuItems(dataTable, newItem, Convert.ToInt32(newItem.Name));
         }
     }
 }

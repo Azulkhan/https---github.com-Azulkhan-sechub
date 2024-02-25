@@ -1,6 +1,7 @@
-<dx:ASPxMenu ID="ASPxMenu1" runat="server" Orientation="Horizontal" 
-    onitemclick="ASPxMenu1_ItemClick">
+<dx:ASPxMenu ID="ASPxMenu1" runat="server" ItemLinkMode="ItemClick" AutoPostBack="false" 
+    ClientInstanceName="menu" onitemclick="ASPxMenu1_ItemClick">
 </dx:ASPxMenu>
+
 
 protected void Page_Load(object sender, EventArgs e)
 {
@@ -14,17 +15,16 @@ private void InitializeMenu()
 {
     DataSet ds = GetMenuDataSet();
     DataTable dt = ds.Tables[0];
-    
+
     foreach (DataRow row in dt.Rows)
     {
-        // Предполагаем, что у вас есть столбцы ID, Name и ParentID в dt
         if (row.IsNull("ParentID") || Convert.ToInt32(row["ParentID"]) == 0)
         {
-            DevExpress.Web.MenuItem rootItem = new DevExpress.Web.MenuItem();
-            rootItem.Text = row["Name"].ToString();
-            rootItem.Name = row["ID"].ToString(); // Используйте это для идентификации в обработчике кликов
-            ASPxMenu1.Items.Add(rootItem);
-            AddChildItems(rootItem, dt);
+            DevExpress.Web.MenuItem menuItem = new DevExpress.Web.MenuItem();
+            menuItem.Text = row["Name"].ToString();
+            menuItem.Name = row["ID"].ToString(); // Уникальный идентификатор
+            ASPxMenu1.Items.Add(menuItem);
+            AddChildItems(menuItem, dt);
         }
     }
 }
@@ -39,16 +39,15 @@ private void AddChildItems(DevExpress.Web.MenuItem parentItem, DataTable dt)
             childItem.Text = row["Name"].ToString();
             childItem.Name = row["ID"].ToString();
             parentItem.Items.Add(childItem);
-            // Рекурсивно добавляем дочерние элементы
-            AddChildItems(childItem, dt);
+            AddChildItems(childItem, dt); // Рекурсивно добавляем подменю
         }
     }
 }
 
-
 protected void ASPxMenu1_ItemClick(object source, DevExpress.Web.MenuItemEventArgs e)
 {
-    // Здесь вы можете использовать e.Item.Name или e.Item.Text в зависимости от того, что вам нужно
+    // Обработка выбора элемента меню
+    // Вы можете здесь использовать e.Item.Name для дальнейших действий
     string selectedValue = e.Item.Name;
-    // Используйте selectedValue для других действий
+    // Тут ваш код для использования selectedValue
 }

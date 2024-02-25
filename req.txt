@@ -2,26 +2,51 @@ protected void Page_Load(object sender, EventArgs e)
 {
     if (!IsPostBack)
     {
-        DataSet ds = YourDataAccessClass.GetMenuData();
-        PopulateMenuItems(ASPxMenu1.Items, ds.Tables[0], null);
+        InitializeMenu();
     }
 }
 
-private void PopulateMenuItems(MenuItemCollection itemsCollection, DataTable menuTable, object parentId)
+private void InitializeMenu()
 {
+    // Предположим, что функция GetMenuData() возвращает таблицу с данными меню
+    DataTable menuTable = GetMenuData();
+    
     foreach (DataRow row in menuTable.Rows)
     {
-        if (row["Block_ID"] == DBNull.Value ? parentId == null : row["Block_ID"].Equals(parentId))
+        // Проверяем, является ли пункт меню корневым (например, BLOK_ID == 0)
+        if (Convert.ToInt32(row["BLOK_ID"]) == 0)
         {
-            MenuItem menuItem = new MenuItem();
-            menuItem.Text = row["Name"].ToString();
-            menuItem.NavigateUrl = row["NavigateUrl"].ToString(); // Если у вас есть URL
-            menuItem.Value = row["ID"].ToString(); // Используйте ID как значение элемента меню
+            DevExpress.Web.MenuItem menuItem = new DevExpress.Web.MenuItem();
+            menuItem.Text = row["NAME"].ToString();
+            menuItem.Name = row["ID"].ToString(); // Используем ID как идентификатор для дальнейшего использования
 
-            itemsCollection.Add(menuItem);
+            // Добавляем дочерние пункты меню
+            AddChildItems(menuItem, menuTable);
 
-            // Рекурсивно добавляем подменю для текущего пункта меню
-            PopulateMenuItems(menuItem.Items, menuTable, row["ID"]);
+            ASPxMenu1.Items.Add(menuItem);
         }
     }
+}
+
+private void AddChildItems(DevExpress.Web.MenuItem menuItem, DataTable menuTable)
+{
+    foreach (DataRow childRow in menuTable.Rows)
+    {
+        if (Convert.ToInt32(childRow["BLOK_ID"]) == Convert.ToInt32(menuItem.Name))
+        {
+            DevExpress.Web.MenuItem childItem = new DevExpress.Web.MenuItem();
+            childItem.Text = childRow["NAME"].ToString();
+            childItem.Name = childRow["ID"].ToString(); // Используем ID как идентификатор
+
+            menuItem.Items.Add(childItem);
+
+            // Рекурсивно добавляем вложенные дочерние элементы
+            AddChildItems(childItem, menuTable);
+        }
+    }
+}
+
+private DataTable GetMenuData()
+{
+    // Ваш код для получения данных из базы данных
 }

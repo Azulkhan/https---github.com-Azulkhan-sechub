@@ -1,17 +1,26 @@
-foreach (DataRow row in menuTable.Rows)
+protected void Page_Load(object sender, EventArgs e)
 {
-    // Проверяем на DBNull перед конвертацией
-    int? blockId = row["BLOK_ID"] != DBNull.Value ? Convert.ToInt32(row["BLOK_ID"]) : (int?)null;
-
-    // Теперь, если blockId не null, мы можем использовать это значение для проверки
-    if (blockId == 0) // Или любое другое условие, которое вы используете для определения родительского пункта
+    if (!IsPostBack)
     {
-        MenuItem menuItem = new MenuItem();
-        // ... ваш код для инициализации menuItem ...
+        InitializeComboBox();
     }
 }
 
-
-foreach (DataRow row in menuTable.Rows)
+private void InitializeComboBox()
 {
-    int? blockId = row["BLOK_ID"] != DBNull.Value ? Convert.ToInt32(row["BLOK_ID
+    DataSet ds = GetMenuDataSet(); // Получаем DataSet
+    DataTable dt = ds.Tables[0]; // Предполагаем, что данные находятся в первой таблице
+
+    // Настраиваем ASPxComboBox
+    ASPxComboBox1.ValueType = typeof(int); // Устанавливаем тип значения
+    ASPxComboBox1.TextField = "NAME"; // Имя поля, которое будет отображаться
+    ASPxComboBox1.ValueField = "ID"; // Имя поля со значением, которое будет использоваться
+
+    ASPxComboBox1.DataSource = dt; // Устанавливаем источник данных
+    ASPxComboBox1.DataBind(); // Привязываем данные
+}
+
+private DataSet GetMenuDataSet()
+{
+    // Ваш код для получения DataSet из базы данных
+}

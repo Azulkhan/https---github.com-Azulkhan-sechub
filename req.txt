@@ -1,12 +1,2 @@
-foreach (DataRow row in menuTable.Rows)
-{
-    // Проверяем на DBNull перед конвертацией
-    int? blockId = row["BLOK_ID"] != DBNull.Value ? Convert.ToInt32(row["BLOK_ID"]) : (int?)null;
-
-    // Теперь, если blockId не null, мы можем использовать это значение для проверки
-    if (blockId == 0) // Или любое другое условие, которое вы используете для определения родительского пункта
+if (row["BLOK_ID"] != DBNull.Value && Convert.ToInt32(row["BLOK_ID"]) == parentId)
     {
-        MenuItem menuItem = new MenuItem();
-        // ... ваш код для инициализации menuItem ...
-    }
-}

@@ -1,52 +1,12 @@
-protected void Page_Load(object sender, EventArgs e)
+foreach (DataRow row in menuTable.Rows)
 {
-    if (!IsPostBack)
+    // Проверяем на DBNull перед конвертацией
+    int? blockId = row["BLOK_ID"] != DBNull.Value ? Convert.ToInt32(row["BLOK_ID"]) : (int?)null;
+
+    // Теперь, если blockId не null, мы можем использовать это значение для проверки
+    if (blockId == 0) // Или любое другое условие, которое вы используете для определения родительского пункта
     {
-        InitializeMenu();
+        MenuItem menuItem = new MenuItem();
+        // ... ваш код для инициализации menuItem ...
     }
-}
-
-private void InitializeMenu()
-{
-    // Предположим, что функция GetMenuDataSet() возвращает DataSet с данными меню
-    DataSet menuDataSet = GetMenuDataSet();
-    DataTable menuTable = menuDataSet.Tables[0];
-    
-    foreach (DataRow row in menuTable.Rows)
-    {
-        if (Convert.ToInt32(row["BLOK_ID"]) == 0) // или другое условие для определения родительского пункта
-        {
-            DevExpress.Web.MenuItem menuItem = new DevExpress.Web.MenuItem();
-            menuItem.Text = row["NAME"].ToString();
-            menuItem.Name = row["ID"].ToString(); // Здесь предполагается, что 'ID' - это имя столбца в вашей таблице
-
-            // Добавляем дочерние элементы
-            AddChildItems(menuItem, menuTable);
-
-            ASPxMenu1.Items.Add(menuItem);
-        }
-    }
-}
-
-private void AddChildItems(DevExpress.Web.MenuItem parentItem, DataTable menuTable)
-{
-    foreach (DataRow row in menuTable.Rows)
-    {
-        if (row["BLOK_ID"] != DBNull.Value && Convert.ToInt32(row["BLOK_ID"]) == Convert.ToInt32(parentItem.Name))
-        {
-            DevExpress.Web.MenuItem childItem = new DevExpress.Web.MenuItem();
-            childItem.Text = row["NAME"].ToString();
-            childItem.Name = row["ID"].ToString();
-
-            parentItem.Items.Add(childItem);
-
-            // Рекурсивно добавляем вложенные элементы
-            AddChildItems(childItem, menuTable);
-        }
-    }
-}
-
-private DataSet GetMenuDataSet()
-{
-    // Ваш код для получения DataSet из базы данных
 }

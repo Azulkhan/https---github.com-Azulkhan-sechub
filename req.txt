@@ -2,20 +2,26 @@ protected void Page_Load(object sender, EventArgs e)
 {
     if (!IsPostBack)
     {
-        // Получаем DataSet из вашего класса, который взаимодействует с базой данных
-        DataSet ds = YourClassWithMethods.CSA_BLOCK_PARENT_FULL();
-
-        // Используем DataSet для инициализации меню
-        InitializeMenu(ds);
+        DataSet ds = YourDataAccessClass.GetMenuData();
+        PopulateMenuItems(ASPxMenu1.Items, ds.Tables[0], null);
     }
 }
 
-private void InitializeMenu(DataSet ds)
+private void PopulateMenuItems(MenuItemCollection itemsCollection, DataTable menuTable, object parentId)
 {
-    foreach (DataRow row in ds.Tables[0].Rows)
+    foreach (DataRow row in menuTable.Rows)
     {
-        DevExpress.Web.MenuItem menuItem = new DevExpress.Web.MenuItem();
-        menuItem.Text = row["YourColumnName"].ToString(); // Используйте имя колонки из вашего DataSet
-        ASPxMenu1.Items.Add(menuItem);
+        if (row["Block_ID"] == DBNull.Value ? parentId == null : row["Block_ID"].Equals(parentId))
+        {
+            MenuItem menuItem = new MenuItem();
+            menuItem.Text = row["Name"].ToString();
+            menuItem.NavigateUrl = row["NavigateUrl"].ToString(); // Если у вас есть URL
+            menuItem.Value = row["ID"].ToString(); // Используйте ID как значение элемента меню
+
+            itemsCollection.Add(menuItem);
+
+            // Рекурсивно добавляем подменю для текущего пункта меню
+            PopulateMenuItems(menuItem.Items, menuTable, row["ID"]);
+        }
     }
 }

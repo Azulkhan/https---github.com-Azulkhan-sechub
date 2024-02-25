@@ -1,6 +1,35 @@
-Debug.WriteLine("Количество строк: " + menuTable.Rows.Count);
-foreach (DataRow row in menuTable.Rows)
+protected void Page_Load(object sender, EventArgs e)
 {
-    Debug.WriteLine("BLOK_ID: " + row["BLOK_ID"].ToString());
-    // Используйте подходящий метод для вывода данных в вашей среде
+    if (!IsPostBack)
+    {
+        DataSet ds = YourDataAccessClass.GetMenuData();
+        PopulateMenuItems(ds.Tables[0], null, 0);
+    }
+}
+
+private void PopulateMenuItems(DataTable dataTable, DevExpress.Web.ASPxMenu.MenuItem parentItem, int parentId)
+{
+    foreach (DataRow row in dataTable.Rows)
+    {
+        if (Convert.ToInt32(row["BLOK_ID"]) == parentId)
+        {
+            DevExpress.Web.ASPxMenu.MenuItem newItem = new DevExpress.Web.ASPxMenu.MenuItem();
+            newItem.Text = row["Name"].ToString();
+            newItem.NavigateUrl = row["Url"].ToString(); // Используйте подходящий столбец для URL, если есть
+            // Если свойства Value нет, можно использовать Name или другой атрибут для хранения ID
+            newItem.Name = row["ID"].ToString();
+
+            if (parentItem == null)
+            {
+                ASPxMenu1.Items.Add(newItem);
+            }
+            else
+            {
+                parentItem.Items.Add(newItem);
+            }
+
+            // Рекурсивно добавляем подменю
+            PopulateMenuItems(dataTable, newItem, Convert.ToInt32(newItem.Name));
+        }
+    }
 }

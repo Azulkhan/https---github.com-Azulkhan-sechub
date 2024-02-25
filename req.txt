@@ -1,3 +1,8 @@
+<dx:ASPxMenu ID="ASPxMenu1" runat="server" ItemLinkMode="ItemClick" AutoPostBack="false" 
+    ClientInstanceName="menu" onitemclick="ASPxMenu1_ItemClick">
+</dx:ASPxMenu>
+
+
 protected void Page_Load(object sender, EventArgs e)
 {
     if (!IsPostBack)
@@ -8,27 +13,18 @@ protected void Page_Load(object sender, EventArgs e)
 
 private void InitializeMenu()
 {
-    DataSet ds = GetMenuDataSet(); // Получаем данные
+    DataSet ds = GetMenuDataSet();
     DataTable dt = ds.Tables[0];
 
-    // Создаем главный пункт меню
-    DevExpress.Web.MenuItem mainItem = new DevExpress.Web.MenuItem();
-    mainItem.Text = "Основной пункт"; // Текст основного пункта
-    ASPxMenu1.Items.Add(mainItem);
-
-    // Добавляем дочерние пункты меню к основному пункту
     foreach (DataRow row in dt.Rows)
     {
         if (row.IsNull("ParentID") || Convert.ToInt32(row["ParentID"]) == 0)
         {
-        if (Convert.ToInt32(row["ParentID"]) == MainParentID) // Замените MainParentID на ID основного пункта
-        {
-            DevExpress.Web.MenuItem childItem = new DevExpress.Web.MenuItem();
-            childItem.Text = row["Name"].ToString();
-            childItem.Name = row["ID"].ToString(); // Уникальный идентификатор пункта меню
-            mainItem.Items.Add(childItem);
-            // Если есть подменю, вызываем рекурсивное добавление
-            AddChildItems(childItem, dt);
+            DevExpress.Web.MenuItem menuItem = new DevExpress.Web.MenuItem();
+            menuItem.Text = row["Name"].ToString();
+            menuItem.Name = row["ID"].ToString(); // Уникальный идентификатор
+            ASPxMenu1.Items.Add(menuItem);
+            AddChildItems(menuItem, dt);
         }
     }
 }
@@ -37,7 +33,7 @@ private void AddChildItems(DevExpress.Web.MenuItem parentItem, DataTable dt)
 {
     foreach (DataRow row in dt.Rows)
     {
-        if (Convert.ToInt32(row["ParentID"]) == Convert.ToInt32(parentItem.Name))
+        if (!row.IsNull("ParentID") && Convert.ToInt32(row["ParentID"]) == Convert.ToInt32(parentItem.Name))
         {
             DevExpress.Web.MenuItem childItem = new DevExpress.Web.MenuItem();
             childItem.Text = row["Name"].ToString();
@@ -48,7 +44,10 @@ private void AddChildItems(DevExpress.Web.MenuItem parentItem, DataTable dt)
     }
 }
 
-private DataSet GetMenuDataSet()
+protected void ASPxMenu1_ItemClick(object source, DevExpress.Web.MenuItemEventArgs e)
 {
-    // Ваш метод для получения данных из базы данных
+    // Обработка выбора элемента меню
+    // Вы можете здесь использовать e.Item.Name для дальнейших действий
+    string selectedValue = e.Item.Name;
+    // Тут ваш код для использования selectedValue
 }

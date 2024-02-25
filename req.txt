@@ -1,2 +1,2 @@
-if (row["BLOK_ID"] != DBNull.Value && Convert.ToInt32(row["BLOK_ID"]) == parentId)
-    {
+if (row["Block_ID"] == DBNull.Value ? parentId == null : row["Block_ID"].Equals(parentId))
+        {

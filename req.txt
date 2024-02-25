@@ -1,3 +1,7 @@
+<%@ Register Assembly="DevExpress.Web.vXX.X, Version=XX.X.X.X, Culture=neutral, PublicKeyToken=b88d1754d700e49a"
+    Namespace="DevExpress.Web" TagPrefix="dx" %>
+
+
 <dx:ASPxDropDownEdit ID="dropDownEdit" runat="server" Width="200px">
     <DropDownWindowTemplate>
         <dx:ASPxTreeView ID="treeView" runat="server" ShowCheckBoxes="True" AllowSelectNode="True">

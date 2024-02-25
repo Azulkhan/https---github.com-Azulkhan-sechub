@@ -1,6 +1,20 @@
-<dx:ASPxMenu ID="ASPxMenu1" runat="server" ItemLinkMode="ItemClick" AutoPostBack="false" 
-    ClientInstanceName="menu" onitemclick="ASPxMenu1_ItemClick">
+<dx:ASPxComboBox ID="ASPxComboBox1" runat="server" IncrementalFilteringMode="Contains" 
+    EnableIncrementalFiltering="True" DropDownStyle="DropDown">
+</dx:ASPxComboBox>
+
+<dx:ASPxMenu ID="ASPxMenu1" runat="server" ClientInstanceName="menu" 
+    onitemclick="ASPxMenu1_ItemClick">
+    <!-- Пункты меню будут добавлены динамически -->
 </dx:ASPxMenu>
+
+<script type="text/javascript">
+    function OnMenuItemClick(s, e) {
+        var comboBox = ASPxComboBox1;
+        comboBox.SetText(e.item.text); // Установка текста в ASPxComboBox
+        comboBox.SetValue(e.item.name); // Установка значения в ASPxComboBox
+        comboBox.HideDropDown(); // Закрытие выпадающего списка
+    }
+</script>
 
 
 protected void Page_Load(object sender, EventArgs e)
@@ -13,7 +27,7 @@ protected void Page_Load(object sender, EventArgs e)
 
 private void InitializeMenu()
 {
-    DataSet ds = GetMenuDataSet();
+    DataSet ds = GetMenuDataSet(); // Предположим, что здесь вы получаете данные
     DataTable dt = ds.Tables[0];
 
     foreach (DataRow row in dt.Rows)
@@ -22,7 +36,7 @@ private void InitializeMenu()
         {
             DevExpress.Web.MenuItem menuItem = new DevExpress.Web.MenuItem();
             menuItem.Text = row["Name"].ToString();
-            menuItem.Name = row["ID"].ToString(); // Уникальный идентификатор
+            menuItem.Name = row["ID"].ToString();
             ASPxMenu1.Items.Add(menuItem);
             AddChildItems(menuItem, dt);
         }
@@ -39,15 +53,14 @@ private void AddChildItems(DevExpress.Web.MenuItem parentItem, DataTable dt)
             childItem.Text = row["Name"].ToString();
             childItem.Name = row["ID"].ToString();
             parentItem.Items.Add(childItem);
-            AddChildItems(childItem, dt); // Рекурсивно добавляем подменю
+            AddChildItems(childItem, dt); // Рекурсивное добавление подменю
         }
     }
 }
 
+// Этот обработчик необходим, если вы хотите выполнять серверные действия при выборе пункта меню
 protected void ASPxMenu1_ItemClick(object source, DevExpress.Web.MenuItemEventArgs e)
 {
-    // Обработка выбора элемента меню
-    // Вы можете здесь использовать e.Item.Name для дальнейших действий
-    string selectedValue = e.Item.Name;
-    // Тут ваш код для использования selectedValue
+    // Вы можете здесь использовать e.Item.Name или e.Item.Text в зависимости от того, что вам нужно
+    // Например, установить значение в скрытом поле, для использования на сервере
 }

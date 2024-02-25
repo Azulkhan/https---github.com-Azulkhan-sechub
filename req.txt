@@ -1,49 +1,54 @@
-<%@ Register Assembly="DevExpress.Web.vXX.X, Version=XX.X.X.X, Culture=neutral, PublicKeyToken=b88d1754d700e49a"
-    Namespace="DevExpress.Web" TagPrefix="dx" %>
-
-
-<dx:ASPxDropDownEdit ID="dropDownEdit" runat="server" Width="200px">
-    <DropDownWindowTemplate>
-        <dx:ASPxTreeView ID="treeView" runat="server" ShowCheckBoxes="True" AllowSelectNode="True">
-            <%-- Код для заполнения древовидного списка --%>
-        </dx:ASPxTreeView>
-    </DropDownWindowTemplate>
-</dx:ASPxDropDownEdit>
-
+<dx:ASPxMenu ID="ASPxMenu1" runat="server" Orientation="Horizontal" 
+    onitemclick="ASPxMenu1_ItemClick">
+</dx:ASPxMenu>
 
 protected void Page_Load(object sender, EventArgs e)
 {
     if (!IsPostBack)
     {
-        InitializeTreeView();
+        InitializeMenu();
     }
 }
 
-private void InitializeTreeView()
+private void InitializeMenu()
 {
-    ASPxTreeView treeView = dropDownEdit.FindControl("treeView") as ASPxTreeView;
-    DataSet ds = GetMenuDataSet(); // Получаем DataSet
+    DataSet ds = GetMenuDataSet();
     DataTable dt = ds.Tables[0];
-
-    // Используем рекурсивный метод для заполнения древовидного списка
-    PopulateTreeViewNodes(treeView.Nodes, dt, 0);
-}
-
-private void PopulateTreeViewNodes(TreeViewNodeCollection nodesCollection, DataTable dataTable, int parentID)
-{
-    foreach (DataRow dataRow in dataTable.Select($"BLOK_ID = {parentID}"))
+    
+    foreach (DataRow row in dt.Rows)
     {
-        TreeViewNode node = new TreeViewNode();
-        node.Name = dataRow["ID"].ToString();
-        node.Text = dataRow["NAME"].ToString();
-        nodesCollection.Add(node);
-
-        // Рекурсивно заполняем дочерние узлы
-        PopulateTreeViewNodes(node.Nodes, dataTable, Convert.ToInt32(dataRow["ID"]));
+        // Предполагаем, что у вас есть столбцы ID, Name и ParentID в dt
+        if (row.IsNull("ParentID") || Convert.ToInt32(row["ParentID"]) == 0)
+        {
+            DevExpress.Web.MenuItem rootItem = new DevExpress.Web.MenuItem();
+            rootItem.Text = row["Name"].ToString();
+            rootItem.Name = row["ID"].ToString(); // Используйте это для идентификации в обработчике кликов
+            ASPxMenu1.Items.Add(rootItem);
+            AddChildItems(rootItem, dt);
+        }
     }
 }
 
-private DataSet GetMenuDataSet()
+private void AddChildItems(DevExpress.Web.MenuItem parentItem, DataTable dt)
 {
-    // Ваш код для получения DataSet из базы данных
+    foreach (DataRow row in dt.Rows)
+    {
+        if (!row.IsNull("ParentID") && Convert.ToInt32(row["ParentID"]) == Convert.ToInt32(parentItem.Name))
+        {
+            DevExpress.Web.MenuItem childItem = new DevExpress.Web.MenuItem();
+            childItem.Text = row["Name"].ToString();
+            childItem.Name = row["ID"].ToString();
+            parentItem.Items.Add(childItem);
+            // Рекурсивно добавляем дочерние элементы
+            AddChildItems(childItem, dt);
+        }
+    }
+}
+
+
+protected void ASPxMenu1_ItemClick(object source, DevExpress.Web.MenuItemEventArgs e)
+{
+    // Здесь вы можете использовать e.Item.Name или e.Item.Text в зависимости от того, что вам нужно
+    string selectedValue = e.Item.Name;
+    // Используйте selectedValue для других действий
 }

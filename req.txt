@@ -19,8 +19,8 @@ private void InitializeMenu()
     // Добавляем дочерние пункты меню к основному пункту
     foreach (DataRow row in dt.Rows)
     {
-        if (!row.IsNull("ParentID") && Convert.ToInt32(row["ParentID"]) == Convert.ToInt32(parentItem.Name))
-                {
+        if (row.IsNull("ParentID") || Convert.ToInt32(row["ParentID"]) == 0)
+        {
         if (Convert.ToInt32(row["ParentID"]) == MainParentID) // Замените MainParentID на ID основного пункта
         {
             DevExpress.Web.MenuItem childItem = new DevExpress.Web.MenuItem();

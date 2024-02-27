@@ -1,1 +1,57 @@
 
+Чтобы сделать так, чтобы элемент управления ASPxMemo появлялся или исчезал в зависимости от выбора в ASPxComboBox, вы можете использовать клиентский JavaScript для обработки события изменения выбранного элемента в ASPxComboBox и серверный код для начальной настройки видимости ASPxMemo.
+
+В этом примере предполагается, что ASPxMemo должен появляться только тогда, когда выбран определенный элемент в ASPxComboBox.
+
+Шаг 1: Определение ASPxComboBox и ASPxMemo
+Добавьте ASPxComboBox и ASPxMemo на вашу страницу ASPX. Установите для ASPxMemo свойство ClientInstanceName, чтобы можно было легко обращаться к нему в JavaScript.
+
+aspx
+Copy code
+<dx:ASPxComboBox ID="ASPxComboBox1" runat="server" AutoPostBack="False" 
+    OnClientSelectedIndexChanged="function(s, e) { OnComboChanged(s); }"
+    ClientInstanceName="comboBox">
+    <Items>
+        <dx:ListEditItem Text="Показать Memo" Value="ShowMemo" />
+        <dx:ListEditItem Text="Скрыть Memo" Value="HideMemo" />
+    </Items>
+</dx:ASPxComboBox>
+
+<dx:ASPxMemo ID="ASPxMemo1" runat="server" ClientInstanceName="memo" Width="200px" Height="100px">
+</dx:ASPxMemo>
+Шаг 2: Добавление скрипта для управления видимостью
+Добавьте небольшой фрагмент JavaScript на страницу для управления видимостью ASPxMemo. Этот скрипт будет вызываться при изменении выбранного значения в ASPxComboBox.
+
+html
+Copy code
+<script type="text/javascript">
+    function OnComboChanged(combo) {
+        // Проверяем, выбран ли элемент, при котором нужно показать memo
+        var showMemo = combo.GetValue() === "ShowMemo";
+        // Управляем видимостью memo на основе выбранного значения
+        var memo = ASPxClientControl.GetControlCollection().GetByName("memo");
+        if(memo) {
+            memo.SetVisible(showMemo);
+        }
+    }
+</script>
+Шаг 3: Настройка начальной видимости ASPxMemo
+Если вы хотите, чтобы ASPxMemo был изначально скрыт, вы можете установить его видимость в коде C# (CodeBehind) или непосредственно в ASPX через свойство Visible.
+
+Вариант CodeBehind:
+csharp
+Copy code
+protected void Page_Load(object sender, EventArgs e)
+{
+    if (!IsPostBack)
+    {
+        // Начальная настройка видимости
+        ASPxMemo1.ClientVisible = false; // Используйте ClientVisible для контролов DevExpress
+    }
+}
+Или непосредственно в ASPX:
+aspx
+Copy code
+<dx:ASPxMemo ID="ASPxMemo1" runat="server" ClientInstanceName="memo" Width="200px" Height="100px" ClientVisible="False">
+</dx:ASPxMemo>
+Таким образом, ASPxMemo будет изначально скрыт и будет показываться или скрываться в зависимости от выбора пользователя в ASPxComboBox. Этот подход сочетает в себе клиентские и серверные технологии для динамического управления видимостью элементов на странице.

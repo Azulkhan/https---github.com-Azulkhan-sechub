@@ -1,3 +1,13 @@
+console.log("Selected value:", value); // Вы уже сделали это
+
+// После получения значения, проверяем, доходим ли мы до следующего шага
+console.log("Checking visibility conditions for components");
+
+// Проверяем, правильно ли определены и найдены элементы
+console.log("Memo element found:", !!document.getElementById("yourMemoElementId"));
+console.log("Other related element found:", !!document.getElementById("yourRelatedElementId"));
+
+
 <dx:ASPxComboBox ID="ComboBox1" runat="server">
     <ClientSideEvents SelectedIndexChanged="function(s, e) { OnComboChanged(s); }" />
     ...

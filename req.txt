@@ -38,3 +38,13 @@ Copy code
 Этот скрипт теперь управляет видимостью как ASPxMemo, так и контейнера с элементом <strong>. Когда пользователь выбирает определенный элемент в ASPxComboBox, оба компонента будут показаны или скрыты в зависимости от выбранного значения.
 
 Такой подход позволяет синхронизировать видимость различных элементов на вашей веб-странице, используя клиентские сценарии, что обеспечивает более динамичное и интерактивное взаимодействие с пользователем.
+
+<dx:ASPxComboBox ID="ASPxComboBox1" runat="server" 
+                 AutoPostBack="False" 
+                 ClientInstanceName="comboBox"
+                 OnClientSelectedIndexChanged="OnComboChanged">
+    <Items>
+        <dx:ListEditItem Text="Показать Memo и сообщение" Value="ShowMemo" />
+        <dx:ListEditItem Text="Скрыть Memo и сообщение" Value="HideMemo" />
+    </Items>
+</dx:ASPxComboBox>

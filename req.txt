@@ -1,3 +1,12 @@
+protected void YourComboBox_SelectedIndexChanged(object sender, EventArgs e)
+{
+    // Предполагаем, что у вас есть ASPxComboBox с именем YourComboBox
+    var selectedValue = YourComboBox.SelectedItem.Value.ToString();
+    // Проверяем значение и устанавливаем видимость ASPxMemo
+    YourASPxMemo.Visible = selectedValue == "SomeValue"; // Замените "SomeValue" на значение, при котором должен отображаться мемо
+}
+
+
 console.log("Selected value:", value); // Вы уже сделали это
 
 // После получения значения, проверяем, доходим ли мы до следующего шага

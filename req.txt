@@ -1,50 +1,34 @@
-Чтобы элемент <strong> также появлялся и исчезал вместе с ASPxMemo, вам нужно будет добавить этот элемент на вашу страницу и управлять его видимостью с помощью JavaScript, аналогично тому, как вы управляете видимостью ASPxMemo.
+<dx:ASPxMemo ID="Memo" runat="server" ClientInstanceName="memo" Visible="False">
+</dx:ASPxMemo>
+<asp:RequiredFieldValidator ID="RequiredFieldValidatorMemo" runat="server"
+    ControlToValidate="Memo" ErrorMessage="Memo is required" 
+    InitialValue="" Display="Dynamic" Enabled="False">
+</asp:RequiredFieldValidator>
 
-Вот как вы можете это сделать:
+Дополнение к функции JavaScript
+В вашей функции OnComboChanged вы уже меняете видимость ASPxMemo. Чтобы сделать так, чтобы элемент <strong> также появлялся и исчезал, добавьте к этой функции изменение свойства display соответствующего элемента. Предположим, что у вашего элемента <strong> есть идентификатор strongElement.
 
-Шаг 1: Добавление элемента <strong> на страницу
-Добавьте элемент <strong> на вашу страницу ASPX. Для удобства управления видимостью, поместите его в контейнер, например, <div>, и присвойте этому контейнеру идентификатор (ID).
-
-aspx
+javascript
 Copy code
-<div id="strongContainer" style="display:none;">
-    <strong>Важное сообщение</strong>
-</div>
-В примере выше, style="display:none;" указывает, что контейнер (и, соответственно, элемент <strong>) изначально будет скрыт.
+function OnComboChanged(combo) {
+    var showComponents = combo.GetValue() === "ShowMemo";
+    var memo = ASPxClientControl.GetControlCollection().GetByName("memo");
+    var strongElement = document.getElementById("strongElement"); // Предполагаем, что таковой ID
 
-Шаг 2: Обновление скрипта для управления видимостью
-Теперь вам нужно обновить существующий JavaScript-код, чтобы он также управлял видимостью контейнера <div> с элементом <strong>.
+    if(memo && strongElement) {
+        memo.SetVisible(showComponents);
+        strongElement.style.display = showComponents ? "block" : "none"; // Показать или скрыть <strong>
+        // Если ASPxMemo видим, включаем валидацию
+        var validator = document.getElementById("<%= RequiredFieldValidatorMemo.ClientID %>");
+        ValidatorEnable(validator, showComponents);
+    }
+}
+Убедитесь, что у элемента <strong> в вашем HTML действительно есть id="strongElement", чтобы этот код работал корректно:
 
 html
 Copy code
-<script type="text/javascript">
-    function OnComboChanged(combo) {
-        // Проверяем, выбран ли элемент, при котором нужно показать memo и strong
-        var showComponents = combo.GetValue() === "ShowMemo";
-        
-        // Управляем видимостью memo
-        var memo = ASPxClientControl.GetControlCollection().GetByName("memo");
-        if(memo) {
-            memo.SetVisible(showComponents);
-        }
+<strong id="strongElement" style="display:none;">Важный текст</strong>
+Обязательность ASPxMemo
+Для того чтобы сделать ASPxMemo обязательным только когда он видим, следуйте инструкциям, которые были предоставлены ранее, добавляя валидацию на клиентской стороне и управляя её активацией в той же функции OnComboChanged, что и видимость элементов.
 
-        // Управляем видимостью контейнера с <strong>
-        var strongContainer = document.getElementById("strongContainer");
-        if(strongContainer) {
-            strongContainer.style.display = showComponents ? "block" : "none";
-        }
-    }
-</script>
-Этот скрипт теперь управляет видимостью как ASPxMemo, так и контейнера с элементом <strong>. Когда пользователь выбирает определенный элемент в ASPxComboBox, оба компонента будут показаны или скрыты в зависимости от выбранного значения.
-
-Такой подход позволяет синхронизировать видимость различных элементов на вашей веб-странице, используя клиентские сценарии, что обеспечивает более динамичное и интерактивное взаимодействие с пользователем.
-
-<dx:ASPxComboBox ID="ASPxComboBox1" runat="server" 
-                 AutoPostBack="False" 
-                 ClientInstanceName="comboBox"
-                 OnClientSelectedIndexChanged="OnComboChanged">
-    <Items>
-        <dx:ListEditItem Text="Показать Memo и сообщение" Value="ShowMemo" />
-        <dx:ListEditItem Text="Скрыть Memo и сообщение" Value="HideMemo" />
-    </Items>
-</dx:ASPxComboBox>
+Таким образом, вы получите динамическое управление видимостью элементов и валидацией ASPxMemo на основе выбора пользователя в ASPxComboBox, полностью на стороне клиента без необходимости серверного кода для этой конкретной логики.

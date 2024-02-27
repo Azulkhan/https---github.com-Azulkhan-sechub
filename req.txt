@@ -1,3 +1,5 @@
+console.log("ComboBox value changed", combo.GetValue());
+
 <dx:ASPxMemo ID="Memo" runat="server" ClientInstanceName="memo" Visible="False">
 </dx:ASPxMemo>
 <asp:RequiredFieldValidator ID="RequiredFieldValidatorMemo" runat="server"

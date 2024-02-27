@@ -1,3 +1,9 @@
+<dx:ASPxComboBox ID="ComboBox1" runat="server">
+    <ClientSideEvents SelectedIndexChanged="function(s, e) { OnComboChanged(s); }" />
+    ...
+</dx:ASPxComboBox>
+
+
 console.log("ComboBox value changed", combo.GetValue());
 
 <dx:ASPxMemo ID="Memo" runat="server" ClientInstanceName="memo" Visible="False">

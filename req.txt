@@ -1,41 +1,48 @@
 
-Я здесь, чтобы помочь, так что давайте посмотрим, как можно сохранить выбранную дату после использования ASPxCalendar. Вы можете сохранить выбранную дату в базе данных, сессии, куки или любом другом хранилище данных в зависимости от потребностей вашего приложения. Вот пример того, как можно сохранить выбранную дату в сессии:
+Чтобы привязать выбранную дату из `ASPxCalendar` к `ASPxComboBox` (или `ASPxDropDownEdit`), вам нужно выполнить несколько шагов. Предположим, у вас есть `ASPxCalendar` для выбора даты и `ASPxComboBox`, в который вы хотите добавить выбранную дату как элемент списка.
 
-```csharp
-protected void ASPxCalendar1_SelectionChanged(object sender, EventArgs e)
-{
-    // Получаем выбранную дату
-    DateTime selectedDate = ASPxCalendar1.SelectedDate;
-    
-    // Сохраняем выбранную дату в сессии
-    Session["SelectedDate"] = selectedDate;
-}
+### Шаг 1: Разметка ASPX
+
+Ваша разметка может выглядеть примерно так:
+
+```aspx
+<dx:ASPxCalendar ID="ASPxCalendar1" runat="server" AutoPostBack="True" 
+    OnSelectionChanged="ASPxCalendar1_SelectionChanged">
+</dx:ASPxCalendar>
+
+<dx:ASPxComboBox ID="ASPxComboBox1" runat="server">
+</dx:ASPxComboBox>
 ```
 
-Если вам нужно сохранить эту дату в базе данных, пример может выглядеть следующим образом:
+Обратите внимание, что для `ASPxCalendar` установлен `AutoPostBack="True"`, что означает, что после выбора даты будет происходить автоматическая отправка данных на сервер, и `OnSelectionChanged="ASPxCalendar1_SelectionChanged"`, указывающий на метод обработки изменения выбора.
+
+### Шаг 2: Обработчик события `SelectionChanged`
+
+Теперь добавьте код обработчика событий в ваш кодовый файл (например, `YourPage.aspx.cs`), чтобы обновить `ASPxComboBox` при изменении выбора в календаре:
 
 ```csharp
 protected void ASPxCalendar1_SelectionChanged(object sender, EventArgs e)
 {
-    // Получаем выбранную дату
+    // Получаем выбранную дату из календаря
     DateTime selectedDate = ASPxCalendar1.SelectedDate;
     
-    // Здесь код для подключения к базе данных и сохранения даты
-    // Пример использования псевдокода для иллюстрации
-    string connectionString = "..."; // Ваша строка подключения
-    using (SqlConnection connection = new SqlConnection(connectionString))
+    // Преобразуем дату в строку (можно настроить форматирование по желанию)
+    string dateString = selectedDate.ToString("yyyy-MM-dd");
+    
+    // Проверяем, существует ли уже такая дата в списке
+    if (!ASPxComboBox1.Items.FindByText(dateString) != null)
     {
-        string query = "INSERT INTO YourTableName (YourDateColumnName) VALUES (@SelectedDate)";
-        using (SqlCommand command = new SqlCommand(query, connection))
-        {
-            command.Parameters.AddWithValue("@SelectedDate", selectedDate);
-            connection.Open();
-            command.ExecuteNonQuery();
-        }
+        // Добавляем новый элемент в выпадающий список, если такой даты нет
+        ASPxComboBox1.Items.Add(dateString, dateString);
     }
+    
+    // Выбираем добавленную дату
+    ASPxComboBox1.Value = dateString;
 }
 ```
 
-Важно помнить, что вам нужно будет адаптировать этот код под вашу конкретную ситуацию, включая названия таблицы и столбцов, а также строку подключения к вашей базе данных.
+Этот код сначала преобразует выбранную дату в строку (вы можете настроить формат даты по своему усмотрению), проверяет, существует ли такая дата уже в `ASPxComboBox`, и если нет, добавляет её как новый элемент. Затем он устанавливает выбранным текущее значение даты в `ASPxComboBox`.
 
-Если у вас есть конкретные требования или дополнительные вопросы о том, как работать с данными после их выбора, пожалуйста, дайте мне знать, и я постараюсь помочь вам лучше.
+### Заключение
+
+Таким образом, после выбора даты в `ASPxCalendar`, выбранная дата автоматически добавляется в `ASPxComboBox`, позволяя пользователям видеть и выбирать из ранее выбранных дат. Убедитесь, что вы адаптировали код под вашу конкретную ситуацию, включая правильное использование ID элементов управления и форматирование даты.

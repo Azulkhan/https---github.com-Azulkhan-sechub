@@ -1,34 +1,60 @@
 
-Для реализации такого поведения, где календарь отображается при раскрытии `ASPxComboBox`, можно использовать комбинацию `ASPxDateEdit` вместо отдельного `ASPxComboBox` и `ASPxCalendar`. `ASPxDateEdit` объединяет функциональность выпадающего списка с календарём, позволяя пользователю выбирать дату из календаря, который отображается при нажатии на элемент управления.
+Чтобы реализовать описанный вами функционал с использованием ASP.NET, необходимо выполнить несколько шагов. В вашем случае, вы хотите, чтобы после нажатия на строку в `GridView`, появлялся `ASPxPopupControl`, и в этом `PopupControl` должен находиться `ASPxComboBox`, при раскрытии которого должен открываться еще один `ASPxPopupControl`. 
 
-### Шаг 1: Использование `ASPxDateEdit`
+Давайте разберем, как это можно сделать на примере кода. 
+
+1. **GridView с обработчиком нажатия на строку**:
+
+   Вы должны иметь `GridView`, в котором определен обработчик события для нажатия на строку. При нажатии на строку можно использовать JavaScript или server-side обработчик, чтобы открыть `ASPxPopupControl`.
+
+2. **ASPxPopupControl для отображения при нажатии на строку**:
+
+   В `ASPxPopupControl` вы поместите `ASPxComboBox`. Это можно сделать напрямую в разметке или динамически через код.
+
+3. **ASPxComboBox с обработчиком для открытия второго ASPxPopupControl**:
+
+   В `ASPxComboBox` необходимо добавить обработчик события, который будет открывать второй `ASPxPopupControl` при его раскрытии. Это может быть сделано с помощью событий `ClientSideEvents` в `ASPxComboBox`.
+
+4. **Второй ASPxPopupControl, открываемый из ASPxComboBox**:
+
+   Для этого `PopupControl` можно задать условие видимости, основываясь на действиях пользователя в `ASPxComboBox`.
+
+Вот примерный код, который иллюстрирует это:
+
+### ASPX Разметка:
 
 ```aspx
-<dx:ASPxDateEdit ID="ASPxDateEdit1" runat="server">
-</dx:ASPxDateEdit>
+<dx:ASPxGridView ID="GridView" runat="server" AutoGenerateColumns="False" KeyFieldName="ID" OnRowClick="GridView_RowClick">
+    <Columns>
+        <!-- Ваши столбцы здесь -->
+    </Columns>
+</dx:ASPxGridView>
+
+<dx:ASPxPopupControl ID="PopupControl1" runat="server" PopupElementID="GridView" ClientInstanceName="pc1">
+    <ContentCollection>
+        <dx:PopupControlContentControl runat="server">
+            <dx:ASPxComboBox ID="ComboBox1" runat="server" AutoPostBack="False" ClientInstanceName="cb1" OnClientDropDown="function(s, e) { pc2.Show(); }">
+                <!-- Элементы ComboBox -->
+            </dx:ASPxComboBox>
+        </dx:PopupControlContentControl>
+    </ContentCollection>
+</dx:ASPxPopupControl>
+
+<dx:ASPxPopupControl ID="PopupControl2" runat="server" ClientInstanceName="pc2">
+    <ContentCollection>
+        <dx:PopupControlContentControl runat="server">
+            <!-- Содержимое для второго PopupControl -->
+        </dx:PopupControlContentControl>
+    </ContentCollection>
+</dx:ASPxPopupControl>
 ```
 
-Этот контрол `ASPxDateEdit` автоматически включает в себя календарь, который открывается при нажатии на него, предоставляя пользователю интерфейс для выбора даты.
+### JavaScript для управления PopupControl:
 
-### Шаг 2: Настройка внешнего вида (опционально)
-
-Вы можете настроить `ASPxDateEdit`, чтобы он соответствовал вашим потребностям, например, изменить формат отображаемой даты или стили:
-
-```aspx
-<dx:ASPxDateEdit ID="ASPxDateEdit1" runat="server" DisplayFormatString="yyyy-MM-dd">
-</dx:ASPxDateEdit>
+```javascript
+function GridView_RowClick(s, e) {
+    pc1.Show();
+}
 ```
 
-### Шаг 3: Работа с выбранной датой
-
-Для работы с выбранной датой, например, для сохранения её в базе данных или использования в других частях вашего приложения, вы можете обращаться к свойству `Date` контрола `ASPxDateEdit`:
-
-```csharp
-DateTime selectedDate = ASPxDateEdit1.Date;
-```
-
-### Заключение
-
-Использование `ASPxDateEdit` позволяет вам создать интерфейс, где календарь появляется при активации элемента управления, упрощая процесс выбора даты для пользователя. Это решение более изящное и интегрированное, чем попытка объединить `ASPxCalendar` с `ASPxComboBox`.
-
-Если у вас есть дополнительные требования, такие как добавление времени к выбору даты или использование конкретных стилей, `ASPxDateEdit` предоставляет широкие возможности для настройки. Обратитесь к документации DevExpress для получения более подробной информации о настройке и использовании `ASPxDateEdit`.
+Этот код является только общей схемой реализации. Вам, возможно, потребуется настроить идентификаторы, события и логику в соответствии с вашими конкретными требованиями и структурой проекта.

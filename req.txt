@@ -1,60 +1,34 @@
 
-Чтобы реализовать описанный вами функционал с использованием ASP.NET, необходимо выполнить несколько шагов. В вашем случае, вы хотите, чтобы после нажатия на строку в `GridView`, появлялся `ASPxPopupControl`, и в этом `PopupControl` должен находиться `ASPxComboBox`, при раскрытии которого должен открываться еще один `ASPxPopupControl`. 
+Если проблема заключается в том, что второй `ASPxPopupControl` (`pc2`) не появляется при нажатии на стрелку `ASPxComboBox`, находящегося внутри первого `ASPxPopupControl` (`pc1`), возможно, проблема связана с обработчиком событий на клиенте или с конфигурацией `ASPxComboBox`.
 
-Давайте разберем, как это можно сделать на примере кода. 
+Чтобы убедиться, что `pc2` открывается при нажатии на стрелку `ASPxComboBox`, вам нужно правильно настроить клиентский обработчик события для `ASPxComboBox`. Например, вы можете использовать событие `DropDown` (событие, происходящее при попытке открыть список элементов `ComboBox`), чтобы открыть `pc2`.
 
-1. **GridView с обработчиком нажатия на строку**:
+Вот как это можно сделать:
 
-   Вы должны иметь `GridView`, в котором определен обработчик события для нажатия на строку. При нажатии на строку можно использовать JavaScript или server-side обработчик, чтобы открыть `ASPxPopupControl`.
+### Шаг 1: Настройка ASPxComboBox
 
-2. **ASPxPopupControl для отображения при нажатии на строку**:
-
-   В `ASPxPopupControl` вы поместите `ASPxComboBox`. Это можно сделать напрямую в разметке или динамически через код.
-
-3. **ASPxComboBox с обработчиком для открытия второго ASPxPopupControl**:
-
-   В `ASPxComboBox` необходимо добавить обработчик события, который будет открывать второй `ASPxPopupControl` при его раскрытии. Это может быть сделано с помощью событий `ClientSideEvents` в `ASPxComboBox`.
-
-4. **Второй ASPxPopupControl, открываемый из ASPxComboBox**:
-
-   Для этого `PopupControl` можно задать условие видимости, основываясь на действиях пользователя в `ASPxComboBox`.
-
-Вот примерный код, который иллюстрирует это:
-
-### ASPX Разметка:
+Убедитесь, что у вашего `ASPxComboBox` есть обработчик для события `ClientSideEvents-DropDown`, который будет вызывать открытие `pc2`.
 
 ```aspx
-<dx:ASPxGridView ID="GridView" runat="server" AutoGenerateColumns="False" KeyFieldName="ID" OnRowClick="GridView_RowClick">
-    <Columns>
-        <!-- Ваши столбцы здесь -->
-    </Columns>
-</dx:ASPxGridView>
+<dx:ASPxComboBox ID="ComboBox1" runat="server" ClientInstanceName="cb1">
+    <ClientSideEvents DropDown="function(s, e) { pc2.Show(); }" />
+</dx:ASPxComboBox>
+```
 
-<dx:ASPxPopupControl ID="PopupControl1" runat="server" PopupElementID="GridView" ClientInstanceName="pc1">
-    <ContentCollection>
-        <dx:PopupControlContentControl runat="server">
-            <dx:ASPxComboBox ID="ComboBox1" runat="server" AutoPostBack="False" ClientInstanceName="cb1" OnClientDropDown="function(s, e) { pc2.Show(); }">
-                <!-- Элементы ComboBox -->
-            </dx:ASPxComboBox>
-        </dx:PopupControlContentControl>
-    </ContentCollection>
-</dx:ASPxPopupControl>
+### Шаг 2: Убедитесь, что pc2 готов к отображению
 
-<dx:ASPxPopupControl ID="PopupControl2" runat="server" ClientInstanceName="pc2">
-    <ContentCollection>
-        <dx:PopupControlContentControl runat="server">
-            <!-- Содержимое для второго PopupControl -->
-        </dx:PopupControlContentControl>
-    </ContentCollection>
+Проверьте, что `pc2` настроен правильно и готов к отображению. Убедитесь, что он не имеет свойства `ShowOnPageLoad` установленного в `false`, если вы хотите управлять его видимостью исключительно через код.
+
+```aspx
+<dx:ASPxPopupControl ID="PopupControl2" runat="server" ClientInstanceName="pc2" ShowOnPageLoad="false">
+    <!-- Контент pc2 -->
 </dx:ASPxPopupControl>
 ```
 
-### JavaScript для управления PopupControl:
+### Возможные проблемы и их решение
 
-```javascript
-function GridView_RowClick(s, e) {
-    pc1.Show();
-}
-```
+- **Взаимодействие событий**: Убедитесь, что событие `DropDown` `ASPxComboBox` не блокируется или не переопределяется другими скриптами или обработчиками событий.
+- **Зависимости скриптов**: Проверьте, что все необходимые скрипты загружены корректно, и нет ошибок JavaScript в консоли браузера, которые могут мешать исполнению вашего кода.
+- **Использование ClientInstanceName**: Проверьте, что свойство `ClientInstanceName` установлено и правильно используется в вашем скрипте для обоих `ASPxPopupControl`.
 
-Этот код является только общей схемой реализации. Вам, возможно, потребуется настроить идентификаторы, события и логику в соответствии с вашими конкретными требованиями и структурой проекта.
+Если предложенные шаги не решают проблему, возможно, потребуется более детальный анализ кода и конфигурации на вашей стороне, включая проверку наличия JavaScript ошибок в консоли браузера и убедиться, что нет конфликтов с другими клиентскими скриптами на странице.

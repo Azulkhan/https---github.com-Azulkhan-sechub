@@ -1,34 +1,53 @@
+Чтобы добавить чекбоксы для выбора строк в ASPxGridView, вы можете использовать встроенный GridViewCommandColumn с типом GridViewCommandColumnType.SelectCheckbox. Это позволит пользователям отмечать строки галочками.
 
-Если вы работаете с HTTPS, вам потребуется библиотека LuaSec в дополнение к LuaSocket, поскольку LuaSocket по умолчанию не поддерживает SSL/TLS, необходимые для HTTPS. LuaSec расширяет LuaSocket, добавляя поддержку защищённых соединений.
+Для реализации функций "отметить все" или "снять отметки со всех", можно добавить кнопки на страницу, которые будут вызывать соответствующие методы клиентского API ASPxGridView.
 
-Вот пример кода, который отправляет HTTPS POST-запрос с использованием LuaSec:
+Вот пример, как это можно сделать:
 
-```lua
-local https = require("ssl.https")
-local ltn12 = require("ltn12")
+ASPX:
+aspx
+Copy code
+<dxe:ASPxGridView ID="grid" runat="server" KeyFieldName="Id">
+    <Columns>
+        <dx:GridViewCommandColumn ShowSelectCheckbox="True" VisibleIndex="0">
+            <SelectAllCheckboxMode>Page</SelectAllCheckboxMode>
+        </dx:GridViewCommandColumn>
+        <!-- Остальные столбцы... -->
+    </Columns>
+    <ClientSideEvents EndCallback="function(s, e) { grid.SelectAllRowsOnPage(false); }" />
+</dxe:ASPxGridView>
 
-local url = "https://ваш_сайт.com/путь"
-local body = "param1=value1&param2=value2" -- данные для отправки
-local response = {}
+<dx:ASPxButton ID="SelectAllButton" runat="server" Text="Отметить все" AutoPostBack="False">
+    <ClientSideEvents Click="function(s, e) { grid.SelectAllRowsOnPage(true); }" />
+</dx:ASPxButton>
 
-local res, code, response_headers, status = https.request{
-    url = url,
-    method = "POST",
-    headers = {
-        ["Content-Type"] = "application/x-www-form-urlencoded",
-        ["Content-Length"] = tostring(#body)
-    },
-    source = ltn12.source.string(body),
-    sink = ltn12.sink.table(response)
+<dx:ASPxButton ID="DeselectAllButton" runat="server" Text="Снять все отметки" AutoPostBack="False">
+    <ClientSideEvents Click="function(s, e) { grid.SelectAllRowsOnPage(false); }" />
+</dx:ASPxButton>
+JavaScript:
+Вы можете использовать следующий JavaScript для управления чекбоксами на клиентской стороне:
+
+javascript
+Copy code
+function selectAllRowsOnPage() {
+    grid.SelectAllRowsOnPage(true);
 }
 
-if code == 200 then
-    print(table.concat(response)) -- вывод ответа сервера
-else
-    print("Ошибка: " .. (code or "неизвестный код"))
-end
-```
+function deselectAllRowsOnPage() {
+    grid.SelectAllRowsOnPage(false);
+}
+Где grid - это ClientInstanceName вашего ASPxGridView.
 
-Этот код аналогичен предыдущему, но использует `ssl.https` вместо `socket.http` для работы с HTTPS. Параметры запроса, такие как URL, метод, заголовки и тело запроса, указываются в таблице, передаваемой функции `https.request`.
+Кроме того, если вы хотите работать с выбранными строками на серверной стороне, вы можете использовать ASPxGridView.GetSelectedFieldValues для получения значений определенного поля выбранных строк. Пример:
 
-Перед использованием убедитесь, что у вас установлены как LuaSocket, так и LuaSec. Установка и настройка могут отличаться в зависимости от вашей операционной системы и среды разработки. Обычно они доступны через системы управления пакетами Lua, такие как LuaRocks.
+C# код на сервере:
+csharp
+Copy code
+protected void GetSelectedRowsButton_Click(object sender, EventArgs e)
+{
+    List<object> selectedIDs = grid.GetSelectedFieldValues("Id");
+    // Теперь у вас есть список идентификаторов выбранных строк
+}
+Этот код можно вызывать, например, при обработке нажатия кнопки, которая будет обрабатывать идентификаторы выбранных строк.
+
+Обратите внимание, что SelectAllCheckboxMode может быть настроен как на Page, так и на AllPages в зависимости от того, хотите ли вы выбирать все строки только на текущей странице или на всех страницах таблицы.

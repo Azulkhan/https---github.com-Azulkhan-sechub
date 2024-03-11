@@ -1,55 +1,75 @@
 
-Если вам нужно выполнить какую-то операцию в хранимой процедуре для каждого ID из списка, предоставленного из ASP.NET приложения, вот как вы можете это сделать для обоих подходов.
+Для Oracle Database процесс передачи списка идентификаторов и их обработки в хранимой процедуре немного отличается от SQL Server, поскольку Oracle использует другой синтаксис и подходы. Один из распространенных методов — использование PL/SQL коллекций или строк, разделенных запятыми, которые затем можно разбирать внутри процедуры. Вот как это можно сделать:
 
-### Для подхода с передачей строки, разделённой запятыми
+### Передача списка ID как строки, разделенной запятыми:
 
-Предположим, у вас есть список ID в виде строки, и вы хотите выполнить операцию для каждого ID в этом списке. В SQL Server вы можете использовать функцию `STRING_SPLIT` (доступна начиная с SQL Server 2016) для разделения строки и последующей обработки каждого элемента:
-
-```sql
-CREATE PROCEDURE ProcessEachID
-    @IDList NVARCHAR(MAX)
-AS
-BEGIN
-    -- Предполагая, что STRING_SPLIT доступна в вашей версии SQL Server
-    FROM ID IN (SELECT value FROM STRING_SPLIT(@IDList, ','))
-    BEGIN
-        -- Здесь можно выполнить операции с каждым ID, например, обновить таблицу
-        UPDATE YourTable
-        SET SomeColumn = SomeValue
-        WHERE ID = ID;
-    END
-END
-```
-
-Обратите внимание, что `STRING_SPLIT` возвращает таблицу с одним столбцом `value`, который содержит элементы, полученные в результате разделения входной строки.
-
-### Для подхода с использованием table-valued parameter
-
-Когда вы используете table-valued parameter, вы можете напрямую работать с данными, как с таблицей, что упрощает обработку каждого ID:
+1. **Создайте хранимую процедуру в Oracle, которая принимает строку и обрабатывает каждый ID:**
 
 ```sql
-CREATE PROCEDURE ProcessEachID
-    @IDList IDListType READONLY
-AS
+CREATE OR REPLACE PROCEDURE ProcessEachID(p_idList IN VARCHAR2) IS
 BEGIN
-    -- Обработка каждого ID из таблицы @IDList
-    -- Предположим, вы хотите обновить данные в YourTable для каждого ID из списка
-    UPDATE yt
-    SET yt.SomeColumn = SomeValue
-    FROM YourTable yt
-    INNER JOIN @IDList il ON yt.ID = il.ID;
-END
+    FOR cur IN (SELECT trim(regexp_substr(p_idList, '[^,]+', 1, level)) AS single_id
+                FROM dual
+                CONNECT BY regexp_substr(p_idList, '[^,]+', 1, level) IS NOT NULL)
+    LOOP
+        -- Здесь выполняется операция с каждым ID, например:
+        -- UPDATE YourTable SET SomeColumn = SomeValue WHERE ID = cur.single_id;
+    END LOOP;
+END;
 ```
 
-Этот метод позволяет использовать преимущества SQL операций, таких как `JOIN`, для эффективной обработки каждого ID. Вам не нужно разбивать строку и обрабатывать каждый ID отдельно, что улучшает производительность и упрощает код хранимой процедуры.
+Этот подход использует комбинацию `regexp_substr` и `CONNECT BY` для итерации по каждому элементу в строке, разделенной запятыми.
 
-Когда вы вызываете эту хранимую процедуру из C#, передайте `DataTable` или другую коллекцию, соответствующую вашему table-valued parameter, напрямую в параметры команды:
+### Использование PL/SQL коллекций:
+
+Другой подход заключается в использовании PL/SQL коллекций для передачи списка идентификаторов. Этот метод требует больше настройки, но обеспечивает большую гибкость и производительность:
+
+1. **Создайте тип коллекции для списка ID:**
+
+```sql
+CREATE OR REPLACE TYPE NumberTable AS TABLE OF NUMBER;
+```
+
+2. **Создайте хранимую процедуру, которая использует этот тип:**
+
+```sql
+CREATE OR REPLACE PROCEDURE ProcessEachID(p_idList IN NumberTable) IS
+BEGIN
+    FOR i IN p_idList.FIRST..p_idList.LAST LOOP
+        -- Здесь выполняется операция с каждым ID
+        -- UPDATE YourTable SET SomeColumn = SomeValue WHERE ID = p_idList(i);
+    END LOOP;
+END;
+```
+
+### Вызов хранимой процедуры из C#:
+
+Для вызова этих процедур из C# через Oracle.DataAccess или Oracle.ManagedDataAccess клиент, используйте что-то вроде следующего:
 
 ```csharp
-// Предполагая, что idsTable уже заполнен ID
-SqlParameter param = cmd.Parameters.AddWithValue("@IDList", idsTable);
-param.SqlDbType = SqlDbType.Structured;
-param.TypeName = "IDListType";
+using Oracle.ManagedDataAccess.Client; // или Oracle.DataAccess.Client для неуправляемого драйвера
+
+// Строка соединения
+string oradb = "Data Source=YourDB;User Id=YourUsername;Password=YourPassword;";
+
+// Создайте соединение
+using (OracleConnection conn = new OracleConnection(oradb))
+{
+    conn.Open();
+
+    using (OracleCommand cmd = new OracleCommand("ProcessEachID", conn))
+    {
+        cmd.CommandType = CommandType.StoredProcedure;
+
+        // Для строки, разделенной запятыми
+        cmd.Parameters.Add("p_idList", OracleDbType.Varchar2).Value = "1,2,3"; // Пример строки ID
+
+        // Для PL/SQL коллекций
+        // Передача массива требует более сложной настройки, включая возможное использование OracleParameter.
+
+        cmd.ExecuteNonQuery();
+    }
+}
 ```
 
-Этот подход обеспечивает более чистый и эффективный способ обработки списков в SQL Server, позволяя SQL Server оптимизировать выполнение операций с данными.
+Учтите, что для передачи PL/SQL коллекций из C# в Oracle может потребоваться использовать специфические типы данных Oracle и настроить параметры команды соответствующим образом. Это может включать определение параметров как типа `OracleDbType.Array` и использование настроенного типа Oracle, соответствующего вашему пользовательскому типу данных в базе данных.

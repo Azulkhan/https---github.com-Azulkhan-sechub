@@ -1,75 +1,45 @@
 
-Для Oracle Database процесс передачи списка идентификаторов и их обработки в хранимой процедуре немного отличается от SQL Server, поскольку Oracle использует другой синтаксис и подходы. Один из распространенных методов — использование PL/SQL коллекций или строк, разделенных запятыми, которые затем можно разбирать внутри процедуры. Вот как это можно сделать:
+Для выполнения действий с каждым идентификатором из списка `selectedKeys`, полученного с помощью метода `GetSelectedFieldValues("ID")` компонента ASPxGridView в ASP.NET приложении, вам необходимо итерировать по этому списку в вашем коде C#. Рассмотрим пример, где вы хотите выполнить действия с каждым ID индивидуально, например, вызвать хранимую процедуру в базе данных Oracle для каждого идентификатора.
 
-### Передача списка ID как строки, разделенной запятыми:
-
-1. **Создайте хранимую процедуру в Oracle, которая принимает строку и обрабатывает каждый ID:**
+Предположим, у вас есть следующая хранимая процедура в Oracle, которая выполняет некоторые операции с одним ID:
 
 ```sql
-CREATE OR REPLACE PROCEDURE ProcessEachID(p_idList IN VARCHAR2) IS
+CREATE OR REPLACE PROCEDURE ProcessSingleID(p_id IN NUMBER) IS
 BEGIN
-    FOR cur IN (SELECT trim(regexp_substr(p_idList, '[^,]+', 1, level)) AS single_id
-                FROM dual
-                CONNECT BY regexp_substr(p_idList, '[^,]+', 1, level) IS NOT NULL)
-    LOOP
-        -- Здесь выполняется операция с каждым ID, например:
-        -- UPDATE YourTable SET SomeColumn = SomeValue WHERE ID = cur.single_id;
-    END LOOP;
+    -- Здесь ваша логика, например, обновление записи:
+    -- UPDATE YourTable SET SomeColumn = 'SomeValue' WHERE ID = p_id;
 END;
 ```
 
-Этот подход использует комбинацию `regexp_substr` и `CONNECT BY` для итерации по каждому элементу в строке, разделенной запятыми.
-
-### Использование PL/SQL коллекций:
-
-Другой подход заключается в использовании PL/SQL коллекций для передачи списка идентификаторов. Этот метод требует больше настройки, но обеспечивает большую гибкость и производительность:
-
-1. **Создайте тип коллекции для списка ID:**
-
-```sql
-CREATE OR REPLACE TYPE NumberTable AS TABLE OF NUMBER;
-```
-
-2. **Создайте хранимую процедуру, которая использует этот тип:**
-
-```sql
-CREATE OR REPLACE PROCEDURE ProcessEachID(p_idList IN NumberTable) IS
-BEGIN
-    FOR i IN p_idList.FIRST..p_idList.LAST LOOP
-        -- Здесь выполняется операция с каждым ID
-        -- UPDATE YourTable SET SomeColumn = SomeValue WHERE ID = p_idList(i);
-    END LOOP;
-END;
-```
-
-### Вызов хранимой процедуры из C#:
-
-Для вызова этих процедур из C# через Oracle.DataAccess или Oracle.ManagedDataAccess клиент, используйте что-то вроде следующего:
+Далее, в вашем коде C# вы можете перебрать `selectedKeys` и вызвать `ProcessSingleID` для каждого ID. Вам понадобится использовать OracleCommand для вызова хранимой процедуры из вашего приложения. Вот как это может выглядеть:
 
 ```csharp
-using Oracle.ManagedDataAccess.Client; // или Oracle.DataAccess.Client для неуправляемого драйвера
+using Oracle.ManagedDataAccess.Client; // Используйте Oracle.DataAccess.Client для неуправляемого драйвера
 
-// Строка соединения
-string oradb = "Data Source=YourDB;User Id=YourUsername;Password=YourPassword;";
+string oradb = "Data Source=YourDB;User Id=YourUsername;Password=YourPassword;"; // Строка подключения
 
-// Создайте соединение
+List<object> selectedKeys = grid.GetSelectedFieldValues("ID"); // Получаем список ID
+
 using (OracleConnection conn = new OracleConnection(oradb))
 {
     conn.Open();
-
-    using (OracleCommand cmd = new OracleCommand("ProcessEachID", conn))
+    
+    foreach (var key in selectedKeys)
     {
-        cmd.CommandType = CommandType.StoredProcedure;
-
-        // Для строки, разделенной запятыми
-        cmd.Parameters.Add("p_idList", OracleDbType.Varchar2).Value = "1,2,3"; // Пример строки ID
-
-        // Для PL/SQL коллекций
-        // Передача массива требует более сложной настройки, включая возможное использование OracleParameter.
-
-        cmd.ExecuteNonQuery();
+        using (OracleCommand cmd = new OracleCommand("ProcessSingleID", conn))
+        {
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add("p_id", OracleDbType.Int32).Value = Convert.ToInt32(key);
+            
+            cmd.ExecuteNonQuery();
+        }
     }
 }
 ```
 
-Учтите, что для передачи PL/SQL коллекций из C# в Oracle может потребоваться использовать специфические типы данных Oracle и настроить параметры команды соответствующим образом. Это может включать определение параметров как типа `OracleDbType.Array` и использование настроенного типа Oracle, соответствующего вашему пользовательскому типу данных в базе данных.
+В этом примере:
+- Используется цикл `foreach` для перебора всех `selectedKeys`.
+- Для каждого `key` из списка `selectedKeys` создается новый экземпляр `OracleCommand`, который вызывает хранимую процедуру `ProcessSingleID`.
+- Каждому вызову процедуры передается значение `key` как параметр.
+
+Обратите внимание, что вызовы базы данных в цикле могут быть неэффективными с точки зрения производительности, особенно если `selectedKeys` содержит большое количество элементов. В таких случаях рассмотрите возможность использования пакетной обработки или других техник оптимизации.

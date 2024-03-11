@@ -1,53 +1,84 @@
-Чтобы добавить чекбоксы для выбора строк в ASPxGridView, вы можете использовать встроенный GridViewCommandColumn с типом GridViewCommandColumnType.SelectCheckbox. Это позволит пользователям отмечать строки галочками.
 
-Для реализации функций "отметить все" или "снять отметки со всех", можно добавить кнопки на страницу, которые будут вызывать соответствующие методы клиентского API ASPxGridView.
+Чтобы передать список идентификаторов, полученных из `ASPxGridView` с использованием метода `GetSelectedFieldValues("ID")`, в хранимую процедуру SQL Server, есть несколько подходов. Один из популярных способов — передача списка идентификаторов в виде строки, разделённой запятыми, и последующая обработка этой строки внутри хранимой процедуры. Начиная с SQL Server 2008, вы также можете использовать тип данных `table-valued parameter` для передачи списка значений.
 
-Вот пример, как это можно сделать:
+### Пример с передачей строки, разделённой запятыми:
 
-ASPX:
-aspx
-Copy code
-<dxe:ASPxGridView ID="grid" runat="server" KeyFieldName="Id">
-    <Columns>
-        <dx:GridViewCommandColumn ShowSelectCheckbox="True" VisibleIndex="0">
-            <SelectAllCheckboxMode>Page</SelectAllCheckboxMode>
-        </dx:GridViewCommandColumn>
-        <!-- Остальные столбцы... -->
-    </Columns>
-    <ClientSideEvents EndCallback="function(s, e) { grid.SelectAllRowsOnPage(false); }" />
-</dxe:ASPxGridView>
+1. **Сформируйте строку из списка ID:**
 
-<dx:ASPxButton ID="SelectAllButton" runat="server" Text="Отметить все" AutoPostBack="False">
-    <ClientSideEvents Click="function(s, e) { grid.SelectAllRowsOnPage(true); }" />
-</dx:ASPxButton>
+```csharp
+List<object> selectedKeys = grid.GetSelectedFieldValues("ID");
+string idList = string.Join(",", selectedKeys.Select(k => k.ToString()).ToArray());
+```
 
-<dx:ASPxButton ID="DeselectAllButton" runat="server" Text="Снять все отметки" AutoPostBack="False">
-    <ClientSideEvents Click="function(s, e) { grid.SelectAllRowsOnPage(false); }" />
-</dx:ASPxButton>
-JavaScript:
-Вы можете использовать следующий JavaScript для управления чекбоксами на клиентской стороне:
+2. **Передайте эту строку в хранимую процедуру:**
 
-javascript
-Copy code
-function selectAllRowsOnPage() {
-    grid.SelectAllRowsOnPage(true);
-}
+Предположим, у вас есть хранимая процедура `YourStoredProcedure`, принимающая список ID как строку:
 
-function deselectAllRowsOnPage() {
-    grid.SelectAllRowsOnPage(false);
-}
-Где grid - это ClientInstanceName вашего ASPxGridView.
+```sql
+CREATE PROCEDURE YourStoredProcedure
+    @IDList VARCHAR(MAX)
+AS
+BEGIN
+    -- Разделение строки и обработка каждого ID
+END
+```
 
-Кроме того, если вы хотите работать с выбранными строками на серверной стороне, вы можете использовать ASPxGridView.GetSelectedFieldValues для получения значений определенного поля выбранных строк. Пример:
+В вашем C# коде, используйте эту строку для вызова процедуры:
 
-C# код на сервере:
-csharp
-Copy code
-protected void GetSelectedRowsButton_Click(object sender, EventArgs e)
+```csharp
+using (SqlConnection conn = new SqlConnection("YourConnectionString"))
 {
-    List<object> selectedIDs = grid.GetSelectedFieldValues("Id");
-    // Теперь у вас есть список идентификаторов выбранных строк
+    SqlCommand cmd = new SqlCommand("YourStoredProcedure", conn);
+    cmd.CommandType = CommandType.StoredProcedure;
+    cmd.Parameters.AddWithValue("@IDList", idList);
+    conn.Open();
+    cmd.ExecuteNonQuery();
 }
-Этот код можно вызывать, например, при обработке нажатия кнопки, которая будет обрабатывать идентификаторы выбранных строк.
+```
 
-Обратите внимание, что SelectAllCheckboxMode может быть настроен как на Page, так и на AllPages в зависимости от того, хотите ли вы выбирать все строки только на текущей странице или на всех страницах таблицы.
+### Пример с использованием table-valued parameter:
+
+1. **Создайте тип в SQL Server:**
+
+```sql
+CREATE TYPE IDListType AS TABLE ( ID INT );
+```
+
+2. **Создайте хранимую процедуру, использующую этот тип:**
+
+```sql
+CREATE PROCEDURE YourStoredProcedure
+    @IDList IDListType READONLY
+AS
+BEGIN
+    -- Обработка ID
+END
+```
+
+3. **Передайте данные из C#:**
+
+```csharp
+using (SqlConnection conn = new SqlConnection("YourConnectionString"))
+{
+    SqlCommand cmd = new SqlCommand("YourStoredProcedure", conn);
+    cmd.CommandType = CommandType.StoredProcedure;
+
+    // Создание DataTable для хранения ID
+    DataTable idsTable = new DataTable();
+    idsTable.Columns.Add("ID", typeof(int));
+
+    foreach (var id in selectedKeys)
+    {
+        idsTable.Rows.Add(id);
+    }
+
+    SqlParameter param = cmd.Parameters.AddWithValue("@IDList", idsTable);
+    param.SqlDbType = SqlDbType.Structured;
+    param.TypeName = "IDListType";
+
+    conn.Open();
+    cmd.ExecuteNonQuery();
+}
+```
+
+Этот подход обеспечивает более гибкую и мощную обработку списков данных в SQL Server, поскольку вы можете работать с переданным списком как с таблицей, используя JOIN, WHERE и другие операции SQL.

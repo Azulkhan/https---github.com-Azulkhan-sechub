@@ -1,84 +1,55 @@
 
-Чтобы передать список идентификаторов, полученных из `ASPxGridView` с использованием метода `GetSelectedFieldValues("ID")`, в хранимую процедуру SQL Server, есть несколько подходов. Один из популярных способов — передача списка идентификаторов в виде строки, разделённой запятыми, и последующая обработка этой строки внутри хранимой процедуры. Начиная с SQL Server 2008, вы также можете использовать тип данных `table-valued parameter` для передачи списка значений.
+Если вам нужно выполнить какую-то операцию в хранимой процедуре для каждого ID из списка, предоставленного из ASP.NET приложения, вот как вы можете это сделать для обоих подходов.
 
-### Пример с передачей строки, разделённой запятыми:
+### Для подхода с передачей строки, разделённой запятыми
 
-1. **Сформируйте строку из списка ID:**
-
-```csharp
-List<object> selectedKeys = grid.GetSelectedFieldValues("ID");
-string idList = string.Join(",", selectedKeys.Select(k => k.ToString()).ToArray());
-```
-
-2. **Передайте эту строку в хранимую процедуру:**
-
-Предположим, у вас есть хранимая процедура `YourStoredProcedure`, принимающая список ID как строку:
+Предположим, у вас есть список ID в виде строки, и вы хотите выполнить операцию для каждого ID в этом списке. В SQL Server вы можете использовать функцию `STRING_SPLIT` (доступна начиная с SQL Server 2016) для разделения строки и последующей обработки каждого элемента:
 
 ```sql
-CREATE PROCEDURE YourStoredProcedure
-    @IDList VARCHAR(MAX)
+CREATE PROCEDURE ProcessEachID
+    @IDList NVARCHAR(MAX)
 AS
 BEGIN
-    -- Разделение строки и обработка каждого ID
+    -- Предполагая, что STRING_SPLIT доступна в вашей версии SQL Server
+    FROM ID IN (SELECT value FROM STRING_SPLIT(@IDList, ','))
+    BEGIN
+        -- Здесь можно выполнить операции с каждым ID, например, обновить таблицу
+        UPDATE YourTable
+        SET SomeColumn = SomeValue
+        WHERE ID = ID;
+    END
 END
 ```
 
-В вашем C# коде, используйте эту строку для вызова процедуры:
+Обратите внимание, что `STRING_SPLIT` возвращает таблицу с одним столбцом `value`, который содержит элементы, полученные в результате разделения входной строки.
 
-```csharp
-using (SqlConnection conn = new SqlConnection("YourConnectionString"))
-{
-    SqlCommand cmd = new SqlCommand("YourStoredProcedure", conn);
-    cmd.CommandType = CommandType.StoredProcedure;
-    cmd.Parameters.AddWithValue("@IDList", idList);
-    conn.Open();
-    cmd.ExecuteNonQuery();
-}
-```
+### Для подхода с использованием table-valued parameter
 
-### Пример с использованием table-valued parameter:
-
-1. **Создайте тип в SQL Server:**
+Когда вы используете table-valued parameter, вы можете напрямую работать с данными, как с таблицей, что упрощает обработку каждого ID:
 
 ```sql
-CREATE TYPE IDListType AS TABLE ( ID INT );
-```
-
-2. **Создайте хранимую процедуру, использующую этот тип:**
-
-```sql
-CREATE PROCEDURE YourStoredProcedure
+CREATE PROCEDURE ProcessEachID
     @IDList IDListType READONLY
 AS
 BEGIN
-    -- Обработка ID
+    -- Обработка каждого ID из таблицы @IDList
+    -- Предположим, вы хотите обновить данные в YourTable для каждого ID из списка
+    UPDATE yt
+    SET yt.SomeColumn = SomeValue
+    FROM YourTable yt
+    INNER JOIN @IDList il ON yt.ID = il.ID;
 END
 ```
 
-3. **Передайте данные из C#:**
+Этот метод позволяет использовать преимущества SQL операций, таких как `JOIN`, для эффективной обработки каждого ID. Вам не нужно разбивать строку и обрабатывать каждый ID отдельно, что улучшает производительность и упрощает код хранимой процедуры.
+
+Когда вы вызываете эту хранимую процедуру из C#, передайте `DataTable` или другую коллекцию, соответствующую вашему table-valued parameter, напрямую в параметры команды:
 
 ```csharp
-using (SqlConnection conn = new SqlConnection("YourConnectionString"))
-{
-    SqlCommand cmd = new SqlCommand("YourStoredProcedure", conn);
-    cmd.CommandType = CommandType.StoredProcedure;
-
-    // Создание DataTable для хранения ID
-    DataTable idsTable = new DataTable();
-    idsTable.Columns.Add("ID", typeof(int));
-
-    foreach (var id in selectedKeys)
-    {
-        idsTable.Rows.Add(id);
-    }
-
-    SqlParameter param = cmd.Parameters.AddWithValue("@IDList", idsTable);
-    param.SqlDbType = SqlDbType.Structured;
-    param.TypeName = "IDListType";
-
-    conn.Open();
-    cmd.ExecuteNonQuery();
-}
+// Предполагая, что idsTable уже заполнен ID
+SqlParameter param = cmd.Parameters.AddWithValue("@IDList", idsTable);
+param.SqlDbType = SqlDbType.Structured;
+param.TypeName = "IDListType";
 ```
 
-Этот подход обеспечивает более гибкую и мощную обработку списков данных в SQL Server, поскольку вы можете работать с переданным списком как с таблицей, используя JOIN, WHERE и другие операции SQL.
+Этот подход обеспечивает более чистый и эффективный способ обработки списков в SQL Server, позволяя SQL Server оптимизировать выполнение операций с данными.

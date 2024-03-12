@@ -1,58 +1,23 @@
 
-Если вы хотите, чтобы в одном столбце таблицы `ASPxGridView` была кнопка, а в остальных столбцах был поиск или другой функционал, вам потребуется комбинировать использование Template Column для столбца с кнопкой и настройки для остальных столбцов, чтобы они поддерживали поиск.
+Понял вас, если ваша задача заключается в добавлении кнопки в определённую строку столбца `GridViewDataTextColumn`, где уже автоматически есть поле для поиска, то можно использовать `DataItemTemplate` для определения пользовательского содержимого и внутри него выполнить проверку для отображения кнопки только в нужной строке. Так как `GridViewDataTextColumn` не поддерживает напрямую разное содержимое для разных строк, мы можем использовать `DataItemTemplate` для всего столбца и добавить в него логику отображения кнопки только для конкретной строки.
 
-Давайте разберём, как это можно реализовать:
-
-### 1. Создание Template Column для кнопки
-
-Для столбца, в котором должна быть размещена кнопка, используйте `TemplateColumn`. Вы определяете кнопку внутри `DataItemTemplate` для этого столбца.
+Пример кода на ASP.NET, который демонстрирует, как это можно реализовать:
 
 ```aspx
-<dx:GridViewDataColumn VisibleIndex="0">
-    <DataItemTemplate>
-        <asp:Button ID="myButton" runat="server" Text="Кнопка" CommandName="MyCommand" CommandArgument='<%# Eval("ID") %>' />
-    </DataItemTemplate>
-</dx:GridViewDataColumn>
-```
-
-### 2. Настройка остальных столбцов для поддержки поиска
-
-Для остальных столбцов, где вы хотите использовать поиск, убедитесь, что они настроены соответствующим образом. В `ASPxGridView` поиск можно включить с помощью свойства `Settings.ShowFilterRow`, которое позволяет отображать строку фильтрации в верхней части грида.
-
-```aspx
-<dx:ASPxGridView ID="GridView1" runat="server" DataSourceID="yourDataSource">
-    <Settings ShowFilterRow="True" />
+<dx:ASPxGridView ID="GridView1" runat="server" AutoGenerateColumns="False" KeyFieldName="ID" OnHtmlRowPrepared="GridView1_HtmlRowPrepared">
     <Columns>
-        <!-- Колонка с кнопкой -->
-        <dx:GridViewDataColumn VisibleIndex="0">
+        <dx:GridViewDataTextColumn FieldName="FieldName">
             <DataItemTemplate>
-                <asp:Button ID="myButton" runat="server" Text="Кнопка" CommandName="MyCommand" CommandArgument='<%# Eval("ID") %>' />
+                <asp:Panel runat="server" Visible='<%# Container.VisibleIndex == 1 %>'> <!-- Визуализация для строки с индексом 1 (вторая строка, т.к. индексация начинается с 0) -->
+                    <asp:Button ID="Button1" runat="server" Text="Моя кнопка" CommandArgument='<%# Eval("ID") %>' OnClick="Button1_Click" />
+                </asp:Panel>
             </DataItemTemplate>
-        </dx:GridViewDataColumn>
-
-        <!-- Остальные колонки для поиска -->
-        <dx:GridViewDataTextColumn FieldName="FieldName1" VisibleIndex="1" />
-        <dx:GridViewDataTextColumn FieldName="FieldName2" VisibleIndex="2" />
-        <!-- Добавьте столько колонок, сколько необходимо -->
+        </dx:GridViewDataTextColumn>
+        <!-- Остальные столбцы -->
     </Columns>
 </dx:ASPxGridView>
 ```
 
-В этом примере, для первой колонки используется `TemplateColumn` для вставки кнопки, а для остальных колонок включен поиск, благодаря `ShowFilterRow="True"`.
+В этом примере для каждой строки создаётся `Panel` в `DataItemTemplate` столбца. Видимость `Panel` устанавливается в `True` только для строки с индексом 1 (что соответствует второй строке, так как индексация начинается с нуля). Внутри панели размещается кнопка. Этот подход позволяет кнопке отображаться только в определённой строке, в то время как остальные строки будут содержать пустое пространство в этом месте столбца или же вы можете настроить их по-разному, в зависимости от условий.
 
-### 3. Обработка нажатия кнопки
-
-Обработку нажатия кнопки можно реализовать через событие `RowCommand` `ASPxGridView`. Не забудьте прописать логику обработки в коде сервера:
-
-```csharp
-protected void GridView1_RowCommand(object sender, ASPxGridViewRowCommandEventArgs e)
-{
-    if(e.CommandName == "MyCommand")
-    {
-        object id = e.CommandArgument;
-        // Ваша логика обработки
-    }
-}
-```
-
-Это позволит вам иметь таблицу, где в одной колонке расположены кнопки для выполнения действий над строками, а в остальных колонках реализован поиск по содержимому.
+Обратите внимание, что `Container.VisibleIndex` используется для определения индекса текущей строки внутри `GridView`, и если ваша логика требует расположения кнопки в другой строке, вам нужно будет соответствующим образом настроить условие видимости.

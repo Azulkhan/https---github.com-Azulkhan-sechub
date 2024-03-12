@@ -1,44 +1,58 @@
 
-Если вы столкнулись с проблемой, при которой чекбоксы в вашем `ASPxGridView` отмечаются только после второго клика и не позволяют выбрать более одного чекбокса за раз, проблема может быть связана с несколькими аспектами конфигурации или обработки событий в вашем коде. Вот несколько общих мест, которые стоит проверить и возможные решения:
+Если вы хотите, чтобы в одном столбце таблицы `ASPxGridView` была кнопка, а в остальных столбцах был поиск или другой функционал, вам потребуется комбинировать использование Template Column для столбца с кнопкой и настройки для остальных столбцов, чтобы они поддерживали поиск.
 
-### 1. Проверка режима выбора
+Давайте разберём, как это можно реализовать:
 
-Убедитесь, что режим выбора строки (`SettingsBehavior.AllowSelectByRowClick` и `SettingsBehavior.AllowSelectSingleRowOnly`) настроен правильно в вашем `ASPxGridView`. Если вам нужно разрешить выбор нескольких строк с помощью чекбоксов, убедитесь, что `AllowSelectSingleRowOnly` не включен.
+### 1. Создание Template Column для кнопки
+
+Для столбца, в котором должна быть размещена кнопка, используйте `TemplateColumn`. Вы определяете кнопку внутри `DataItemTemplate` для этого столбца.
 
 ```aspx
-<dx:ASPxGridView ID="grid" runat="server" ...>
-    <SettingsBehavior AllowSelectByRowClick="True" AllowSelectSingleRowOnly="False" />
-    ...
-</dx:ASPxGridView>
+<dx:GridViewDataColumn VisibleIndex="0">
+    <DataItemTemplate>
+        <asp:Button ID="myButton" runat="server" Text="Кнопка" CommandName="MyCommand" CommandArgument='<%# Eval("ID") %>' />
+    </DataItemTemplate>
+</dx:GridViewDataColumn>
 ```
 
-### 2. Конфигурация столбца с чекбоксами
+### 2. Настройка остальных столбцов для поддержки поиска
 
-Убедитесь, что столбец с чекбоксами настроен правильно. `GridViewCommandColumn` должен иметь включенный `ShowSelectCheckbox`, и, если вы используете чекбокс "Выбрать все", то `ShowSelectAllCheckbox` также должен быть включен.
+Для остальных столбцов, где вы хотите использовать поиск, убедитесь, что они настроены соответствующим образом. В `ASPxGridView` поиск можно включить с помощью свойства `Settings.ShowFilterRow`, которое позволяет отображать строку фильтрации в верхней части грида.
 
 ```aspx
-<dx:ASPxGridView ID="YourGridView" runat="server" ...>
+<dx:ASPxGridView ID="GridView1" runat="server" DataSourceID="yourDataSource">
+    <Settings ShowFilterRow="True" />
     <Columns>
-        <dx:GridViewCommandColumn ShowSelectCheckbox="True" ShowSelectAllCheckbox="True" />
-        ...
+        <!-- Колонка с кнопкой -->
+        <dx:GridViewDataColumn VisibleIndex="0">
+            <DataItemTemplate>
+                <asp:Button ID="myButton" runat="server" Text="Кнопка" CommandName="MyCommand" CommandArgument='<%# Eval("ID") %>' />
+            </DataItemTemplate>
+        </dx:GridViewDataColumn>
+
+        <!-- Остальные колонки для поиска -->
+        <dx:GridViewDataTextColumn FieldName="FieldName1" VisibleIndex="1" />
+        <dx:GridViewDataTextColumn FieldName="FieldName2" VisibleIndex="2" />
+        <!-- Добавьте столько колонок, сколько необходимо -->
     </Columns>
 </dx:ASPxGridView>
 ```
 
-### 3. Проверка обработчиков событий
+В этом примере, для первой колонки используется `TemplateColumn` для вставки кнопки, а для остальных колонок включен поиск, благодаря `ShowFilterRow="True"`.
 
-Если у вас есть обработчики событий, связанные с выбором строки или кликами по гриду, убедитесь, что они не мешают стандартному поведению выбора. Иногда логика в этих обработчиках может случайно предотвратить выбор строк или изменить его поведение.
+### 3. Обработка нажатия кнопки
 
-### 4. Обновление страницы или AJAX UpdatePanel
+Обработку нажатия кнопки можно реализовать через событие `RowCommand` `ASPxGridView`. Не забудьте прописать логику обработки в коде сервера:
 
-Если ваш `ASPxGridView` находится внутри `UpdatePanel` или если страница обновляется другим способом, это может повлиять на поведение выбора чекбоксов. Убедитесь, что состояние выбранных строк сохраняется между обновлениями или что AJAX обновления корректно настроены.
+```csharp
+protected void GridView1_RowCommand(object sender, ASPxGridViewRowCommandEventArgs e)
+{
+    if(e.CommandName == "MyCommand")
+    {
+        object id = e.CommandArgument;
+        // Ваша логика обработки
+    }
+}
+```
 
-### 5. Проверка JavaScript и CSS
-
-Любые пользовательские скрипты или стили, которые влияют на `ASPxGridView` или его чекбоксы, также могут быть причиной. Проверьте, нет ли конфликтующих JavaScript функций или CSS стилей, которые могут мешать стандартному поведению.
-
-### 6. Проверка настройки грида и его DataSource
-
-Убедитесь, что `DataSource` грида корректно настроен и что данные не перезагружаются или не перебиндиваются к гриду в ненужный момент, что может сбросить выбор чекбоксов.
-
-Если проблема сохраняется, рекомендуется проверить документацию DevExpress и форумы поддержки за похожими случаями или обратиться за помощью к службе поддержки DevExpress с детальным описанием вашей проблемы и конфигурации.
+Это позволит вам иметь таблицу, где в одной колонке расположены кнопки для выполнения действий над строками, а в остальных колонках реализован поиск по содержимому.

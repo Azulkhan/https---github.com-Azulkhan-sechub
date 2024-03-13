@@ -1,32 +1,21 @@
-
-Для работы с компонентом `ASPxGridView` от DevExpress и реализации функционала проверки состояния выбора всех строк на странице, вы можете использовать клиентский API, который предоставляется данным компонентом. Чтобы определить, выбраны ли все строки на странице, и в зависимости от этого возвращать `true` или `false`, можно использовать метод `GetSelectedKeysOnPage()`. Этот метод возвращает массив ключей выбранных строк на текущей странице.
-
-Здесь пример того, как можно реализовать функцию, которая проверяет, выбраны ли все строки на странице, и возвращает `false`, если все строки выбраны, и `true`, если хотя бы одна строка не выбрана:
-
-```javascript
-function areNotAllRowsSelectedOnPage(gridView) {
-    // Получаем количество строк на странице
-    var rowsCount = gridView.GetVisibleRowsOnPage();
-    // Получаем массив ключей выбранных строк на странице
-    var selectedKeys = gridView.GetSelectedKeysOnPage();
-
-    // Проверяем, совпадает ли количество выбранных строк с общим количеством строк на странице
-    if(selectedKeys.length === rowsCount) {
-        // Все строки выбраны
-        return false;
-    } else {
-        // Не все строки выбраны
-        return true;
-    }
-}
-```
-
-Для использования этой функции, вам нужно передать в неё экземпляр вашего `ASPxGridView`. Например, если ваш `ASPxGridView` имеет клиентский идентификатор `grid`, то вызов функции будет выглядеть так:
-
-```javascript
-var gridInstance = ASPxClientGridView.Cast("grid");
-var result = areNotAllRowsSelectedOnPage(gridInstance);
-alert(result); // выведет true, если не все строки выбраны, и false, если все строки выбраны
-```
-
-Обратите внимание, что вам может потребоваться адаптировать этот код в зависимости от вашей конкретной реализации и версии компонентов DevExpress, которые вы используете.
+<dx:ASPxGridView ID="GridView1" runat="server">
+    <Columns>
+        <dx:GridViewDataTextColumn FieldName="YourFieldName" VisibleIndex="0">
+            <HeaderTemplate>
+                <dx:ASPxButton ID="PopupButton" runat="server" Text="Выберите действие">
+                    <ClientSideEvents Click="function(s, e) { var popup = ASPxPopupControl.Cast('popupControl'); popup.Show(); }" />
+                </dx:ASPxButton>
+                <dx:ASPxPopupControl ID="popupControl" runat="server" PopupElementID="PopupButton" AllowDragging="true">
+                    <ContentCollection>
+                        <dx:PopupControlContentControl runat="server">
+                            <!-- Поместите ваши кнопки здесь -->
+                            <dx:ASPxButton ID="Button1" runat="server" Text="Кнопка 1"></dx:ASPxButton>
+                            <dx:ASPxButton ID="Button2" runat="server" Text="Кнопка 2"></dx:ASPxButton>
+                        </dx:PopupControlContentControl>
+                    </ContentCollection>
+                </dx:ASPxPopupControl>
+            </HeaderTemplate>
+        </dx:GridViewDataTextColumn>
+        <!-- Другие столбцы -->
+    </Columns>
+</dx:ASPxGridView>

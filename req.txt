@@ -1,24 +1,29 @@
 
-Для создания ЭЦП (электронной цифровой подписи) в JavaScript вы можете использовать различные библиотеки, такие как `jsrsasign` или `crypto` в Node.js. Вот пример создания ЭЦП с использованием `crypto` в Node.js:
+Для создания ЭЦП (электронной цифровой подписи) в AngularJS вам потребуется использовать библиотеку или сервис для работы с криптографией, такую как PKI.js или другие аналогичные инструменты. Например, вы можете использовать библиотеку PKI.js для генерации и проверки подписей.
+
+Вот пример того, как можно создать подпись с использованием PKI.js в AngularJS:
 
 ```javascript
-const crypto = require('crypto');
-const fs = require('fs');
+// Загрузка библиотеки PKI.js
+var PKI = require('pkijs');
 
-// Чтение закрытого ключа
-const privateKey = fs.readFileSync('private.pem', 'utf8');
+// Создание нового объекта подписи
+var cmsSignedData = new PKI.CMS_SignedData();
 
-// Данные для подписи
-const data = 'Данные, которые нужно подписать';
+// Создание хеша данных для подписи
+var hash = crypto.createHash('sha256').update('Data to sign').digest();
 
-// Создание ЭЦП
-const sign = crypto.createSign('RSA-SHA256');
-sign.update(data);
-const signature = sign.sign(privateKey, 'base64');
-
-console.log('ЭЦП:', signature);
+// Инициализация подписи
+cmsSignedData.sign(hash).then(
+    function(result) {
+        // Получение подписи
+        var signature = result.signature;
+        console.log("Signature: ", signature);
+    },
+    function(error) {
+        console.log("Error: ", error);
+    }
+);
 ```
 
-В этом примере `private.pem` - это файл с вашим закрытым ключом. Вы можете заменить `private.pem` на путь к вашему файлу закрытого ключа.
-
-Убедитесь, что ваш закрытый ключ находится в безопасном месте и не доступен посторонним лицам. Создание и использование ЭЦП требует особой осторожности и безопасности.
+Это простой пример. Пожалуйста, убедитесь, что вы правильно настроили и подключили библиотеку PKI.js к вашему проекту AngularJS, а также обработали все ошибки и исключения соответствующим образом.

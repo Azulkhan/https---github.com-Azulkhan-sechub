@@ -1,37 +1,22 @@
 
-Да, конечно. Вот как вы можете реализовать это с использованием AngularJS:
+В AngularJS вы можете использовать директиву `ng-model` для связывания значения поля ввода типа файла с переменной в контроллере. Вот как это можно сделать:
 
 ```html
-<!DOCTYPE html>
-<html lang="en" ng-app="myApp">
-<head>
-  <meta charset="UTF-8">
-  <title>AngularJS File Input</title>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
-</head>
-<body ng-controller="FileController">
-  <input type="file" id="fileInput" onchange="angular.element(this).scope().getFileDetails(event)" />
-  <script>
-    var app = angular.module('myApp', []);
-    app.controller('FileController', function($scope) {
-      $scope.getFileDetails = function(event) {
-        var files = event.target.files;
-        for (var i = 0; i < files.length; i++) {
-          var fileName = files[i].name;
-          if (fileName.startsWith('auth-rsa')) {
-            alert('Выбран файл с именем: ' + fileName);
-            // Дополнительные действия с файлом...
-          } else {
-            alert('Выберите файлы, имена которых начинаются с "auth-rsa".');
-            document.getElementById('fileInput').value = ''; // Очистить выбранные файлы
-            return;
-          }
-        }
-      };
-    });
-  </script>
-</body>
-</html>
+<input type="file" ng-model="uploadedFile" />
 ```
 
-В этом примере AngularJS используется для создания контроллера FileController, который содержит функцию getFileDetails для обработки выбранных файлов.
+Затем в вашем контроллере AngularJS вы сможете получить доступ к имени файла, загруженного через это поле ввода:
+
+```javascript
+app.controller('MainController', function($scope) {
+    $scope.uploadedFileName = null;
+    
+    $scope.getFileDetails = function() {
+        if ($scope.uploadedFile) {
+            $scope.uploadedFileName = $scope.uploadedFile.name;
+        }
+    };
+});
+```
+
+Используйте метод `getFileDetails()` для получения имени файла после того, как пользователь выберет файл.

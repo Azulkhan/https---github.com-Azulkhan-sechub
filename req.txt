@@ -1,21 +1,30 @@
 
-Извините за путаницу. В AngularJS нет прямой возможности получить доступ к имени файла, выбранного через поле ввода типа файла, с помощью директивы `ng-model`. Вместо этого, вы можете использовать объект события изменения `change` для получения этой информации. Вот как это можно сделать:
+Понял. Вы можете сохранить информацию о выбранном файле в переменной области видимости контроллера AngularJS и обращаться к ней из других функций контроллера. Вот пример:
 
 ```html
-<input type="file" id="fileInput" ng-change="getFileDetails($event)" />
+<input type="file" id="fileInput" ng-model="uploadedFile" style="display: none;" />
+<button ng-click="openFileInput()">Выбрать файл</button>
+<button ng-click="getFileName()">Получить название файла</button>
 
 <script>
 app.controller('MainController', function($scope) {
+    $scope.uploadedFile = null;
     $scope.uploadedFileName = null;
-    
-    $scope.getFileDetails = function(event) {
-        var files = event.target.files;
-        if (files.length > 0) {
-            $scope.uploadedFileName = files[0].name;
+
+    $scope.openFileInput = function() {
+        document.getElementById('fileInput').click();
+    };
+
+    $scope.getFileName = function() {
+        if ($scope.uploadedFile) {
+            $scope.uploadedFileName = $scope.uploadedFile.name;
+            console.log("Имя файла: ", $scope.uploadedFileName);
+        } else {
+            console.log("Файл не выбран");
         }
     };
 });
 </script>
 ```
 
-Этот код реагирует на изменения в поле ввода типа файла и вызывает функцию `getFileDetails()`, передавая объект события изменения. В этой функции мы можем получить доступ к выбранным файлам через `event.target.files`. Каждый файл представлен объектом File, у которого есть свойство `name`, содержащее имя файла.
+Этот код позволяет выбрать файл, нажав на кнопку "Выбрать файл", и затем получить его имя, нажав на кнопку "Получить название файла".

@@ -1,25 +1,37 @@
 
-Вы можете получить название файла из объекта File, который представляет выбранный файл. Вот пример, как это можно сделать:
+Да, конечно. Вот как вы можете реализовать это с использованием AngularJS:
 
 ```html
-<input type="file" id="fileInput" onchange="getFileDetails(event)">
-<script>
-    function getFileDetails(event) {
-        const fileInput = event.target;
-        const files = fileInput.files;
-        for (let i = 0; i < files.length; i++) {
-            const fileName = files[i].name;
-            if (fileName.startsWith('auth-rsa')) {
-                alert('Выбран файл с именем: ' + fileName);
-                // Дополнительные действия с файлом...
-            } else {
-                alert('Выберите файлы, имена которых начинаются с "auth-rsa".');
-                fileInput.value = ''; // Очистить выбранные файлы
-                return;
-            }
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+  <meta charset="UTF-8">
+  <title>AngularJS File Input</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<body ng-controller="FileController">
+  <input type="file" id="fileInput" onchange="angular.element(this).scope().getFileDetails(event)" />
+  <script>
+    var app = angular.module('myApp', []);
+    app.controller('FileController', function($scope) {
+      $scope.getFileDetails = function(event) {
+        var files = event.target.files;
+        for (var i = 0; i < files.length; i++) {
+          var fileName = files[i].name;
+          if (fileName.startsWith('auth-rsa')) {
+            alert('Выбран файл с именем: ' + fileName);
+            // Дополнительные действия с файлом...
+          } else {
+            alert('Выберите файлы, имена которых начинаются с "auth-rsa".');
+            document.getElementById('fileInput').value = ''; // Очистить выбранные файлы
+            return;
+          }
         }
-    }
-</script>
+      };
+    });
+  </script>
+</body>
+</html>
 ```
 
-Этот код выводит название файла, если оно начинается с "auth-rsa". Вы можете добавить в эту функцию любую логику, которая должна выполняться с выбранным файлом.
+В этом примере AngularJS используется для создания контроллера FileController, который содержит функцию getFileDetails для обработки выбранных файлов.

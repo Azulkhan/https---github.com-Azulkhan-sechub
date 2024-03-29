@@ -1,22 +1,21 @@
 
-В AngularJS вы можете использовать директиву `ng-model` для связывания значения поля ввода типа файла с переменной в контроллере. Вот как это можно сделать:
+Извините за путаницу. В AngularJS нет прямой возможности получить доступ к имени файла, выбранного через поле ввода типа файла, с помощью директивы `ng-model`. Вместо этого, вы можете использовать объект события изменения `change` для получения этой информации. Вот как это можно сделать:
 
 ```html
-<input type="file" ng-model="uploadedFile" />
-```
+<input type="file" id="fileInput" ng-change="getFileDetails($event)" />
 
-Затем в вашем контроллере AngularJS вы сможете получить доступ к имени файла, загруженного через это поле ввода:
-
-```javascript
+<script>
 app.controller('MainController', function($scope) {
     $scope.uploadedFileName = null;
     
-    $scope.getFileDetails = function() {
-        if ($scope.uploadedFile) {
-            $scope.uploadedFileName = $scope.uploadedFile.name;
+    $scope.getFileDetails = function(event) {
+        var files = event.target.files;
+        if (files.length > 0) {
+            $scope.uploadedFileName = files[0].name;
         }
     };
 });
+</script>
 ```
 
-Используйте метод `getFileDetails()` для получения имени файла после того, как пользователь выберет файл.
+Этот код реагирует на изменения в поле ввода типа файла и вызывает функцию `getFileDetails()`, передавая объект события изменения. В этой функции мы можем получить доступ к выбранным файлам через `event.target.files`. Каждый файл представлен объектом File, у которого есть свойство `name`, содержащее имя файла.

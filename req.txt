@@ -1,30 +1,14 @@
 
-Понял. Вы можете сохранить информацию о выбранном файле в переменной области видимости контроллера AngularJS и обращаться к ней из других функций контроллера. Вот пример:
+Вот пример JavaScript кода, использующего цикл `while`, чтобы функция выполнялась, когда значение равно 0:
 
-```html
-<input type="file" id="fileInput" ng-model="uploadedFile" style="display: none;" />
-<button ng-click="openFileInput()">Выбрать файл</button>
-<button ng-click="getFileName()">Получить название файла</button>
+```javascript
+let value = 0;
 
-<script>
-app.controller('MainController', function($scope) {
-    $scope.uploadedFile = null;
-    $scope.uploadedFileName = null;
-
-    $scope.openFileInput = function() {
-        document.getElementById('fileInput').click();
-    };
-
-    $scope.getFileName = function() {
-        if ($scope.uploadedFile) {
-            $scope.uploadedFileName = $scope.uploadedFile.name;
-            console.log("Имя файла: ", $scope.uploadedFileName);
-        } else {
-            console.log("Файл не выбран");
-        }
-    };
-});
-</script>
+while (value === 0) {
+    // Ваш код функции здесь
+    console.log("Функция работает");
+    value = 1; // Если вы хотите, чтобы функция выполнялась только один раз, вы можете изменить значение переменной value
+}
 ```
 
-Этот код позволяет выбрать файл, нажав на кнопку "Выбрать файл", и затем получить его имя, нажав на кнопку "Получить название файла".
+Этот код будет выполнять функцию, пока переменная `value` равна 0. Как только `value` будет изменено на что-то отличное от 0, цикл завершится.

@@ -1,14 +1,45 @@
 
-Вот пример JavaScript кода, использующего цикл `while`, чтобы функция выполнялась, когда значение равно 0:
+В Java и Angular это два разных языка и технологии, поэтому вызов функции в Java отличается от вызова функции в Angular.
 
-```javascript
-let value = 0;
+В Java, если вы хотите вызвать вторую функцию, вам нужно сначала создать экземпляр объекта класса, в котором определена эта функция, а затем вызвать её. Например:
 
-while (value === 0) {
-    // Ваш код функции здесь
-    console.log("Функция работает");
-    value = 1; // Если вы хотите, чтобы функция выполнялась только один раз, вы можете изменить значение переменной value
+```java
+public class MyClass {
+    public void firstFunction() {
+        System.out.println("Вызвана первая функция");
+    }
+
+    public void secondFunction() {
+        System.out.println("Вызвана вторая функция");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        MyClass obj = new MyClass();
+        obj.secondFunction(); // вызов второй функции
+    }
 }
 ```
 
-Этот код будет выполнять функцию, пока переменная `value` равна 0. Как только `value` будет изменено на что-то отличное от 0, цикл завершится.
+В Angular, если вы хотите вызвать функцию, определенную в компоненте или сервисе, вам просто нужно вызвать её по имени из другого метода или события в шаблоне компонента. Например:
+
+```typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'my-component',
+  template: '<button (click)="secondFunction()">Вызвать функцию</button>'
+})
+export class MyComponent {
+  firstFunction() {
+    console.log('Вызвана первая функция');
+  }
+
+  secondFunction() {
+    console.log('Вызвана вторая функция');
+  }
+}
+```
+
+В обоих случаях вызов второй функции зависит от контекста, в котором она определена, и от места, откуда вы хотите её вызвать.

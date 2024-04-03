@@ -1,16 +1,31 @@
 
-Вы можете использовать `$window.location.reload()` в AngularJS для перезагрузки текущей страницы. Вот пример:
+В AngularJS вы можете вызвать две функции при нажатии на кнопку и управлять порядком их выполнения. Однако, если вы хотите, чтобы первая функция сработала быстрее и изменила данные, которые использует вторая функция, вам нужно учесть асинхронную природу JavaScript. Например, если вам нужно выполнить асинхронную операцию, такую как HTTP-запрос, вы можете использовать обещания (`Promises`) или функции обратного вызова (`callbacks`). Вот пример:
 
 ```javascript
-app.controller('MainController', function($scope, $window) {
-    $scope.reloadPage = function() {
-        $window.location.reload();
+angular.module('myApp', [])
+  .controller('myController', function($scope, $http) {
+    $scope.data = {};
+
+    $scope.firstFunction = function() {
+      // Асинхронная операция, например, HTTP-запрос
+      $http.get('some-url')
+        .then(function(response) {
+          // Обработка успешного ответа и изменение данных
+          $scope.data.someProperty = response.data.someValue;
+          // Вызов второй функции после обновления данных
+          $scope.secondFunction();
+        })
+        .catch(function(error) {
+          // Обработка ошибки
+          console.error('Error:', error);
+        });
     };
-});
+
+    $scope.secondFunction = function() {
+      // Вторая функция, использующая обновленные данные
+      console.log("Second function executed with updated data:", $scope.data);
+    };
+  });
 ```
 
-И в вашем HTML:
-
-```html
-<button ng-click="reloadPage()">Перезапустить страницу</button>
-```
+Здесь `firstFunction` выполняет асинхронную операцию (например, HTTP-запрос) и, после успешного выполнения, обновляет данные и вызывает `secondFunction`, которая использует эти данные.

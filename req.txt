@@ -1,45 +1,16 @@
 
-В Java и Angular это два разных языка и технологии, поэтому вызов функции в Java отличается от вызова функции в Angular.
+Вы можете использовать `$window.location.reload()` в AngularJS для перезагрузки текущей страницы. Вот пример:
 
-В Java, если вы хотите вызвать вторую функцию, вам нужно сначала создать экземпляр объекта класса, в котором определена эта функция, а затем вызвать её. Например:
-
-```java
-public class MyClass {
-    public void firstFunction() {
-        System.out.println("Вызвана первая функция");
-    }
-
-    public void secondFunction() {
-        System.out.println("Вызвана вторая функция");
-    }
-}
-
-public class Main {
-    public static void main(String[] args) {
-        MyClass obj = new MyClass();
-        obj.secondFunction(); // вызов второй функции
-    }
-}
+```javascript
+app.controller('MainController', function($scope, $window) {
+    $scope.reloadPage = function() {
+        $window.location.reload();
+    };
+});
 ```
 
-В Angular, если вы хотите вызвать функцию, определенную в компоненте или сервисе, вам просто нужно вызвать её по имени из другого метода или события в шаблоне компонента. Например:
+И в вашем HTML:
 
-```typescript
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'my-component',
-  template: '<button (click)="secondFunction()">Вызвать функцию</button>'
-})
-export class MyComponent {
-  firstFunction() {
-    console.log('Вызвана первая функция');
-  }
-
-  secondFunction() {
-    console.log('Вызвана вторая функция');
-  }
-}
+```html
+<button ng-click="reloadPage()">Перезапустить страницу</button>
 ```
-
-В обоих случаях вызов второй функции зависит от контекста, в котором она определена, и от места, откуда вы хотите её вызвать.

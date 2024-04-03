@@ -1,29 +1,21 @@
 
-Если вы хотите объединить элементы массивов `uploader.queue` и `authuploader.queue` в один массив и использовать его в `ng-repeat`, вы можете сделать это, объединив их до передачи в область видимости AngularJS. Давайте рассмотрим пример:
-
-HTML:
-```html
-<div ng-controller="MyController">
-  <div ng-repeat="item in combinedQueue">
-    {{ item }}
+<div ng-app="myApp" ng-controller="myCtrl">
+  <div class="row">
+    <div class="col-md-4">
+      <label>Label 1</label>
+      <input type="text" class="form-control" ng-model="field1">
+    </div>
+    <div class="col-md-4">
+      <label>Label 2</label>
+      <input type="text" class="form-control" ng-model="field2">
+    </div>
   </div>
 </div>
-```
 
-JavaScript (AngularJS контроллер):
-```javascript
-angular.module('myApp', [])
-.controller('MyController', function($scope) {
-  $scope.uploader = {
-    queue: ['Uploader 1', 'Uploader 2']
-  };
-  
-  $scope.authuploader = {
-    queue: ['Auth Uploader 1', 'Auth Uploader 2']
-  };
-  
-  $scope.combinedQueue = $scope.uploader.queue.concat($scope.authuploader.queue);
-});
-```
-
-В этом примере мы объединяем массивы `uploader.queue` и `authuploader.queue` с помощью метода `concat()`, создавая новый массив `combinedQueue`. Затем мы используем `ng-repeat` для перебора элементов этого объединенного массива и выводим их в соответствующих элементах DOM.
+<script>
+  var app = angular.module('myApp', []);
+  app.controller('myCtrl', function($scope) {
+    $scope.field1 = ''; // переменная для первого поля
+    $scope.field2 = ''; // переменная для второго поля
+  });
+</script>

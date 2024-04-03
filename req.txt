@@ -1,31 +1,29 @@
 
-В AngularJS вы можете вызвать две функции при нажатии на кнопку и управлять порядком их выполнения. Однако, если вы хотите, чтобы первая функция сработала быстрее и изменила данные, которые использует вторая функция, вам нужно учесть асинхронную природу JavaScript. Например, если вам нужно выполнить асинхронную операцию, такую как HTTP-запрос, вы можете использовать обещания (`Promises`) или функции обратного вызова (`callbacks`). Вот пример:
+Если вы хотите объединить элементы массивов `uploader.queue` и `authuploader.queue` в один массив и использовать его в `ng-repeat`, вы можете сделать это, объединив их до передачи в область видимости AngularJS. Давайте рассмотрим пример:
 
-```javascript
-angular.module('myApp', [])
-  .controller('myController', function($scope, $http) {
-    $scope.data = {};
-
-    $scope.firstFunction = function() {
-      // Асинхронная операция, например, HTTP-запрос
-      $http.get('some-url')
-        .then(function(response) {
-          // Обработка успешного ответа и изменение данных
-          $scope.data.someProperty = response.data.someValue;
-          // Вызов второй функции после обновления данных
-          $scope.secondFunction();
-        })
-        .catch(function(error) {
-          // Обработка ошибки
-          console.error('Error:', error);
-        });
-    };
-
-    $scope.secondFunction = function() {
-      // Вторая функция, использующая обновленные данные
-      console.log("Second function executed with updated data:", $scope.data);
-    };
-  });
+HTML:
+```html
+<div ng-controller="MyController">
+  <div ng-repeat="item in combinedQueue">
+    {{ item }}
+  </div>
+</div>
 ```
 
-Здесь `firstFunction` выполняет асинхронную операцию (например, HTTP-запрос) и, после успешного выполнения, обновляет данные и вызывает `secondFunction`, которая использует эти данные.
+JavaScript (AngularJS контроллер):
+```javascript
+angular.module('myApp', [])
+.controller('MyController', function($scope) {
+  $scope.uploader = {
+    queue: ['Uploader 1', 'Uploader 2']
+  };
+  
+  $scope.authuploader = {
+    queue: ['Auth Uploader 1', 'Auth Uploader 2']
+  };
+  
+  $scope.combinedQueue = $scope.uploader.queue.concat($scope.authuploader.queue);
+});
+```
+
+В этом примере мы объединяем массивы `uploader.queue` и `authuploader.queue` с помощью метода `concat()`, создавая новый массив `combinedQueue`. Затем мы используем `ng-repeat` для перебора элементов этого объединенного массива и выводим их в соответствующих элементах DOM.

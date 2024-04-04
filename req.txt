@@ -1,24 +1,23 @@
 
-Понял вас. Если у вас есть два элемента `item`, и вы хотите вызвать функцию `upload()` для каждого из них перед подтверждением, вы можете передать оба элемента в функцию `uploadAndConfirm`. Вот пример:
+Вы можете использовать промисы для этого. Первые две функции `item1.upload()` и `item2.upload()` должны возвращать промисы, а затем, когда оба промиса будут успешно выполнены, вызовется функция `confirm()`. Вот как это можно сделать:
 
 ```html
-<div ng-repeat="item in uploads">
-    <button ng-click="uploadAndConfirm(item, $index)">Upload and Confirm</button>
+<div ng-repeat="item1 in uploader">
+    <div ng-repeat="item2 in authuploader">
+        <button ng-click="uploadAndConfirm(item1, item2)">Upload and Confirm</button>
+    </div>
 </div>
 ```
 
-Затем в контроллере вы можете определить функцию `uploadAndConfirm`, которая принимает оба элемента `item`:
-
 ```javascript
-$scope.uploadAndConfirm = function(item, index) {
-    var promises = [];
-    promises.push(item1.upload());
-    promises.push(item2.upload());
+$scope.uploadAndConfirm = function(item1, item2) {
+    var promise1 = item1.upload();
+    var promise2 = item2.upload();
 
-    Promise.all(promises).then(function() {
+    $q.all([promise1, promise2]).then(function() {
         confirm();
     });
 };
 ```
 
-Здесь `item1` и `item2` - это ваши элементы, которые вы хотите загрузить и подтвердить. Вы можете передавать их в `uploadAndConfirm`, чтобы они могли быть обработаны соответствующим образом в функции.
+Обратите внимание, что я использовал `$q.all()` для ожидания выполнения обоих промисов. Помните также, что вы должны внедрить сервис `$q` в ваш контроллер.

@@ -1,21 +1,18 @@
 
-<div ng-app="myApp" ng-controller="myCtrl">
-  <div class="row">
-    <div class="col-md-4">
-      <label>Label 1</label>
-      <input type="text" class="form-control" ng-model="field1">
-    </div>
-    <div class="col-md-4">
-      <label>Label 2</label>
-      <input type="text" class="form-control" ng-model="field2">
-    </div>
-  </div>
-</div>
+Для этого вам нужно использовать промисы (Promises) или асинхронные функции. Вот пример, как это можно сделать:
 
-<script>
-  var app = angular.module('myApp', []);
-  app.controller('myCtrl', function($scope) {
-    $scope.field1 = ''; // переменная для первого поля
-    $scope.field2 = ''; // переменная для второго поля
-  });
-</script>
+```html
+<div ng-repeat="item in uploads">
+    <button ng-click="uploadAndConfirm(item)">Upload</button>
+</div>
+```
+
+```javascript
+$scope.uploadAndConfirm = function(item) {
+    item.upload().then(function() {
+        confirm();
+    });
+};
+```
+
+Здесь `item.upload()` должен возвращать промис. Когда загрузка завершится успешно, будет вызвана функция `confirm()`.

@@ -1,20 +1,52 @@
 
-Возможно, проблема связана с тем, что функции `upload()` не возвращают промисы. Убедитесь, что `upload()` возвращает промисы, чтобы цепочка `.then()` правильно выполнялась. Вот пример того, как это может быть сделано:
+Понял, если это просто загрузка файла, вы можете использовать `FileReader` для чтения файла и создания промиса. Вот как это можно сделать:
 
 ```javascript
-item1.upload = function() {
-  // Возвращает промис, например, через $http
-  return $http.post('/upload', data);
+item1.upload = function(file) {
+  var deferred = $q.defer();
+  var reader = new FileReader();
+  
+  reader.onload = function(event) {
+    // Логика загрузки файла item1...
+    // После завершения загрузки вызываем resolve
+    deferred.resolve();
+  };
+  
+  reader.onerror = function(error) {
+    // В случае ошибки вызываем reject
+    deferred.reject(error);
+  };
+  
+  reader.readAsDataURL(file);
+  
+  return deferred.promise;
 };
 
-item2.upload = function() {
-  // Возвращает промис
-  return $http.post('/upload', data);
+item2.upload = function(file) {
+  var deferred = $q.defer();
+  var reader = new FileReader();
+  
+  reader.onload = function(event) {
+    // Логика загрузки файла item2...
+    // После завершения загрузки вызываем resolve
+    deferred.resolve();
+  };
+  
+  reader.onerror = function(error) {
+    // В случае ошибки вызываем reject
+    deferred.reject(error);
+  };
+  
+  reader.readAsDataURL(file);
+  
+  return deferred.promise;
 };
 
-item1.upload()
+var file = /* ваш файл */;
+
+item1.upload(file)
   .then(function() {
-    return item2.upload();
+    return item2.upload(file);
   })
   .then(function() {
     $scope.confirm();
@@ -24,4 +56,4 @@ item1.upload()
   });
 ```
 
-Убедитесь, что `upload()` возвращает промисы, чтобы обеспечить правильную последовательность выполнения.
+Этот код использует `FileReader` для чтения файла и создания промиса. После загрузки файла функция `upload()` вызывает `resolve()`, чтобы промис завершался успешно.

@@ -1,24 +1,38 @@
 
-Да, вы правы. В AngularJS функции обычно вызываются без прямого вызова внутри атрибута `ng-click`. Вместо этого, для выполнения последовательности действий, вам нужно будет создать функцию в контроллере, которая вызовет функции `upload` для каждого `item`, а затем вызовет `confirm`. Вот как это может выглядеть:
+Вот пример Lua скрипта, который вызывает одну и ту же Java функцию с разными данными:
 
-HTML:
-```html
-<div ng-repeat="item1 in uploader">
-    <div ng-repeat="item2 in authuploader">
-        <button ng-click="uploadAndConfirm(item1, item2)">Upload and Confirm</button>
-    </div>
-</div>
+```lua
+-- Подключение библиотеки Java
+local luaj = require("luaj")
+
+-- Путь к Java классу
+local classPath = "com.example.MyJavaClass"
+
+-- Функция для вызова Java метода с разными данными
+local function callJavaMethod(data)
+    -- Создание объекта Java
+    local javaObject, error = luaj.newInstance(classPath)
+    if not javaObject then
+        print("Ошибка создания объекта Java:", error)
+        return
+    end
+    
+    -- Вызов Java метода с передачей данных
+    local success, result = luaj.callMethod(javaObject, "myJavaMethod", {data})
+    if success then
+        print("Результат вызова Java метода:", result)
+    else
+        print("Ошибка вызова Java метода:", result)
+    end
+end
+
+-- Примеры данных для передачи в Java метод
+local data1 = "первые данные"
+local data2 = "вторые данные"
+
+-- Вызов функции с разными данными
+callJavaMethod(data1)
+callJavaMethod(data2)
 ```
 
-JavaScript (контроллер):
-```javascript
-$scope.uploadAndConfirm = function(item1, item2) {
-    item1.upload().then(function() {
-        return item2.upload();
-    }).then(function() {
-        confirm();
-    });
-};
-```
-
-Этот код вызовет функции `upload()` для `item1`, а затем для `item2`. После успешной загрузки обоих элементов будет вызвана функция `confirm()`.
+Пожалуйста, замените `"com.example.MyJavaClass"` на полное имя вашего Java класса, а `"myJavaMethod"` на имя метода, который вы хотите вызвать.

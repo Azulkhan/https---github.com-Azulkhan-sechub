@@ -1,38 +1,23 @@
 
-Вот пример Lua скрипта, который вызывает одну и ту же Java функцию с разными данными:
+Для выполнения этих функций по порядку, вы можете использовать Promise или async/await. Вот пример с использованием Promise:
 
-```lua
--- Подключение библиотеки Java
-local luaj = require("luaj")
-
--- Путь к Java классу
-local classPath = "com.example.MyJavaClass"
-
--- Функция для вызова Java метода с разными данными
-local function callJavaMethod(data)
-    -- Создание объекта Java
-    local javaObject, error = luaj.newInstance(classPath)
-    if not javaObject then
-        print("Ошибка создания объекта Java:", error)
-        return
-    end
-    
-    -- Вызов Java метода с передачей данных
-    local success, result = luaj.callMethod(javaObject, "myJavaMethod", {data})
-    if success then
-        print("Результат вызова Java метода:", result)
-    else
-        print("Ошибка вызова Java метода:", result)
-    end
-end
-
--- Примеры данных для передачи в Java метод
-local data1 = "первые данные"
-local data2 = "вторые данные"
-
--- Вызов функции с разными данными
-callJavaMethod(data1)
-callJavaMethod(data2)
+```javascript
+item1.upload()
+  .then(() => item2.upload())
+  .then(() => $scope.confirm())
+  .catch(error => console.error('Ошибка:', error));
 ```
 
-Пожалуйста, замените `"com.example.MyJavaClass"` на полное имя вашего Java класса, а `"myJavaMethod"` на имя метода, который вы хотите вызвать.
+Или с использованием async/await:
+
+```javascript
+try {
+  await item1.upload();
+  await item2.upload();
+  await $scope.confirm();
+} catch (error) {
+  console.error('Ошибка:', error);
+}
+```
+
+Обратите внимание, что в обоих случаях следующая функция будет вызвана только после успешного завершения предыдущей.

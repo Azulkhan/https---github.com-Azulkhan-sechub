@@ -1,23 +1,17 @@
 
-Для выполнения этих функций по порядку, вы можете использовать Promise или async/await. Вот пример с использованием Promise:
+В AngularJS вы можете использовать промисы для выполнения функций по порядку. Для этого вам понадобится зависимость `$q`:
 
 ```javascript
 item1.upload()
-  .then(() => item2.upload())
-  .then(() => $scope.confirm())
-  .catch(error => console.error('Ошибка:', error));
+  .then(function() {
+    return item2.upload();
+  })
+  .then(function() {
+    $scope.confirm();
+  })
+  .catch(function(error) {
+    console.error('Ошибка:', error);
+  });
 ```
 
-Или с использованием async/await:
-
-```javascript
-try {
-  await item1.upload();
-  await item2.upload();
-  await $scope.confirm();
-} catch (error) {
-  console.error('Ошибка:', error);
-}
-```
-
-Обратите внимание, что в обоих случаях следующая функция будет вызвана только после успешного завершения предыдущей.
+Убедитесь, что `$q` доступен в вашем контроллере или сервисе.

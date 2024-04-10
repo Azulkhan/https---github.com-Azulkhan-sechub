@@ -40,3 +40,38 @@ end
 ```
 
 Этот скрипт использует библиотеку OpenSSL для Lua. Он сначала создает объект открытого ключа из строки с открытым ключом, а затем проверяет подпись под текстом. Если подпись верна, он выведет "Подпись верна!", в противном случае - "Подпись не верна.". Не забудьте установить библиотеку OpenSSL для Lua перед использованием этого скрипта.
+
+
+
+
+Понял вас. Если вы хотите извлечь данные из открытого ключа, например, его компоненты, такие как модуль и открытая экспонента, вы можете использовать библиотеку OpenSSL для Lua. Вот пример, как это можно сделать:
+
+```lua
+local openssl = require "openssl"
+
+-- Ваш открытый ключ
+local public_key = [[
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr3Y1lvmYK54/n0lfodlE
+GKnKYp1Z8zkgTh5VO/L66WFuU0xxl8rWxeBoHZzAaZXhfMCetZ3a69eFyTBeuBy0
+qThpXQk+6QGnVoKciKydW6vVGpo/rdX2y9uWlxX1SRE/nzZnWwNlzbDDMSv7PS82
+EPIrEuk8hHwQn8hF3x/6hhUToGClABISiShJ7CpNnKuMjwX+gkzfAg1Asqy+x3xt
+Q2bfz7zN4WrgKzve8sDfnE/PS0SeOqPvKrxJL8fwWm1DGX0eK5arMIOhceYOoP2v
+xzuy1s6hWJwd7X4Hd4pl3aUj9rCrgX0q9aDf4/1hup4SYrlBbHMGt2zdd0wxBxOv
+VwIDAQAB
+-----END PUBLIC KEY-----
+]]
+
+-- Создаем объект публичного ключа из строки с открытым ключом
+local pub_key = assert(openssl.pkey.read(public_key, true))
+
+-- Получаем данные из открытого ключа
+local key_info = pub_key:parse().rsa
+
+-- Выводим данные
+print("Модуль (n):", key_info.n)
+print("Открытая экспонента (e):", key_info.e)
+```
+
+Этот скрипт извлекает данные из открытого ключа RSA (модуль и открытую экспоненту) и выводит их на экран. Помните, что структура ключей может быть разной в зависимости от типа ключа (RSA, DSA, ECDSA и т. д.). Убедитесь, что вы используете правильные методы для вашего типа ключа.
+

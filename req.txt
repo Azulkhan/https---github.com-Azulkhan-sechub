@@ -1,59 +1,22 @@
 
-Понял, если это просто загрузка файла, вы можете использовать `FileReader` для чтения файла и создания промиса. Вот как это можно сделать:
+Флаг, как правило, представляет собой переменную, используемую для управления каким-либо аспектом программы или процесса. В контексте подписания данных он может использоваться, например, для указания наличия или отсутствия дополнительных параметров или опций подписи.
+
+Вот пример кода на JavaScript для подписи данных с использованием KalkanCrypt:
 
 ```javascript
-item1.upload = function(file) {
-  var deferred = $q.defer();
-  var reader = new FileReader();
-  
-  reader.onload = function(event) {
-    // Логика загрузки файла item1...
-    // После завершения загрузки вызываем resolve
-    deferred.resolve();
-  };
-  
-  reader.onerror = function(error) {
-    // В случае ошибки вызываем reject
-    deferred.reject(error);
-  };
-  
-  reader.readAsDataURL(file);
-  
-  return deferred.promise;
-};
+// Предполагается, что у вас уже есть закрытый ключ в переменной privateKey
+var privateKey = "здесь ваш закрытый ключ";
 
-item2.upload = function(file) {
-  var deferred = $q.defer();
-  var reader = new FileReader();
-  
-  reader.onload = function(event) {
-    // Логика загрузки файла item2...
-    // После завершения загрузки вызываем resolve
-    deferred.resolve();
-  };
-  
-  reader.onerror = function(error) {
-    // В случае ошибки вызываем reject
-    deferred.reject(error);
-  };
-  
-  reader.readAsDataURL(file);
-  
-  return deferred.promise;
-};
+// Подготовка данных для подписи
+var dataToSign = "Some data to sign";
 
-var file = /* ваш файл */;
+// Вызов функции подписи с использованием закрытого ключа
+var signature = KalkanCrypt.sign(privateKey, dataToSign);
 
-item1.upload(file)
-  .then(function() {
-    return item2.upload(file);
-  })
-  .then(function() {
-    $scope.confirm();
-  })
-  .catch(function(error) {
-    console.error('Ошибка:', error);
-  });
+// Отображение подписи
+console.log("Подпись данных: ", signature);
 ```
 
-Этот код использует `FileReader` для чтения файла и создания промиса. После загрузки файла функция `upload()` вызывает `resolve()`, чтобы промис завершался успешно.
+В этом коде `privateKey` представляет собой ваш закрытый ключ, `dataToSign` - данные, которые вы хотите подписать. Функция `KalkanCrypt.sign` используется для создания подписи данных на основе заданного закрытого ключа и данных для подписи. Подпись сохраняется в переменной `signature`.
+
+Пожалуйста, убедитесь, что у вас есть действительный закрытый ключ, который соответствует открытому ключу, используемому для проверки подписи. Кроме того, проверьте документацию KalkanCrypt для подробностей о функции подписи и о том, как использовать ее в вашем коде.

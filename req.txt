@@ -1,9 +1,7 @@
 
-Конечно, предположим, у вас есть открытый ключ и вы хотите использовать его для проверки подписи электронного сообщения в Lua. Ниже приведен пример Lua-скрипта для этого:
+Понял. Если у вас нет библиотеки `openssl` для Lua, можно воспользоваться другим способом, используя стандартные средства Lua. Вот пример простого способа извлечения данных из открытого ключа в формате PEM:
 
 ```lua
-local openssl = require "openssl"
-
 -- Ваш открытый ключ
 local public_key = [[
 -----BEGIN PUBLIC KEY-----
@@ -17,61 +15,21 @@ VwIDAQAB
 -----END PUBLIC KEY-----
 ]]
 
--- Ваш подписанный текст
-local signed_text = "example_signed_text"
-
--- Ваша подпись
-local signature = [[
-MEUCIQCbkljLM6UYAsxEZ2M4eFlv/cyVn3ry6sY/LiP6YpwKQQIgHCDzUnx8XTv
-eG9A4tTCpPajdihPbjS8XYCwO00/ZqM=
-]]
-
--- Создаем объект публичного ключа из строки с открытым ключом
-local pub_key = assert(openssl.pkey.read(public_key, true))
-
--- Проверяем подпись
-local result = pub_key:verify(signed_text, signature)
-
-if result then
-    print("Подпись верна!")
-else
-    print("Подпись не верна.")
+-- Функция для извлечения данных из открытого ключа
+local function parse_public_key(public_key)
+    local key_data = {}
+    for line in public_key:gmatch("[^\n]+") do
+        if not line:find("-----") then
+            key_data[#key_data + 1] = line
+        end
+    end
+    return table.concat(key_data)
 end
+
+-- Извлекаем данные из открытого ключа
+local extracted_key = parse_public_key(public_key)
+print("Извлеченные данные из открытого ключа:")
+print(extracted_key)
 ```
 
-Этот скрипт использует библиотеку OpenSSL для Lua. Он сначала создает объект открытого ключа из строки с открытым ключом, а затем проверяет подпись под текстом. Если подпись верна, он выведет "Подпись верна!", в противном случае - "Подпись не верна.". Не забудьте установить библиотеку OpenSSL для Lua перед использованием этого скрипта.
-
-
-
-
-Понял вас. Если вы хотите извлечь данные из открытого ключа, например, его компоненты, такие как модуль и открытая экспонента, вы можете использовать библиотеку OpenSSL для Lua. Вот пример, как это можно сделать:
-
-```lua
-local openssl = require "openssl"
-
--- Ваш открытый ключ
-local public_key = [[
------BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr3Y1lvmYK54/n0lfodlE
-GKnKYp1Z8zkgTh5VO/L66WFuU0xxl8rWxeBoHZzAaZXhfMCetZ3a69eFyTBeuBy0
-qThpXQk+6QGnVoKciKydW6vVGpo/rdX2y9uWlxX1SRE/nzZnWwNlzbDDMSv7PS82
-EPIrEuk8hHwQn8hF3x/6hhUToGClABISiShJ7CpNnKuMjwX+gkzfAg1Asqy+x3xt
-Q2bfz7zN4WrgKzve8sDfnE/PS0SeOqPvKrxJL8fwWm1DGX0eK5arMIOhceYOoP2v
-xzuy1s6hWJwd7X4Hd4pl3aUj9rCrgX0q9aDf4/1hup4SYrlBbHMGt2zdd0wxBxOv
-VwIDAQAB
------END PUBLIC KEY-----
-]]
-
--- Создаем объект публичного ключа из строки с открытым ключом
-local pub_key = assert(openssl.pkey.read(public_key, true))
-
--- Получаем данные из открытого ключа
-local key_info = pub_key:parse().rsa
-
--- Выводим данные
-print("Модуль (n):", key_info.n)
-print("Открытая экспонента (e):", key_info.e)
-```
-
-Этот скрипт извлекает данные из открытого ключа RSA (модуль и открытую экспоненту) и выводит их на экран. Помните, что структура ключей может быть разной в зависимости от типа ключа (RSA, DSA, ECDSA и т. д.). Убедитесь, что вы используете правильные методы для вашего типа ключа.
-
+Этот простой скрипт извлекает данные из открытого ключа PEM, игнорируя заголовки и футер. Результатом будет строка с данными из открытого ключа.

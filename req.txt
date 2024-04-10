@@ -1,22 +1,42 @@
 
-Флаг, как правило, представляет собой переменную, используемую для управления каким-либо аспектом программы или процесса. В контексте подписания данных он может использоваться, например, для указания наличия или отсутствия дополнительных параметров или опций подписи.
+Конечно, предположим, у вас есть открытый ключ и вы хотите использовать его для проверки подписи электронного сообщения в Lua. Ниже приведен пример Lua-скрипта для этого:
 
-Вот пример кода на JavaScript для подписи данных с использованием KalkanCrypt:
+```lua
+local openssl = require "openssl"
 
-```javascript
-// Предполагается, что у вас уже есть закрытый ключ в переменной privateKey
-var privateKey = "здесь ваш закрытый ключ";
+-- Ваш открытый ключ
+local public_key = [[
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr3Y1lvmYK54/n0lfodlE
+GKnKYp1Z8zkgTh5VO/L66WFuU0xxl8rWxeBoHZzAaZXhfMCetZ3a69eFyTBeuBy0
+qThpXQk+6QGnVoKciKydW6vVGpo/rdX2y9uWlxX1SRE/nzZnWwNlzbDDMSv7PS82
+EPIrEuk8hHwQn8hF3x/6hhUToGClABISiShJ7CpNnKuMjwX+gkzfAg1Asqy+x3xt
+Q2bfz7zN4WrgKzve8sDfnE/PS0SeOqPvKrxJL8fwWm1DGX0eK5arMIOhceYOoP2v
+xzuy1s6hWJwd7X4Hd4pl3aUj9rCrgX0q9aDf4/1hup4SYrlBbHMGt2zdd0wxBxOv
+VwIDAQAB
+-----END PUBLIC KEY-----
+]]
 
-// Подготовка данных для подписи
-var dataToSign = "Some data to sign";
+-- Ваш подписанный текст
+local signed_text = "example_signed_text"
 
-// Вызов функции подписи с использованием закрытого ключа
-var signature = KalkanCrypt.sign(privateKey, dataToSign);
+-- Ваша подпись
+local signature = [[
+MEUCIQCbkljLM6UYAsxEZ2M4eFlv/cyVn3ry6sY/LiP6YpwKQQIgHCDzUnx8XTv
+eG9A4tTCpPajdihPbjS8XYCwO00/ZqM=
+]]
 
-// Отображение подписи
-console.log("Подпись данных: ", signature);
+-- Создаем объект публичного ключа из строки с открытым ключом
+local pub_key = assert(openssl.pkey.read(public_key, true))
+
+-- Проверяем подпись
+local result = pub_key:verify(signed_text, signature)
+
+if result then
+    print("Подпись верна!")
+else
+    print("Подпись не верна.")
+end
 ```
 
-В этом коде `privateKey` представляет собой ваш закрытый ключ, `dataToSign` - данные, которые вы хотите подписать. Функция `KalkanCrypt.sign` используется для создания подписи данных на основе заданного закрытого ключа и данных для подписи. Подпись сохраняется в переменной `signature`.
-
-Пожалуйста, убедитесь, что у вас есть действительный закрытый ключ, который соответствует открытому ключу, используемому для проверки подписи. Кроме того, проверьте документацию KalkanCrypt для подробностей о функции подписи и о том, как использовать ее в вашем коде.
+Этот скрипт использует библиотеку OpenSSL для Lua. Он сначала создает объект открытого ключа из строки с открытым ключом, а затем проверяет подпись под текстом. Если подпись верна, он выведет "Подпись верна!", в противном случае - "Подпись не верна.". Не забудьте установить библиотеку OpenSSL для Lua перед использованием этого скрипта.

@@ -1,38 +1,12 @@
 
-Конечно, вот пример кода на языке Python, демонстрирующий создание запроса на сертификацию (CSR) с использованием библиотеки `cryptography`:
+Чтобы узнать доступные функции в модуле "crypto", вы можете использовать функцию `pairs` в Lua. Попробуйте использовать `pairs` с таблицей, возвращаемой `require("pkg/crypto")`, чтобы увидеть список всех функций, доступных в этом модуле. Например:
 
-```python
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.backends import default_backend
-from cryptography.x509.oid import NameOID
-from cryptography.hazmat.primitives import hashes
-from cryptography import x509
+```lua
+local crypto = require("pkg/crypto")
 
-# Генерация открытого и закрытого ключей
-private_key = rsa.generate_private_key(
-    public_exponent=65537,
-    key_size=2048,
-    backend=default_backend()
-)
-
-# Создание запроса на сертификацию (CSR)
-csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
-    x509.NameAttribute(NameOID.COUNTRY_NAME, u"US"),
-    x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"California"),
-    x509.NameAttribute(NameOID.LOCALITY_NAME, u"Mountain View"),
-    x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"Example Corp"),
-    x509.NameAttribute(NameOID.COMMON_NAME, u"example.com"),
-])).add_extension(
-    x509.SubjectAlternativeName([x509.DNSName(u"example.com")]),
-    critical=False,
-).sign(private_key, hashes.SHA256(), default_backend())
-
-# Сохранение CSR в файл
-with open("csr.pem", "wb") as f:
-    f.write(csr.public_bytes(serialization.Encoding.PEM))
+for key, value in pairs(crypto) do
+    print(key, value)
+end
 ```
 
-Этот код генерирует открытый и закрытый ключи, создает запрос на сертификацию (CSR) с указанными атрибутами и расширениями, подписывает его с использованием закрытого ключа, а затем сохраняет CSR в файл "csr.pem". 
-
-Пожалуйста, учтите, что для использования этого кода вам может потребоваться установить библиотеку `cryptography`, например, с помощью команды `pip install cryptography`.
+Это выведет список всех функций в модуле "crypto".

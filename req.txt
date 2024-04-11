@@ -1,35 +1,38 @@
 
-Понял. Если у вас нет библиотеки `openssl` для Lua, можно воспользоваться другим способом, используя стандартные средства Lua. Вот пример простого способа извлечения данных из открытого ключа в формате PEM:
+Конечно, вот пример кода на языке Python, демонстрирующий создание запроса на сертификацию (CSR) с использованием библиотеки `cryptography`:
 
-```lua
--- Ваш открытый ключ
-local public_key = [[
------BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr3Y1lvmYK54/n0lfodlE
-GKnKYp1Z8zkgTh5VO/L66WFuU0xxl8rWxeBoHZzAaZXhfMCetZ3a69eFyTBeuBy0
-qThpXQk+6QGnVoKciKydW6vVGpo/rdX2y9uWlxX1SRE/nzZnWwNlzbDDMSv7PS82
-EPIrEuk8hHwQn8hF3x/6hhUToGClABISiShJ7CpNnKuMjwX+gkzfAg1Asqy+x3xt
-Q2bfz7zN4WrgKzve8sDfnE/PS0SeOqPvKrxJL8fwWm1DGX0eK5arMIOhceYOoP2v
-xzuy1s6hWJwd7X4Hd4pl3aUj9rCrgX0q9aDf4/1hup4SYrlBbHMGt2zdd0wxBxOv
-VwIDAQAB
------END PUBLIC KEY-----
-]]
+```python
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.backends import default_backend
+from cryptography.x509.oid import NameOID
+from cryptography.hazmat.primitives import hashes
+from cryptography import x509
 
--- Функция для извлечения данных из открытого ключа
-local function parse_public_key(public_key)
-    local key_data = {}
-    for line in public_key:gmatch("[^\n]+") do
-        if not line:find("-----") then
-            key_data[#key_data + 1] = line
-        end
-    end
-    return table.concat(key_data)
-end
+# Генерация открытого и закрытого ключей
+private_key = rsa.generate_private_key(
+    public_exponent=65537,
+    key_size=2048,
+    backend=default_backend()
+)
 
--- Извлекаем данные из открытого ключа
-local extracted_key = parse_public_key(public_key)
-print("Извлеченные данные из открытого ключа:")
-print(extracted_key)
+# Создание запроса на сертификацию (CSR)
+csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
+    x509.NameAttribute(NameOID.COUNTRY_NAME, u"US"),
+    x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"California"),
+    x509.NameAttribute(NameOID.LOCALITY_NAME, u"Mountain View"),
+    x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"Example Corp"),
+    x509.NameAttribute(NameOID.COMMON_NAME, u"example.com"),
+])).add_extension(
+    x509.SubjectAlternativeName([x509.DNSName(u"example.com")]),
+    critical=False,
+).sign(private_key, hashes.SHA256(), default_backend())
+
+# Сохранение CSR в файл
+with open("csr.pem", "wb") as f:
+    f.write(csr.public_bytes(serialization.Encoding.PEM))
 ```
 
-Этот простой скрипт извлекает данные из открытого ключа PEM, игнорируя заголовки и футер. Результатом будет строка с данными из открытого ключа.
+Этот код генерирует открытый и закрытый ключи, создает запрос на сертификацию (CSR) с указанными атрибутами и расширениями, подписывает его с использованием закрытого ключа, а затем сохраняет CSR в файл "csr.pem". 
+
+Пожалуйста, учтите, что для использования этого кода вам может потребоваться установить библиотеку `cryptography`, например, с помощью команды `pip install cryptography`.

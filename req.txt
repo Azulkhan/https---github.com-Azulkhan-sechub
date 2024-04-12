@@ -1,22 +1,19 @@
 
 angular.module('myApp', [])
-  .controller('MyController', function($scope) {
-    $scope.shouldExecuteFirstFunction = true;
-    
+  .controller('MyController', function($scope, $timeout) {
     $scope.function1 = function() {
       console.log("Функция 1 выполнена");
+      // Задержка перед вызовом второй функции
+      $timeout(function() {
+        $scope.function2();
+      }, 0);
     };
     
     $scope.function2 = function() {
       console.log("Функция 2 выполнена");
     };
     
-    $scope.executeFunction = function() {
-      if ($scope.shouldExecuteFirstFunction) {
-        $scope.function1();
-        $scope.shouldExecuteFirstFunction = false;
-      } else {
-        $scope.function2();
-      }
+    $scope.executeFunctions = function() {
+      $scope.function1();
     };
   });

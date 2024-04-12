@@ -21,3 +21,27 @@ angular.module('myApp', [])
       }
     };
   });
+
+
+angular.module('myApp', [])
+  .controller('MyController', function($scope) {
+    $scope.currentState = 0;
+    
+    $scope.function1 = function() {
+      console.log("Функция 1 выполнена");
+    };
+    
+    $scope.function2 = function() {
+      console.log("Функция 2 выполнена");
+    };
+    
+    $scope.toggleFunction = function() {
+      if ($scope.currentState === 0) {
+        $scope.function1();
+        $scope.currentState = 1;
+      } else {
+        $scope.function2();
+        $scope.currentState = 0;
+      }
+    };
+  });

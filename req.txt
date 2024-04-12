@@ -1,7 +1,7 @@
 
 angular.module('myApp', [])
   .controller('MyController', function($scope) {
-    $scope.currentState = 0;
+    $scope.shouldExecuteFirstFunction = true;
     
     $scope.function1 = function() {
       console.log("Функция 1 выполнена");
@@ -11,37 +11,12 @@ angular.module('myApp', [])
       console.log("Функция 2 выполнена");
     };
     
-    $scope.toggleFunction = function() {
-      if ($scope.currentState === 0) {
+    $scope.executeFunction = function() {
+      if ($scope.shouldExecuteFirstFunction) {
         $scope.function1();
-        $scope.currentState = 1;
+        $scope.shouldExecuteFirstFunction = false;
       } else {
         $scope.function2();
-        $scope.currentState = 0;
-      }
-    };
-  });
-
-
-angular.module('myApp', [])
-  .controller('MyController', function($scope) {
-    $scope.currentState = 0;
-    
-    $scope.function1 = function() {
-      console.log("Функция 1 выполнена");
-    };
-    
-    $scope.function2 = function() {
-      console.log("Функция 2 выполнена");
-    };
-    
-    $scope.toggleFunction = function() {
-      if ($scope.currentState === 0) {
-        $scope.function1();
-        $scope.currentState = 1;
-      } else {
-        $scope.function2();
-        $scope.currentState = 0;
       }
     };
   });

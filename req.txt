@@ -1,11 +1,23 @@
 
-Чтобы просмотреть данные сертификата из файла .cer в Linux, вы можете использовать команду OpenSSL в терминале. Вот пример команды:
-
-```
-openssl x509 -in certificate.cer -text -noout
-```
-
-Где "certificate.cer" - это имя вашего файла .cer. Эта команда позволит вам просмотреть подробную информацию о сертификате, включая его владельца, срок действия, отпечаток и т. д.
-
-
-openssl x509 -in certificate.cer -noout -enddate
+angular.module('myApp', [])
+  .controller('MyController', function($scope) {
+    $scope.currentState = 0;
+    
+    $scope.function1 = function() {
+      console.log("Функция 1 выполнена");
+    };
+    
+    $scope.function2 = function() {
+      console.log("Функция 2 выполнена");
+    };
+    
+    $scope.toggleFunction = function() {
+      if ($scope.currentState === 0) {
+        $scope.function1();
+        $scope.currentState = 1;
+      } else {
+        $scope.function2();
+        $scope.currentState = 0;
+      }
+    };
+  });

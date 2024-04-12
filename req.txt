@@ -1,15 +1,28 @@
 
+Извините за путаницу. Давайте попробуем другой подход, используя колбэки:
+
+HTML:
+```html
+<button ng-click="runFunctions()">Нажми меня</button>
+```
+
+JavaScript (AngularJS controller):
+```javascript
 $scope.runFunctions = function() {
-    $scope.firstFunction().then(function() {
+    $scope.firstFunction(function() {
         $scope.secondFunction();
     });
 };
 
-$scope.firstFunction = function() {
+$scope.firstFunction = function(callback) {
     // Ваш код для первой функции здесь
-    return $q.resolve(); // Пример использования обещания
+    // Вызываем колбэк, когда первая функция завершает свое выполнение
+    callback();
 };
 
 $scope.secondFunction = function() {
     // Ваш код для второй функции здесь
 };
+```
+
+Теперь, когда вы нажмете кнопку, `firstFunction` сначала выполнится, а затем, когда она завершит свое выполнение, будет вызвана `secondFunction`.

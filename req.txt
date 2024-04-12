@@ -1,5 +1,5 @@
 
-Извините за путаницу. Давайте попробуем другой подход, используя колбэки:
+Понял вас. Попробуем еще раз, используя промисы:
 
 HTML:
 ```html
@@ -9,15 +9,17 @@ HTML:
 JavaScript (AngularJS controller):
 ```javascript
 $scope.runFunctions = function() {
-    $scope.firstFunction(function() {
+    $scope.firstFunction().then(function() {
         $scope.secondFunction();
     });
 };
 
-$scope.firstFunction = function(callback) {
-    // Ваш код для первой функции здесь
-    // Вызываем колбэк, когда первая функция завершает свое выполнение
-    callback();
+$scope.firstFunction = function() {
+    return $q(function(resolve, reject) {
+        // Ваш код для первой функции здесь
+        // Когда первая функция завершает свое выполнение, вызываем resolve()
+        resolve();
+    });
 };
 
 $scope.secondFunction = function() {
@@ -25,4 +27,4 @@ $scope.secondFunction = function() {
 };
 ```
 
-Теперь, когда вы нажмете кнопку, `firstFunction` сначала выполнится, а затем, когда она завершит свое выполнение, будет вызвана `secondFunction`.
+В этом примере `firstFunction` возвращает промис, который разрешается, когда первая функция завершает свое выполнение. Затем `runFunctions` вызывает `secondFunction` после того, как `firstFunction` завершит выполнение. Пожалуйста, убедитесь, что вы правильно настроили `$q` в вашем контроллере AngularJS.

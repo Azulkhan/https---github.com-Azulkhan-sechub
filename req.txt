@@ -1,30 +1,16 @@
 
-Понял вас. Попробуем еще раз, используя промисы:
+В вашем AngularJS приложении вы можете использовать объект `window`, чтобы получить доступ к глобальным переменным и объектам, включая библиотеки, которые вы загрузили. Вы можете использовать метод `Object.keys()` для получения списка всех свойств объекта `window` и проверить, какие библиотеки доступны.
 
-HTML:
-```html
-<button ng-click="runFunctions()">Нажми меня</button>
-```
+Вот пример кода, который выводит список всех глобальных переменных и объектов, доступных в вашем AngularJS приложении:
 
-JavaScript (AngularJS controller):
 ```javascript
-$scope.runFunctions = function() {
-    $scope.firstFunction().then(function() {
-        $scope.secondFunction();
-    });
-};
-
-$scope.firstFunction = function() {
-    return $q(function(resolve, reject) {
-        // Ваш код для первой функции здесь
-        // Когда первая функция завершает свое выполнение, вызываем resolve()
-        resolve();
-    });
-};
-
-$scope.secondFunction = function() {
-    // Ваш код для второй функции здесь
-};
+angular.module('yourApp').controller('YourController', function($scope) {
+  $scope.listLibraries = function() {
+    var libraries = Object.keys(window);
+    console.log('Список доступных библиотек и переменных:');
+    console.log(libraries);
+  };
+});
 ```
 
-В этом примере `firstFunction` возвращает промис, который разрешается, когда первая функция завершает свое выполнение. Затем `runFunctions` вызывает `secondFunction` после того, как `firstFunction` завершит выполнение. Пожалуйста, убедитесь, что вы правильно настроили `$q` в вашем контроллере AngularJS.
+Вызовите функцию `$scope.listLibraries()` в вашем контроллере или в другом месте вашего кода AngularJS, чтобы получить список всех доступных библиотек и переменных. Вывод будет отображаться в консоли вашего браузера.

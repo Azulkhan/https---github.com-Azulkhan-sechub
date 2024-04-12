@@ -1,2 +1,15 @@
 
-<button ng-click="firstFunction(); secondFunction()">Нажми меня</button>
+$scope.runFunctions = function() {
+    $scope.firstFunction().then(function() {
+        $scope.secondFunction();
+    });
+};
+
+$scope.firstFunction = function() {
+    // Ваш код для первой функции здесь
+    return $q.resolve(); // Пример использования обещания
+};
+
+$scope.secondFunction = function() {
+    // Ваш код для второй функции здесь
+};

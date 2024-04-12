@@ -1,19 +1,2 @@
 
-angular.module('myApp', [])
-  .controller('MyController', function($scope, $timeout) {
-    $scope.function1 = function() {
-      console.log("Функция 1 выполнена");
-      // Задержка перед вызовом второй функции
-      $timeout(function() {
-        $scope.function2();
-      }, 0);
-    };
-    
-    $scope.function2 = function() {
-      console.log("Функция 2 выполнена");
-    };
-    
-    $scope.executeFunctions = function() {
-      $scope.function1();
-    };
-  });
+<button ng-click="firstFunction(); secondFunction()">Нажми меня</button>

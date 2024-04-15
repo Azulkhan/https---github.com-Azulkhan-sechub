@@ -1,1 +1,35 @@
 
+Чтобы использовать библиотеку `forge` в Angular, вам нужно выполнить несколько шагов:
+
+1. Установите библиотеку `forge` с помощью npm:
+
+   ```
+   npm install forge
+   ```
+
+2. Импортируйте `forge` в ваш Angular компонент:
+
+   ```typescript
+   import * as forge from 'forge';
+   ```
+
+3. Теперь вы можете использовать функционал `forge` в вашем Angular компоненте для работы с .p12-файлом и ключом ЭЦП.
+
+   Например, чтобы загрузить .p12-файл и получить данные из него, вы можете использовать что-то вроде:
+
+   ```typescript
+   const reader = new FileReader();
+   reader.onload = (event) => {
+     const p12Data = event.target.result;
+     const p12Asn1 = forge.asn1.fromDer(p12Data);
+     const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, ''); // Пустая строка для пароля, если он не защищен
+     const bags = p12.getBags({bagType: forge.pki.oids.certBag});
+     bags.forEach((bag) => {
+       const cert = bag.cert;
+       // Здесь вы можете использовать сертификат cert
+     });
+   };
+   reader.readAsArrayBuffer(yourP12File);
+   ```
+
+Обратите внимание, что это простой пример, и вам может потребоваться дополнительная обработка в зависимости от ваших конкретных потребностей и формата вашего .p12-файла.

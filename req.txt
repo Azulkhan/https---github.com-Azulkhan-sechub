@@ -1,11 +1,7 @@
-
-Попробуйте использовать явный вызов метода `string.gsub()`:
+В Lua нет прямой функции для открытия ключей .p12. Однако вы можете использовать внешние библиотеки или вызывать команды системы через `os.execute`, чтобы выполнить это. Например, вы можете использовать openssl с помощью команды `os.execute` в Lua:
 
 ```lua
-local pincode = "1234"
-local data = "text ".. pincode .." some text"
-local data2 = string.gsub(data, pincode, "*****")
-print(data2) -- Выведет: "text ***** some text"
+os.execute("openssl pkcs12 -in your_key.p12 -out extracted_key.pem -nodes")
 ```
 
-Если ошибка все еще остается, возможно, проблема в другом месте кода.
+Это извлечет закрытый ключ из вашего файла .p12 в файл `extracted_key.pem`.

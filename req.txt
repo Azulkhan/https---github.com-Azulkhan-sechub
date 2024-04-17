@@ -1,1 +1,27 @@
 
+
+Без `$q` можно использовать обычные колбэки. Вот пример:
+
+```javascript
+angular.module('myApp', [])
+  .controller('myController', function($scope) {
+    $scope.find = function(callback) {
+      // Ваш код для функции find
+      callback(); // Вызывайте колбэк после завершения операции
+    };
+
+    $scope.search = function() {
+      // Ваш код для функции search
+    };
+  });
+```
+
+В HTML:
+
+```html
+<div ng-app="myApp" ng-controller="myController">
+  <button ng-click="find(search)">Нажми меня</button>
+</div>
+```
+
+Этот код также гарантирует, что функция `search` будет вызвана только после успешного завершения функции `find`.

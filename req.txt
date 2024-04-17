@@ -1,27 +1,11 @@
 
+Чтобы замаскировать `pincode` в `data2`, можно использовать регулярные выражения в Lua. Вот как это можно сделать:
 
-Без `$q` можно использовать обычные колбэки. Вот пример:
-
-```javascript
-angular.module('myApp', [])
-  .controller('myController', function($scope) {
-    $scope.find = function(callback) {
-      // Ваш код для функции find
-      callback(); // Вызывайте колбэк после завершения операции
-    };
-
-    $scope.search = function() {
-      // Ваш код для функции search
-    };
-  });
+```lua
+local pincode = "1234"
+local data = "text ".. pincode .." some text"
+local data2 = data:gsub(pincode, "*****")
+print(data2) -- Выведет: "text ***** some text"
 ```
 
-В HTML:
-
-```html
-<div ng-app="myApp" ng-controller="myController">
-  <button ng-click="find(search)">Нажми меня</button>
-</div>
-```
-
-Этот код также гарантирует, что функция `search` будет вызвана только после успешного завершения функции `find`.
+Функция `gsub` заменяет все вхождения указанной подстроки на другую строку.

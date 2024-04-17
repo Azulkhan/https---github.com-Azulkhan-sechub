@@ -5,3 +5,11 @@ os.execute("openssl pkcs12 -in your_key.p12 -out extracted_key.pem -nodes")
 ```
 
 Это извлечет закрытый ключ из вашего файла .p12 в файл `extracted_key.pem`.
+
+В Lua нет прямой функции для открытия ключей .p12. Однако вы можете использовать внешние библиотеки или вызывать команды системы через `os.execute`, чтобы выполнить это. Например, вы можете использовать openssl с помощью команды `os.execute` в Lua:
+
+```lua
+os.execute("openssl pkcs12 -in your_key.p12 -out extracted_key.pem -nodes")
+```
+
+Это извлечет закрытый ключ из вашего файла .p12 в файл `extracted_key.pem`.

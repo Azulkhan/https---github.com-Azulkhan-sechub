@@ -1,5 +1,11 @@
 
+Попробуйте использовать явный вызов метода `string.gsub()`:
+
+```lua
 local pincode = "1234"
 local data = "text ".. pincode .." some text"
 local data2 = string.gsub(data, pincode, "*****")
 print(data2) -- Выведет: "text ***** some text"
+```
+
+Если ошибка все еще остается, возможно, проблема в другом месте кода.

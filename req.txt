@@ -1,42 +1,37 @@
 
-Конечно, вот пример функции на AngularJS, которая использует две функции последовательно:
+Понял, если у вас Angular (без "JS" в названии), то вот пример функции, использующей две функции последовательно в Angular:
 
-```javascript
-angular.module('myApp', [])
-  .controller('MyController', function($scope, FirstService, SecondService) {
-    $scope.executeFunctions = function() {
-      FirstService.firstFunction().then(function(result) {
-        // Первая функция выполнена успешно, можно выполнить вторую
-        return SecondService.secondFunction(result);
-      }).then(function(finalResult) {
+```typescript
+import { Component } from '@angular/core';
+import { FirstService } from './first.service';
+import { SecondService } from './second.service';
+
+@Component({
+  selector: 'my-component',
+  template: `
+    <button (click)="executeFunctions()">Выполнить функции</button>
+  `
+})
+export class MyComponent {
+
+  constructor(private firstService: FirstService, private secondService: SecondService) { }
+
+  executeFunctions() {
+    this.firstService.firstFunction().subscribe(result => {
+      // Первая функция выполнена успешно, можно выполнить вторую
+      this.secondService.secondFunction(result).subscribe(finalResult => {
         // Вторая функция выполнена успешно
         console.log("Результат второй функции: ", finalResult);
-      }).catch(function(error) {
-        // Обработка ошибок
-        console.error("Произошла ошибка: ", error);
+      }, error => {
+        // Обработка ошибок при выполнении второй функции
+        console.error("Произошла ошибка при выполнении второй функции: ", error);
       });
-    };
-  })
-  .service('FirstService', function($q) {
-    this.firstFunction = function() {
-      var deferred = $q.defer();
-      // Здесь выполняется первая функция
-      // Предположим, что она возвращает результат после некоторой работы
-      var result = "Результат первой функции";
-      deferred.resolve(result);
-      return deferred.promise;
-    };
-  })
-  .service('SecondService', function($q) {
-    this.secondFunction = function(data) {
-      var deferred = $q.defer();
-      // Здесь выполняется вторая функция с использованием данных из первой функции
-      // Предположим, что она также возвращает результат
-      var result = "Результат второй функции, использующей данные: " + data;
-      deferred.resolve(result);
-      return deferred.promise;
-    };
-  });
+    }, error => {
+      // Обработка ошибок при выполнении первой функции
+      console.error("Произошла ошибка при выполнении первой функции: ", error);
+    });
+  }
+}
 ```
 
-В этом примере создается AngularJS-приложение с контроллером `MyController`, который содержит функцию `executeFunctions()`. Эта функция вызывает две асинхронные функции из сервисов `FirstService` и `SecondService` последовательно, используя промисы для управления потоком выполнения.
+В этом примере компонент Angular `MyComponent` использует сервисы `FirstService` и `SecondService`, чтобы выполнить две функции последовательно при нажатии на кнопку. Результаты обеих функций обрабатываются с использованием подписок.

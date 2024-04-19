@@ -1,23 +1,23 @@
 
-Прошу прощения за путаницу. Давайте воспользуемся обещаниями (promises), чтобы обеспечить последовательное выполнение функций. Вот обновленный пример:
+Приношу извинения за путаницу. Давайте перепишем код таким образом, чтобы `secondFunction` действительно вызывалась после завершения `firstFunction`. 
 
 ```javascript
 angular.module('myApp', [])
   .controller('MyController', function($scope, $q) {
     $scope.executeFunctions = function() {
-      $scope.firstFunction()
-        .then(function(result) {
-          // Первая функция выполнена успешно, можно выполнить вторую
-          return $scope.secondFunction(result);
-        })
-        .then(function(finalResult) {
+      $scope.firstFunction().then(function(result) {
+        // Первая функция выполнена успешно, можно выполнить вторую
+        $scope.secondFunction(result).then(function(finalResult) {
           // Вторая функция выполнена успешно
           console.log("Результат второй функции: ", finalResult);
-        })
-        .catch(function(error) {
-          // Обработка ошибок
-          console.error("Произошла ошибка: ", error);
+        }).catch(function(error) {
+          // Обработка ошибок при выполнении второй функции
+          console.error("Произошла ошибка при выполнении второй функции: ", error);
         });
+      }).catch(function(error) {
+        // Обработка ошибок при выполнении первой функции
+        console.error("Произошла ошибка при выполнении первой функции: ", error);
+      });
     };
 
     $scope.firstFunction = function() {
@@ -38,4 +38,4 @@ angular.module('myApp', [])
   });
 ```
 
-В этом примере используются промисы для обеспечения последовательного выполнения функций. `firstFunction` возвращает промис, который разрешается, когда функция завершена, и затем выполняется `secondFunction`, используя данные из `firstFunction`.
+Теперь `secondFunction` вызывается после успешного завершения `firstFunction`.

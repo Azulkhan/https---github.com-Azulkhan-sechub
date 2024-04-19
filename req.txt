@@ -1,41 +1,12 @@
 
-Приношу извинения за путаницу. Давайте перепишем код таким образом, чтобы `secondFunction` действительно вызывалась после завершения `firstFunction`. 
+Чтобы выбрать первый рабочий день квартала в SQL, вы можете использовать функцию `DATEADD` для добавления дней к началу квартала и функцию `CASE` для проверки, является ли день рабочим. Например, для SQL Server:
 
-```javascript
-angular.module('myApp', [])
-  .controller('MyController', function($scope, $q) {
-    $scope.executeFunctions = function() {
-      $scope.firstFunction().then(function(result) {
-        // Первая функция выполнена успешно, можно выполнить вторую
-        $scope.secondFunction(result).then(function(finalResult) {
-          // Вторая функция выполнена успешно
-          console.log("Результат второй функции: ", finalResult);
-        }).catch(function(error) {
-          // Обработка ошибок при выполнении второй функции
-          console.error("Произошла ошибка при выполнении второй функции: ", error);
-        });
-      }).catch(function(error) {
-        // Обработка ошибок при выполнении первой функции
-        console.error("Произошла ошибка при выполнении первой функции: ", error);
-      });
-    };
-
-    $scope.firstFunction = function() {
-      var deferred = $q.defer();
-      // Логика первой функции
-      var result = "Результат первой функции";
-      deferred.resolve(result);
-      return deferred.promise;
-    };
-
-    $scope.secondFunction = function(data) {
-      var deferred = $q.defer();
-      // Логика второй функции, использующей данные из первой функции
-      var finalResult = "Результат второй функции, использующей данные: " + data;
-      deferred.resolve(finalResult);
-      return deferred.promise;
-    };
-  });
+```sql
+SELECT 
+    CASE 
+        WHEN DATEPART(dw, DATEADD(qq, DATEDIFF(qq, 0, GETDATE()), 0)) = 1 THEN DATEADD(day, 1, DATEADD(qq, DATEDIFF(qq, 0, GETDATE()), 0)) -- Если первый день квартала приходится на воскресенье, выбираем следующий рабочий день
+        ELSE DATEADD(qq, DATEDIFF(qq, 0, GETDATE()), 0) -- В противном случае, просто выбираем первый день квартала
+    END AS First_Working_Day_Of_Quarter
 ```
 
-Теперь `secondFunction` вызывается после успешного завершения `firstFunction`.
+Здесь `GETDATE()` возвращает текущую дату. Вы можете заменить ее на нужную вам дату.

@@ -1,31 +1,41 @@
 
-Понял вас. В таком случае, вы можете использовать колбэки для второй функции, чтобы убедиться, что она запускается только после завершения первой функции. Вот пример:
+Прошу прощения за путаницу. Давайте воспользуемся обещаниями (promises), чтобы обеспечить последовательное выполнение функций. Вот обновленный пример:
 
 ```javascript
 angular.module('myApp', [])
   .controller('MyController', function($scope, $q) {
     $scope.executeFunctions = function() {
-      $scope.firstFunction(function(result) {
-        // Первая функция выполнена успешно, можно выполнить вторую
-        $scope.secondFunction(result, function(finalResult) {
+      $scope.firstFunction()
+        .then(function(result) {
+          // Первая функция выполнена успешно, можно выполнить вторую
+          return $scope.secondFunction(result);
+        })
+        .then(function(finalResult) {
           // Вторая функция выполнена успешно
           console.log("Результат второй функции: ", finalResult);
+        })
+        .catch(function(error) {
+          // Обработка ошибок
+          console.error("Произошла ошибка: ", error);
         });
-      });
     };
 
-    $scope.firstFunction = function(callback) {
+    $scope.firstFunction = function() {
+      var deferred = $q.defer();
       // Логика первой функции
       var result = "Результат первой функции";
-      callback(result);
+      deferred.resolve(result);
+      return deferred.promise;
     };
 
-    $scope.secondFunction = function(data, callback) {
+    $scope.secondFunction = function(data) {
+      var deferred = $q.defer();
       // Логика второй функции, использующей данные из первой функции
       var finalResult = "Результат второй функции, использующей данные: " + data;
-      callback(finalResult);
+      deferred.resolve(finalResult);
+      return deferred.promise;
     };
   });
 ```
 
-В этом примере `firstFunction` вызывается с колбэком, который запускает `secondFunction` только после успешного завершения `firstFunction`.
+В этом примере используются промисы для обеспечения последовательного выполнения функций. `firstFunction` возвращает промис, который разрешается, когда функция завершена, и затем выполняется `secondFunction`, используя данные из `firstFunction`.

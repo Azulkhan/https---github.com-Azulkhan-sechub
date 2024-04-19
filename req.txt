@@ -1,37 +1,38 @@
 
-Понял, если у вас Angular (без "JS" в названии), то вот пример функции, использующей две функции последовательно в Angular:
+Конечно, вот пример с двумя простыми функциями на AngularJS:
 
-```typescript
-import { Component } from '@angular/core';
-import { FirstService } from './first.service';
-import { SecondService } from './second.service';
-
-@Component({
-  selector: 'my-component',
-  template: `
-    <button (click)="executeFunctions()">Выполнить функции</button>
-  `
-})
-export class MyComponent {
-
-  constructor(private firstService: FirstService, private secondService: SecondService) { }
-
-  executeFunctions() {
-    this.firstService.firstFunction().subscribe(result => {
-      // Первая функция выполнена успешно, можно выполнить вторую
-      this.secondService.secondFunction(result).subscribe(finalResult => {
+```javascript
+angular.module('myApp', [])
+  .controller('MyController', function($scope, $q) {
+    $scope.executeFunctions = function() {
+      $scope.firstFunction().then(function(result) {
+        // Первая функция выполнена успешно, можно выполнить вторую
+        return $scope.secondFunction(result);
+      }).then(function(finalResult) {
         // Вторая функция выполнена успешно
         console.log("Результат второй функции: ", finalResult);
-      }, error => {
-        // Обработка ошибок при выполнении второй функции
-        console.error("Произошла ошибка при выполнении второй функции: ", error);
+      }).catch(function(error) {
+        // Обработка ошибок
+        console.error("Произошла ошибка: ", error);
       });
-    }, error => {
-      // Обработка ошибок при выполнении первой функции
-      console.error("Произошла ошибка при выполнении первой функции: ", error);
-    });
-  }
-}
+    };
+
+    $scope.firstFunction = function() {
+      var deferred = $q.defer();
+      // Логика первой функции
+      var result = "Результат первой функции";
+      deferred.resolve(result);
+      return deferred.promise;
+    };
+
+    $scope.secondFunction = function(data) {
+      var deferred = $q.defer();
+      // Логика второй функции, использующей данные из первой функции
+      var finalResult = "Результат второй функции, использующей данные: " + data;
+      deferred.resolve(finalResult);
+      return deferred.promise;
+    };
+  });
 ```
 
-В этом примере компонент Angular `MyComponent` использует сервисы `FirstService` и `SecondService`, чтобы выполнить две функции последовательно при нажатии на кнопку. Результаты обеих функций обрабатываются с использованием подписок.
+Этот пример содержит контроллер AngularJS `MyController`, который определяет две функции `firstFunction()` и `secondFunction()`. Метод `executeFunctions()` вызывает эти две функции последовательно с использованием промисов для управления потоком выполнения.

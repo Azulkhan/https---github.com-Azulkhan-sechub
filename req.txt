@@ -1,13 +1,12 @@
 
-Понял вас. Если у вас проблемы с использованием функции агрегации вместе с условным выражением `CASE`, вы можете разделить запрос на две части: одна часть для подсчета строк и вторая часть для выбора данных с использованием условного выражения. Например:
+В объектном источнике данных (ObjectDataSource) в ASP.NET вы можете добавить параметры с помощью элемента <Parameters>. Вот пример:
 
-```sql
-SELECT 
-    CASE WHEN total_count = 0 THEN 'пусто' ELSE status END AS status 
-FROM (
-    SELECT COUNT(*) AS total_count, MAX(status) AS status 
-    FROM eaw WHERE it_id = 14440
-) AS subquery;
+```xml
+<asp:ObjectDataSource ID="MyObjectDataSource" runat="server" TypeName="YourNamespace.YourClassName" SelectMethod="YourSelectMethod">
+    <SelectParameters>
+        <asp:Parameter Name="YourParameterName" Type="YourParameterType" DefaultValue="YourDefaultValue" />
+    </SelectParameters>
+</asp:ObjectDataSource>
 ```
 
-Этот запрос сначала подсчитывает общее количество строк и находит максимальное значение столбца `status` для данного условия. Затем внешний запрос использует условное выражение для выбора нужного значения.
+Замените "YourNamespace.YourClassName" на ваш класс и метод, а "YourParameterName" и "YourParameterType" на имя и тип вашего параметра соответственно.

@@ -1,14 +1,9 @@
 
-Чтобы получить слово "пусто", когда столбец `status` не содержит значений, вы можете воспользоваться функцией `COALESCE` или `IFNULL` в SQL. Например:
+Понял вас. Если нет данных, которые нужно выбрать, и вы хотите вернуть слово "пусто", вы можете использовать условное выражение `CASE` в SQL:
 
 ```sql
-SELECT COALESCE(status, 'пусто') AS status FROM eaw WHERE it_id = 14440;
+SELECT CASE WHEN COUNT(*) = 0 THEN 'пусто' ELSE status END AS status 
+FROM eaw WHERE it_id = 14440;
 ```
 
-Или:
-
-```sql
-SELECT IFNULL(status, 'пусто') AS status FROM eaw WHERE it_id = 14440;
-```
-
-Обе эти функции заменят `NULL` в столбце `status` на слово "пусто".
+Это вернет "пусто", если нет данных, иначе вернет значение `status`.

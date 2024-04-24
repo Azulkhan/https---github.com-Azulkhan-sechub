@@ -1,4 +1,4 @@
-Вот PL/SQL функция, которая принимает дату и количество рабочих дней для добавления, а затем возвращает новую дату, пропуская выходные:
+Понял вас. Вот PL/SQL функция, которая добавляет указанное количество рабочих дней к заданной дате, пропуская выходные:
 
 ```sql
 CREATE OR REPLACE FUNCTION add_working_days_to_date(input_date DATE, working_days_to_add NUMBER)
@@ -8,7 +8,7 @@ RETURN DATE IS
 BEGIN
     new_date := input_date;
     WHILE days_added < working_days_to_add LOOP
-        new_date := new_date + 1; -- Прибавляем один день
+        new_date := new_date + 1; -- Добавляем один день
         IF TO_CHAR(new_date, 'D') BETWEEN 2 AND 6 THEN -- Проверяем, не выходной ли день (пн-пт)
             days_added := days_added + 1; -- Увеличиваем счетчик рабочих дней
         END IF;
@@ -18,18 +18,18 @@ END add_working_days_to_date;
 /
 ```
 
-Вы можете использовать эту функцию, чтобы определить дату после определенного количества рабочих дней:
+Вы можете использовать эту функцию, чтобы получить третий рабочий день после указанной даты:
 
 ```sql
 DECLARE
-    input_date DATE := TO_DATE('2024-04-24', 'YYYY-MM-DD'); -- Ваша исходная дата
+    input_date DATE := TO_DATE('2024-04-25', 'YYYY-MM-DD'); -- Ваша исходная дата
     working_days_to_add NUMBER := 3; -- Количество рабочих дней для прибавления
     new_date DATE;
 BEGIN
     new_date := add_working_days_to_date(input_date, working_days_to_add);
-    DBMS_OUTPUT.PUT_LINE('Дата после ' || working_days_to_add || ' рабочих дней от ' || TO_CHAR(input_date, 'DD-MON-YYYY') || ' это ' || TO_CHAR(new_date, 'DD-MON-YYYY'));
+    DBMS_OUTPUT.PUT_LINE('Третий рабочий день после ' || TO_CHAR(input_date, 'DD-MON-YYYY') || ' это ' || TO_CHAR(new_date, 'DD-MON-YYYY'));
 END;
 /
 ```
 
-Этот код выведет дату после указанного количества рабочих дней от исходной даты.
+Этот код выведет третий рабочий день после указанной даты.

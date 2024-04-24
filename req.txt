@@ -1,0 +1,13 @@
+Вот пример кода PL/SQL для выявления третьего дня после определенной даты:
+
+```sql
+DECLARE
+    date_input DATE := TO_DATE('2024-04-24', 'YYYY-MM-DD'); -- Ваша исходная дата
+    third_day DATE;
+BEGIN
+    third_day := date_input + 2; -- Прибавляем два дня к исходной дате
+    DBMS_OUTPUT.PUT_LINE('Третий день от ' || TO_CHAR(date_input, 'DD-MON-YYYY') || ' это ' || TO_CHAR(third_day, 'DD-MON-YYYY'));
+END;
+```
+
+Этот код покажет вам третий день после указанной даты в формате DD-MON-YYYY.

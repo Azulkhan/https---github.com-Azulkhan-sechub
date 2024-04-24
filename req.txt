@@ -1,36 +1,14 @@
 
-Прошу прощения за путаницу. Давайте исправим это. Вот обновленная версия функции, которая учитывает, что выходные дни пропускаются:
-
-```sql
-CREATE OR REPLACE FUNCTION add_working_days_to_date(input_date DATE, working_days_to_add NUMBER)
-RETURN DATE IS
-    new_date DATE;
-    days_added NUMBER := 0;
-BEGIN
-    new_date := input_date;
-    WHILE days_added < working_days_to_add LOOP
-        new_date := new_date + 1; -- Добавляем один день
-        IF TO_CHAR(new_date, 'D') BETWEEN 2 AND 6 THEN -- Проверяем, не рабочий ли день (пн-пт)
-            days_added := days_added + 1; -- Увеличиваем счетчик рабочих дней
-        END IF;
-    END LOOP;
-    RETURN new_date;
-END add_working_days_to_date;
-/
-```
-
-Используйте эту функцию, чтобы получить третий рабочий день после указанной даты:
+Если вы хотите вводить дату в блоке `DECLARE`, вы можете использовать оператор `SELECT INTO`, чтобы присвоить значение переменной на основе результата запроса. Вот как это можно сделать:
 
 ```sql
 DECLARE
-    input_date DATE := TO_DATE('2024-04-25', 'YYYY-MM-DD'); -- Ваша исходная дата
-    working_days_to_add NUMBER := 3; -- Количество рабочих дней для прибавления
-    new_date DATE;
+    input_date DATE;
 BEGIN
-    new_date := add_working_days_to_date(input_date, working_days_to_add);
-    DBMS_OUTPUT.PUT_LINE('Третий рабочий день после ' || TO_CHAR(input_date, 'DD-MON-YYYY') || ' это ' || TO_CHAR(new_date, 'DD-MON-YYYY'));
+    SELECT TO_DATE('2024-04-25', 'YYYY-MM-DD') INTO input_date FROM dual; -- Ваш запрос SELECT для ввода даты
+    -- Ваша логика работы с переменной input_date здесь
 END;
 /
 ```
 
-Этот код должен корректно определить третий рабочий день после указанной даты, пропуская выходные дни.
+Замените `TO_DATE('2024-04-25', 'YYYY-MM-DD')` на ваш запрос `SELECT`, который будет извлекать дату из базы данных или откуда-либо еще.

@@ -1,48 +1,26 @@
-Хорошо, вот полный пример кода AngularJS, демонстрирующий добавление `ncalayer` для подписания документа:
+Для преобразования JSON в XML в AngularJS вы можете использовать встроенные возможности JavaScript. Вот пример преобразования:
 
-```html
-<!DOCTYPE html>
-<html ng-app="myApp">
-<head>
-    <title>AngularJS с ncalayer</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
-    <!-- Подключение ncalayer (предполагается, что скрипт ncalayer.js доступен по этому URL) -->
-    <script src="path/to/ncalayer.js"></script>
-</head>
-<body>
-    <div ng-controller="MainController">
-        <button ng-click="signDocument(document)">Подписать документ</button>
-    </div>
+```javascript
+var jsonData = {...}; // ваш JSON объект
 
-    <script>
-        // Создание AngularJS приложения
-        var app = angular.module('myApp', []);
+// Преобразование JSON в XML
+var xmlData = '<root>' + jsonToXml(jsonData) + '</root>';
 
-        // Включение ncalayer в AngularJS контроллере
-        app.controller('MainController', function($scope) {
-            // Примерный документ для подписи
-            var document = {
-                content: 'Текст документа'
-            };
+function jsonToXml(json) {
+    var xml = '';
 
-            // Функция для подписания документа
-            $scope.signDocument = function(document) {
-                // Проверка наличия ncalayer
-                if (typeof ncalayer === 'undefined') {
-                    console.error('ncalayer не найден');
-                    return;
-                }
-                
-                // Имитация подписи документа (заглушка)
-                var signature = 'Подпись документа: ' + document.content;
-                
-                // Вывод результатов в консоль
-                console.log(signature);
-            };
-        });
-    </script>
-</body>
-</html>
+    for (var key in json) {
+        if (json.hasOwnProperty(key)) {
+            if (typeof json[key] === 'object') {
+                xml += '<' + key + '>' + jsonToXml(json[key]) + '</' + key + '>';
+            } else {
+                xml += '<' + key + '>' + json[key] + '</' + key + '>';
+            }
+        }
+    }
+
+    return xml;
+}
 ```
 
-В этом примере предполагается, что библиотека AngularJS и скрипт `ncalayer.js` доступны по соответствующим URL-адресам. Когда пользователь нажимает кнопку "Подписать документ", вызывается функция `signDocument`, которая имитирует подписание документа с использованием `ncalayer`. Вам нужно будет адаптировать этот пример для вашего конкретного использования `ncalayer`, заменив имитацию подписи на реальный код подписи.
+Замените `var jsonData = {...};` на ваш объект JSON, а затем `xmlData` будет содержать XML-представление вашего JSON.

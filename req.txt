@@ -1,30 +1,35 @@
-Для создания функциональности, которая показывает "ncalayer" при нажатии на кнопку "подписать" в AngularJS, вам нужно выполнить несколько шагов:
+В Java для работы с ключами ЭЦП обычно используется Java Cryptography Architecture (JCA) и Java Cryptography Extension (JCE). Вот пример того, как можно открыть ключ ЭЦП в Java:
 
-1. **Добавьте кнопку в HTML**: Создайте кнопку в HTML-разметке вашего AngularJS приложения и свяжите ее с функцией, которая открывает "ncalayer".
+```java
+import java.io.FileInputStream;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
 
-2. **Напишите функцию в контроллере AngularJS**: Создайте функцию в контроллере AngularJS, которая будет вызывать открытие "ncalayer" при нажатии на кнопку.
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // Путь к файлу хранилища ключей (например, PKCS#12)
+        String keystoreFile = "path/to/keystore.p12";
+        // Пароль для доступа к хранилищу ключей
+        char[] keystorePassword = "keystorePassword".toCharArray();
+        // Пароль для доступа к закрытому ключу
+        char[] keyPassword = "keyPassword".toCharArray();
+        // Алиас ключа
+        String alias = "alias";
 
-3. **Реализуйте открытие "ncalayer"**: Напишите код JavaScript, который откроет "ncalayer". Это может потребовать использования специфических библиотек или API, предоставленных вашими средствами разработки для работы с "ncalayer".
+        // Загрузка хранилища ключей
+        KeyStore keystore = KeyStore.getInstance("PKCS12");
+        keystore.load(new FileInputStream(keystoreFile), keystorePassword);
 
-Ниже приведен примерный код для каждого из этих шагов:
+        // Получение закрытого ключа по алиасу
+        PrivateKey privateKey = (PrivateKey) keystore.getKey(alias, keyPassword);
 
-HTML-разметка:
-```html
-<button ng-click="openNcaLayer()">Подписать</button>
+        // Получение сертификата, связанного с закрытым ключом
+        Certificate cert = keystore.getCertificate(alias);
+
+        // Дополнительные действия с закрытым ключом и сертификатом...
+    }
+}
 ```
 
-Контроллер AngularJS:
-```javascript
-angular.module('myApp', [])
-    .controller('MyController', function($scope) {
-        $scope.openNcaLayer = function() {
-            // Здесь вызывается функция для открытия ncalayer
-            // Например, если у вас есть функция openNcaLayer в глобальном объекте window:
-            // window.openNcaLayer();
-        };
-    });
-```
-
-Замените `'myApp'` на имя вашего AngularJS приложения и `'MyController'` на имя вашего контроллера.
-
-Замените комментарии на фактический код открытия "ncalayer", который зависит от ваш
+В этом примере мы загружаем хранилище ключей формата PKCS#12, получаем закрытый ключ и соответствующий ему сертификат по алиасу. Затем вы можете выполнять необходимые операции с этим ключом и сертификатом.

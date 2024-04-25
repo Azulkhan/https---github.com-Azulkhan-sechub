@@ -1,35 +1,17 @@
-В Java для работы с ключами ЭЦП обычно используется Java Cryptography Architecture (JCA) и Java Cryptography Extension (JCE). Вот пример того, как можно открыть ключ ЭЦП в Java:
+В JavaScript нет нативной поддержки работы с ключами ЭЦП, но вы можете использовать библиотеки, такие как "node-forge" или "node-webcrypto-p11" для работы с ними. Вот пример использования библиотеки "node-forge" для открытия ключа ЭЦП:
 
-```java
-import java.io.FileInputStream;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.cert.Certificate;
+```javascript
+const forge = require('node-forge');
+const fs = require('fs');
 
-public class Main {
-    public static void main(String[] args) throws Exception {
-        // Путь к файлу хранилища ключей (например, PKCS#12)
-        String keystoreFile = "path/to/keystore.p12";
-        // Пароль для доступа к хранилищу ключей
-        char[] keystorePassword = "keystorePassword".toCharArray();
-        // Пароль для доступа к закрытому ключу
-        char[] keyPassword = "keyPassword".toCharArray();
-        // Алиас ключа
-        String alias = "alias";
+// Путь к файлу ключа
+const privateKeyPath = 'path/to/privateKey.pem';
 
-        // Загрузка хранилища ключей
-        KeyStore keystore = KeyStore.getInstance("PKCS12");
-        keystore.load(new FileInputStream(keystoreFile), keystorePassword);
+// Загрузка закрытого ключа
+const privateKeyPem = fs.readFileSync(privateKeyPath, 'utf8');
+const privateKey = forge.pki.privateKeyFromPem(privateKeyPem);
 
-        // Получение закрытого ключа по алиасу
-        PrivateKey privateKey = (PrivateKey) keystore.getKey(alias, keyPassword);
-
-        // Получение сертификата, связанного с закрытым ключом
-        Certificate cert = keystore.getCertificate(alias);
-
-        // Дополнительные действия с закрытым ключом и сертификатом...
-    }
-}
+// Дополнительные действия с закрытым ключом...
 ```
 
-В этом примере мы загружаем хранилище ключей формата PKCS#12, получаем закрытый ключ и соответствующий ему сертификат по алиасу. Затем вы можете выполнять необходимые операции с этим ключом и сертификатом.
+Обратите внимание, что для работы с ключами ЭЦП в JavaScript вам может потребоваться установить необходимые зависимости через npm.

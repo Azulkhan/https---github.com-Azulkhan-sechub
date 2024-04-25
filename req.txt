@@ -1,24 +1,48 @@
+Хорошо, вот полный пример кода AngularJS, демонстрирующий добавление `ncalayer` для подписания документа:
 
-Для добавления `ncalayer` для подписания документов в AngularJS вам нужно сначала убедиться, что библиотека `ncalayer` доступна в вашем проекте. Затем вы можете использовать ее API для подписания документов. Ниже приведен пример кода, который демонстрирует базовый подход к добавлению `ncalayer` в AngularJS:
+```html
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+    <title>AngularJS с ncalayer</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <!-- Подключение ncalayer (предполагается, что скрипт ncalayer.js доступен по этому URL) -->
+    <script src="path/to/ncalayer.js"></script>
+</head>
+<body>
+    <div ng-controller="MainController">
+        <button ng-click="signDocument(document)">Подписать документ</button>
+    </div>
 
-```javascript
-// Включение ncalayer в AngularJS контроллере
-app.controller('MainController', function($scope) {
-    // Функция для подписания документа
-    $scope.signDocument = function(document) {
-        // Здесь вы можете использовать API ncalayer для подписания документа
-        // Например:
-        ncalayer.sign(document, function(signature) {
-            // Обработка подписи
-            console.log('Документ успешно подписан:', signature);
-        }, function(error) {
-            // Обработка ошибок подписи
-            console.error('Ошибка подписи документа:', error);
+    <script>
+        // Создание AngularJS приложения
+        var app = angular.module('myApp', []);
+
+        // Включение ncalayer в AngularJS контроллере
+        app.controller('MainController', function($scope) {
+            // Примерный документ для подписи
+            var document = {
+                content: 'Текст документа'
+            };
+
+            // Функция для подписания документа
+            $scope.signDocument = function(document) {
+                // Проверка наличия ncalayer
+                if (typeof ncalayer === 'undefined') {
+                    console.error('ncalayer не найден');
+                    return;
+                }
+                
+                // Имитация подписи документа (заглушка)
+                var signature = 'Подпись документа: ' + document.content;
+                
+                // Вывод результатов в консоль
+                console.log(signature);
+            };
         });
-    };
-});
+    </script>
+</body>
+</html>
 ```
 
-Здесь `ncalayer` предполагается как глобальный объект, который предоставляет метод `sign` для подписания документа. Вам нужно будет заменить `signDocument` функцию на ваш фактический метод подписания, используя соответствующий API `ncalayer`.
-
-Помните, что для успешного использования `ncalayer` в AngularJS вам также может потребоваться настройка зависимостей и включение необходимых скриптов в вашем проекте.
+В этом примере предполагается, что библиотека AngularJS и скрипт `ncalayer.js` доступны по соответствующим URL-адресам. Когда пользователь нажимает кнопку "Подписать документ", вызывается функция `signDocument`, которая имитирует подписание документа с использованием `ncalayer`. Вам нужно будет адаптировать этот пример для вашего конкретного использования `ncalayer`, заменив имитацию подписи на реальный код подписи.

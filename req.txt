@@ -1,15 +1,50 @@
+Конечно! Вот более подробный пример того, как вы можете подключить `nclayer` в ваше AngularJS приложение:
 
-Чтобы подключить `nclayer` (если это какая-то библиотека или модуль) в AngularJS, обычно используют инструкцию `import` или `require`, в зависимости от того, как вы организуете свой проект. Для этого вам нужно убедиться, что `nclayer` доступен через npm или другой менеджер пакетов, который вы используете. После этого вы можете импортировать или подключить его в вашем AngularJS приложении, например:
+1. Убедитесь, что `nclayer` установлен в вашем проекте. Вы можете сделать это, выполнив команду установки через npm или другой менеджер пакетов:
 
-```javascript
-import nclayer from 'nclayer';
-// Или, если используется CommonJS:
-// const nclayer = require('nclayer');
+   ```
+   npm install nclayer --save
+   ```
 
-angular.module('myApp', [])
-  .controller('myController', function($scope) {
-    // Используйте nclayer здесь
-  });
-```
+2. Создайте файл с именем, например, `app.js`, где будете определять ваш AngularJS модуль и контроллер:
 
-Помните, что поддержка import/export в AngularJS может потребовать дополнительной конфигурации, в зависимости от версии фреймворка и инструментов сборки, которые вы используете.
+   ```javascript
+   // app.js
+
+   // Импортируем nclayer
+   import nclayer from 'nclayer';
+
+   // Определяем AngularJS модуль
+   angular.module('myApp', [])
+
+   // Определяем контроллер и используем nclayer в нем
+   .controller('myController', function($scope) {
+     // Используйте nclayer здесь
+   });
+   ```
+
+3. Подключите `app.js` в вашем HTML файле, где находится ваше приложение AngularJS:
+
+   ```html
+   <!-- index.html -->
+
+   <!DOCTYPE html>
+   <html lang="en" ng-app="myApp">
+   <head>
+     <meta charset="UTF-8">
+     <title>AngularJS App</title>
+   </head>
+   <body>
+
+     <div ng-controller="myController">
+       <!-- Ваше содержимое контроллера -->
+     </div>
+
+     <!-- Подключаем app.js -->
+     <script src="app.js"></script>
+
+   </body>
+   </html>
+   ```
+
+Это простой пример. В вашем реальном приложении может потребоваться дополнительная конфигурация для подключения `nclayer`, в зависимости от требований вашего проекта и среды разработки.

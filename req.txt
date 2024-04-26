@@ -1,0 +1,21 @@
+Извините за обрыв. Продолжим. Для вывода списка доступных библиотек в представлении AngularJS, мы можем использовать `ng-repeat` для перечисления элементов списка. Вот как это может выглядеть:
+
+```html
+<div ng-controller="MyController">
+    <h3>Список доступных библиотек:</h3>
+    <ul>
+        <li ng-repeat="library in libraries">{{ library.name }}</li>
+    </ul>
+</div>
+```
+
+Затем в контроллере мы можем использовать метод `getAvailableLibraries()` сервиса `NCALayer` и передать результат в `$scope.libraries`:
+
+```javascript
+MettonicApp.controller('MyController', ['$scope', 'NCALayer', function($scope, NCALayer) {
+    // Получение списка доступных библиотек и передача в $scope.libraries
+    $scope.libraries = NCALayer.getAvailableLibraries();
+}]);
+```
+
+Это позволит вывести список доступных библиотек в вашем представлении AngularJS. Обратите внимание, что реальная реализация будет зависеть от того, как у вас настроены методы и данные в вашем сервисе `NCALayer`.

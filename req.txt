@@ -1,31 +1,22 @@
-Если вы хотите настроить прокси для разработки AngularJS-приложения, обходя политику CORS во время разработки, вы можете использовать средства, такие как `http-proxy-middleware` или `proxy` в вашем `angular.json` или `angular-cli.json` файле.
+В AngularJS для отправки POST-запроса с заголовками XML и использованием прокси вы можете сделать следующее:
 
-Вот пример использования `proxy` в файле `angular.json`:
-
-```json
-{
-  ...
-  "architect": {
-    "serve": {
-      "options": {
-        "proxyConfig": "src/proxy.conf.json"
-      }
-    }
+```javascript
+$http({
+  method: 'POST',
+  url: 'your_api_url',
+  data: 'your_xml_data',
+  headers: {
+    'Content-Type': 'application/xml' // Установка заголовка Content-Type на application/xml
+  },
+  proxy: {
+    host: 'your_proxy_host',
+    port: 'your_proxy_port'
   }
-}
+}).then(function successCallback(response) {
+    // Обработка успешного ответа
+  }, function errorCallback(response) {
+    // Обработка ошибки
+});
 ```
 
-Затем создайте файл `proxy.conf.json` в вашем проекте:
-
-```json
-{
-  "/api": {
-    "target": "http://your-api-url",
-    "secure": false
-  }
-}
-```
-
-Этот конфигурационный файл указывает, что все запросы, начинающиеся с `/api`, будут перенаправлены на `http://your-api-url`. 
-
-После этого, при разработке, все запросы, отправленные с вашего приложения AngularJS на `/api`, будут перенаправлены на ваш API-сервер, обходя политику CORS.
+Замените `'your_api_url'` на URL вашего API, `'your_xml_data'` на ваш XML-документ, `'your_proxy_host'` и `'your_proxy_port'` на хост и порт вашего прокси-сервера соответственно.

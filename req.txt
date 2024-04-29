@@ -1,22 +1,23 @@
-В AngularJS для отправки POST-запроса с заголовками XML и использованием прокси вы можете сделать следующее:
+
+Чтобы выполнить запрос $http.post в AngularJS с данными в формате XML и использованием прокси, вам следует сделать следующее:
+
+1. Убедитесь, что ваш AngularJS-приложение подключено к модулю $http.
+2. Используйте $http.post для отправки POST-запроса.
+3. Для отправки данных в формате XML укажите заголовок Content-Type как 'application/xml'.
+4. Чтобы использовать прокси, настройте ваш сервер на проксирование соответствующего URL.
+
+Пример:
 
 ```javascript
-$http({
-  method: 'POST',
-  url: 'your_api_url',
-  data: 'your_xml_data',
-  headers: {
-    'Content-Type': 'application/xml' // Установка заголовка Content-Type на application/xml
-  },
-  proxy: {
-    host: 'your_proxy_host',
-    port: 'your_proxy_port'
-  }
-}).then(function successCallback(response) {
+$http.post('http://your-proxy-url.com', data, {
+    headers: {
+        'Content-Type': 'application/xml'
+    }
+}).then(function(response) {
     // Обработка успешного ответа
-  }, function errorCallback(response) {
+}, function(error) {
     // Обработка ошибки
 });
 ```
 
-Замените `'your_api_url'` на URL вашего API, `'your_xml_data'` на ваш XML-документ, `'your_proxy_host'` и `'your_proxy_port'` на хост и порт вашего прокси-сервера соответственно.
+Замените `'http://your-proxy-url.com'` на ваш URL-адрес прокси и укажите свои данные XML в переменной `data`.

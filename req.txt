@@ -1,3 +1,22 @@
-SDK есть ссылки на GitHub, где лежат примеры реализации модуля
-https://github.com/pkigovkz/NCALayerAnotherSampleBundle/tree/master 14
-Учтите, что в постоянно хранить в оперативной памяти пароль или закрытый ключ будет небезопасно.
+Вот пример кода для выполнения HTTP POST запроса с заголовками и использованием прокси в AngularJS:
+
+```javascript
+$http.post('http://your-api-url', {
+    data: yourData
+}, {
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer yourAccessToken'
+    },
+    proxy: {
+        host: 'your-proxy-host',
+        port: 'your-proxy-port'
+    }
+}).then(function(response) {
+    // Обработка успешного ответа
+}, function(error) {
+    // Обработка ошибки
+});
+```
+
+Замените `'http://your-api-url'` на URL вашего API, `yourData` на данные, которые вы отправляете, `yourAccessToken` на ваш токен авторизации, если это необходимо, и `'your-proxy-host'` и `'your-proxy-port'` на адрес и порт вашего прокси.

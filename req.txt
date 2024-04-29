@@ -1,22 +1,31 @@
-Вот пример кода для выполнения HTTP POST запроса с заголовками и использованием прокси в AngularJS:
+Если вы хотите настроить прокси для разработки AngularJS-приложения, обходя политику CORS во время разработки, вы можете использовать средства, такие как `http-proxy-middleware` или `proxy` в вашем `angular.json` или `angular-cli.json` файле.
 
-```javascript
-$http.post('http://your-api-url', {
-    data: yourData
-}, {
-    headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer yourAccessToken'
-    },
-    proxy: {
-        host: 'your-proxy-host',
-        port: 'your-proxy-port'
+Вот пример использования `proxy` в файле `angular.json`:
+
+```json
+{
+  ...
+  "architect": {
+    "serve": {
+      "options": {
+        "proxyConfig": "src/proxy.conf.json"
+      }
     }
-}).then(function(response) {
-    // Обработка успешного ответа
-}, function(error) {
-    // Обработка ошибки
-});
+  }
+}
 ```
 
-Замените `'http://your-api-url'` на URL вашего API, `yourData` на данные, которые вы отправляете, `yourAccessToken` на ваш токен авторизации, если это необходимо, и `'your-proxy-host'` и `'your-proxy-port'` на адрес и порт вашего прокси.
+Затем создайте файл `proxy.conf.json` в вашем проекте:
+
+```json
+{
+  "/api": {
+    "target": "http://your-api-url",
+    "secure": false
+  }
+}
+```
+
+Этот конфигурационный файл указывает, что все запросы, начинающиеся с `/api`, будут перенаправлены на `http://your-api-url`. 
+
+После этого, при разработке, все запросы, отправленные с вашего приложения AngularJS на `/api`, будут перенаправлены на ваш API-сервер, обходя политику CORS.

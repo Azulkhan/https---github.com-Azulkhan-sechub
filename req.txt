@@ -1,32 +1,61 @@
-
-Если вы хотите обновить значение переменной из одной функции и использовать его в другой, вы можете воспользоваться сервисом или фабрикой для хранения этой переменной. Вот пример:
+В AngularJS вы можете использовать сервис `$http` для загрузки XML данных и затем преобразовать их в JSON формат, чтобы обрабатывать их в вашем приложении. Вот пример:
 
 ```javascript
-angular.module('myApp').service('sharedService', function() {
-  var sharedVariable = 'initialValue';
+app.controller('MainController', function($scope, $http, $sce) {
+    $http.get('data.xml', { responseType: 'text' })
+        .then(function(response) {
+            // Преобразование XML в JSON
+            var xml = response.data;
+            var parser = new DOMParser();
+            var xmlDoc = parser.parseFromString(xml, "text/xml");
+            var json = xmlToJson(xmlDoc);
+            
+            // Присвоение данных переменной $scope
+            $scope.xmlData = json;
+        });
+});
 
-  return {
-    getSharedVariable: function() {
-      return sharedVariable;
-    },
-    setSharedVariable: function(newValue) {
-      sharedVariable = newValue;
+function xmlToJson(xml) {
+    var obj = {};
+
+    if (xml.nodeType == 1) {
+        if (xml.attributes.length > 0) {
+            obj["@attributes"] = {};
+            for (var j = 0; j < xml.attributes.length; j++) {
+                var attribute = xml.attributes.item(j);
+                obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
+            }
+        }
+    } else if (xml.nodeType == 3) {
+        obj = xml.nodeValue;
     }
-  };
-});
+
+    if (xml.hasChildNodes()) {
+        for (var i = 0; i < xml.childNodes.length; i++) {
+            var item = xml.childNodes.item(i);
+            var nodeName = item.nodeName;
+            if (typeof(obj[nodeName]) == "undefined") {
+                obj[nodeName] = xmlToJson(item);
+            } else {
+                if (typeof(obj[nodeName].push) == "undefined") {
+                    var old = obj[nodeName];
+                    obj[nodeName] = [];
+                    obj[nodeName].push(old);
+                }
+                obj[nodeName].push(xmlToJson(item));
+            }
+        }
+    }
+    return obj;
+}
 ```
 
-Теперь вы можете использовать этот сервис для обновления и получения значения переменной из различных функций контроллеров:
+Затем вы можете использовать `xmlData` в вашем HTML-шаблоне, например:
 
-```javascript
-angular.module('myApp').controller('firstController', function(sharedService) {
-  sharedService.setSharedVariable('newValue');
-});
-
-angular.module('myApp').controller('secondController', function(sharedService) {
-  var value = sharedService.getSharedVariable();
-  console.log(value); // Выведет 'newValue'
-});
+```html
+<div ng-controller="MainController">
+    <pre>{{ xmlData | json }}</pre>
+</div>
 ```
 
-Таким образом, вы можете обновить значение переменной в одной функции и использовать его в другой.
+Это примерный код. Убедитесь, что адаптируете его под свои потребности и проверяйте его работоспособность.

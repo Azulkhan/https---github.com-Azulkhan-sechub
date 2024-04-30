@@ -1,17 +1,32 @@
-Понял. Если вы используете AngularJS и хотите отправить POST-запрос через прокси, вам необходимо настроить прокси на сервере, на котором работает ваше AngularJS-приложение. Затем вы можете отправить запрос через этот прокси, указав нужный URL.
 
-Пример:
+Если вы хотите обновить значение переменной из одной функции и использовать его в другой, вы можете воспользоваться сервисом или фабрикой для хранения этой переменной. Вот пример:
 
 ```javascript
-$http.post('/proxy/your-endpoint', data, {
-    headers: {
-        'Content-Type': 'application/xml'
+angular.module('myApp').service('sharedService', function() {
+  var sharedVariable = 'initialValue';
+
+  return {
+    getSharedVariable: function() {
+      return sharedVariable;
+    },
+    setSharedVariable: function(newValue) {
+      sharedVariable = newValue;
     }
-}).then(function(response) {
-    // Обработка успешного ответа
-}, function(error) {
-    // Обработка ошибки
+  };
 });
 ```
 
-Здесь `/proxy/your-endpoint` - это URL вашего прокси, который настроен на перенаправление запросов на нужный сервер. Вам нужно настроить сервер так, чтобы он перенаправлял запросы на `http://your-other-server.com`.
+Теперь вы можете использовать этот сервис для обновления и получения значения переменной из различных функций контроллеров:
+
+```javascript
+angular.module('myApp').controller('firstController', function(sharedService) {
+  sharedService.setSharedVariable('newValue');
+});
+
+angular.module('myApp').controller('secondController', function(sharedService) {
+  var value = sharedService.getSharedVariable();
+  console.log(value); // Выведет 'newValue'
+});
+```
+
+Таким образом, вы можете обновить значение переменной в одной функции и использовать его в другой.

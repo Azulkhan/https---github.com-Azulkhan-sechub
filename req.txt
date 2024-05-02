@@ -1,9 +1,40 @@
+Вот примеры работы с XML с использованием пространства имен в Lua и JavaScript:
 
-Этот фрагмент, вероятно, является частью описания метода API. Давайте разберем его по частям:
+Lua:
+```lua
+local xml = require("xml")
 
-1. `"module": "kz.gov.pki.knca.commonUtils"` - указывает на модуль или класс, к которому относится метод.
-2. `"method": "createCAdESFromBase64"` - это имя метода, который будет вызван.
-3. `"args": [...]` - список аргументов, которые будут переданы в метод при вызове. В данном случае, это `AKKaztokenStore`, `SIGNATURE`, `MTEK`, `true`.
-4. `"selector": {...}` - это селектор, который, вероятно, содержит какие-то дополнительные параметры для выполнения метода, такие как `deviceId`, `entryId`, `password`.
+-- XML с пространством имен
+local xml_str = [[
+<root xmlns:aawp="v1:awp">
+  <aawp:ncalayer>Текст элемента</aawp:ncalayer>
+</root>
+]]
 
-Судя по всему, этот метод `createCAdESFromBase64` вероятно создает CAdES подпись на основе переданных в него параметров. Аргументы `AKKaztokenStore`, `SIGNATURE`, `MTEK`, `true` вероятно являются необходимыми для этой операции, а селектор содержит информацию о устройстве, входе и пароле для выполнения операции.
+local doc = xml.eval(xml_str)
+
+-- Получение содержимого элемента
+local ncalayer_text = doc:find("aawp:ncalayer"):text()
+print(ncalayer_text)
+```
+
+JavaScript:
+```javascript
+const { DOMParser } = require('xmldom');
+
+// XML с пространством имен
+const xmlStr = `
+<root xmlns:aawp="v1:awp">
+  <aawp:ncalayer>Текст элемента</aawp:ncalayer>
+</root>
+`;
+
+const parser = new DOMParser();
+const xmlDoc = parser.parseFromString(xmlStr, "text/xml");
+
+// Получение содержимого элемента
+const ncalayerText = xmlDoc.getElementsByTagNameNS("v1:awp", "ncalayer")[0].textContent;
+console.log(ncalayerText);
+```
+
+Обратите внимание, что в Lua используется библиотека `xml`, а в JavaScript используется стандартный модуль `xmldom` для работы с XML.

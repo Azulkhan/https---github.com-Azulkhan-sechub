@@ -1,40 +1,18 @@
-Вот примеры работы с XML с использованием пространства имен в Lua и JavaScript:
+Чтобы использовать прокси при отправке POST запроса с помощью JavaScript, вы можете использовать объект XMLHttpRequest вместе с методом open() и указать адрес прокси как адрес назначения запроса. Вот пример:
 
-Lua:
-```lua
-local xml = require("xml")
-
--- XML с пространством имен
-local xml_str = [[
-<root xmlns:aawp="v1:awp">
-  <aawp:ncalayer>Текст элемента</aawp:ncalayer>
-</root>
-]]
-
-local doc = xml.eval(xml_str)
-
--- Получение содержимого элемента
-local ncalayer_text = doc:find("aawp:ncalayer"):text()
-print(ncalayer_text)
-```
-
-JavaScript:
 ```javascript
-const { DOMParser } = require('xmldom');
-
-// XML с пространством имен
-const xmlStr = `
-<root xmlns:aawp="v1:awp">
-  <aawp:ncalayer>Текст элемента</aawp:ncalayer>
-</root>
-`;
-
-const parser = new DOMParser();
-const xmlDoc = parser.parseFromString(xmlStr, "text/xml");
-
-// Получение содержимого элемента
-const ncalayerText = xmlDoc.getElementsByTagNameNS("v1:awp", "ncalayer")[0].textContent;
-console.log(ncalayerText);
+var xhr = new XMLHttpRequest();
+var url = "адрес_прокси";
+xhr.open("POST", url, true);
+xhr.setRequestHeader("Content-Type", "application/json");
+xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4 && xhr.status === 200) {
+        // Обработка успешного ответа
+        console.log(xhr.responseText);
+    }
+};
+var data = JSON.stringify({"ключ": "значение"});
+xhr.send(data);
 ```
 
-Обратите внимание, что в Lua используется библиотека `xml`, а в JavaScript используется стандартный модуль `xmldom` для работы с XML.
+Замените "адрес_прокси" на адрес вашего прокси-сервера, а также замените {"ключ": "значение"} на ваш объект данных, который вы хотите отправить.

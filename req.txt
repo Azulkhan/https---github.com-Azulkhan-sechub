@@ -1,24 +1,21 @@
-В AngularJS можно использовать `$httpProvider` для конфигурации CORS заголовков. Вот пример использования `Access-Control-Allow-Origin` в AngularJS:
+В AngularJS вы не можете напрямую отправить запрос через прокси с клиентской стороны из-за политики Same-Origin Policy браузера. Однако, вы можете настроить прокси на вашем сервере разработки для обхода этого ограничения во время разработки.
+
+Если вам нужно отправить запрос на другой домен из AngularJS приложения, вы можете использовать JSONP или CORS (если сервер поддерживает). Вот пример использования CORS с AngularJS:
 
 ```javascript
-angular.module('myApp', [])
-  .config(['$httpProvider', function($httpProvider) {
-    // Разрешаем доступ с определенного домена
-    $httpProvider.defaults.headers.common['Access-Control-Allow-Origin'] = 'https://example.com';
-  }])
-  .controller('MyController', ['$scope', '$http', function($scope, $http) {
-    $scope.loadData = function() {
-      $http.get('https://api.example.com/data')
-        .then(function(response) {
-          $scope.data = response.data;
-        })
-        .catch(function(error) {
-          console.error('Произошла ошибка при загрузке данных:', error);
-        });
-    };
-  }]);
+$http({
+  method: 'POST',
+  url: 'https://example.com/api/endpoint', // Замените URL на ваш целевой URL
+  data: { key: 'value' },
+  headers: {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*' // Должен быть установлен на сервере
+  }
+}).then(function(response) {
+  // Обработка успешного ответа
+}, function(error) {
+  // Обработка ошибки
+});
 ```
 
-В этом примере мы используем `$httpProvider` для добавления заголовка `Access-Control-Allow-Origin` с указанным значением `'https://example.com'`. Это означает, что любые запросы, отправленные из приложения AngularJS на этом домене, будут иметь доступ к ресурсам на сервере, который возвращает этот заголовок.
-
-Затем в контроллере `MyController` мы отправляем GET запрос к серверу по адресу `'https://api.example.com/data'` и обрабатываем успешный ответ, сохраняя данные в `$scope.data`, или выводим сообщение об ошибке в случае неудачи.
+Обратите внимание, что сервер также должен быть настроен на поддержку CORS, добавив заголовок `Access-Control-Allow-Origin` в ответ.

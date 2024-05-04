@@ -1,47 +1,49 @@
-Понял. Для этого вам нужно настроить прокси-сервер таким образом, чтобы он перенаправлял ваши запросы на целевой URL. Это можно сделать с помощью различных технологий, таких как Node.js с использованием Express.js или любой другой серверной технологии.
-
-Вот пример настройки прокси-сервера с использованием Node.js и Express.js:
+Понял. В этом случае вы можете использовать сервис или фабрику, чтобы передавать данные между контроллерами на одной странице. Вот пример:
 
 ```javascript
-const express = require('express');
-const bodyParser = require('body-parser');
-const request = require('request');
+angular.module('myApp', [])
+  .service('tempDataService', function() {
+    var tempData = '';
 
-const app = express();
-const port = 3000;
-
-app.use(bodyParser.json());
-
-app.post('/your-route', (req, res) => {
-  // Получаем данные из запроса
-  const requestData = req.body;
-
-  // Адрес целевого URL
-  const targetUrl = 'адрес_целевого_URL';
-
-  // Опции для запроса к целевому URL
-  const options = {
-    url: targetUrl,
-    method: 'POST',
-    json: true,
-    body: requestData
-  };
-
-  // Отправляем запрос к целевому URL через прокси
-  request(options, (error, response, body) => {
-    if (error) {
-      console.error(error);
-      res.status(500).send('Произошла ошибка');
-    } else {
-      // Отправляем ответ обратно клиенту
-      res.status(response.statusCode).json(body);
-    }
+    return {
+      setData: function(data) {
+        tempData = data;
+      },
+      getData: function() {
+        return tempData;
+      }
+    };
   });
-});
 
-app.listen(port, () => {
-  console.log(`Прокси-сервер запущен на порту ${port}`);
-});
+angular.module('myApp')
+  .controller('FirstController', function($scope, tempDataService) {
+    $scope.saveData = function(data) {
+      tempDataService.setData(data);
+    };
+  });
+
+angular.module('myApp')
+  .controller('SecondController', function($scope, tempDataService) {
+    $scope.getData = function() {
+      $scope.data = tempDataService.getData();
+    };
+  });
 ```
 
-Этот пример создает прокси-сервер, который принимает POST запросы на `/your-route`, извлекает данные из запроса и отправляет их на целевой URL через `request`. Вы можете настроить `/your-route` на любой URL вашего выбора.
+Здесь `tempDataService` используется для сохранения данных из одного контроллера и их получения в другом. 
+
+Пример HTML:
+
+```html
+<div ng-controller="FirstController">
+  <input type="text" ng-model="dataToSave">
+  <button ng-click="saveData(dataToSave)">Сохранить</button>
+</div>
+
+<div ng-controller="SecondController">
+  <button ng-click="getData()">Получить данные</button>
+  <p>Данные: {{ data }}</p>
+</div>
+```
+
+Теперь, когда вы вводите данные и нажимаете кнопку "Сохранить" в первом контроллере, они сохраняются в сервисе `tempDataService`. Когда вы нажимаете кнопку "Получить данные" во втором контроллере, сохраненные данные выводятся.

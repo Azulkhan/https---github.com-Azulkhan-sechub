@@ -1,49 +1,24 @@
-Понял. В этом случае вы можете использовать сервис или фабрику, чтобы передавать данные между контроллерами на одной странице. Вот пример:
+В AngularJS можно использовать `$httpProvider` для конфигурации CORS заголовков. Вот пример использования `Access-Control-Allow-Origin` в AngularJS:
 
 ```javascript
 angular.module('myApp', [])
-  .service('tempDataService', function() {
-    var tempData = '';
-
-    return {
-      setData: function(data) {
-        tempData = data;
-      },
-      getData: function() {
-        return tempData;
-      }
+  .config(['$httpProvider', function($httpProvider) {
+    // Разрешаем доступ с определенного домена
+    $httpProvider.defaults.headers.common['Access-Control-Allow-Origin'] = 'https://example.com';
+  }])
+  .controller('MyController', ['$scope', '$http', function($scope, $http) {
+    $scope.loadData = function() {
+      $http.get('https://api.example.com/data')
+        .then(function(response) {
+          $scope.data = response.data;
+        })
+        .catch(function(error) {
+          console.error('Произошла ошибка при загрузке данных:', error);
+        });
     };
-  });
-
-angular.module('myApp')
-  .controller('FirstController', function($scope, tempDataService) {
-    $scope.saveData = function(data) {
-      tempDataService.setData(data);
-    };
-  });
-
-angular.module('myApp')
-  .controller('SecondController', function($scope, tempDataService) {
-    $scope.getData = function() {
-      $scope.data = tempDataService.getData();
-    };
-  });
+  }]);
 ```
 
-Здесь `tempDataService` используется для сохранения данных из одного контроллера и их получения в другом. 
+В этом примере мы используем `$httpProvider` для добавления заголовка `Access-Control-Allow-Origin` с указанным значением `'https://example.com'`. Это означает, что любые запросы, отправленные из приложения AngularJS на этом домене, будут иметь доступ к ресурсам на сервере, который возвращает этот заголовок.
 
-Пример HTML:
-
-```html
-<div ng-controller="FirstController">
-  <input type="text" ng-model="dataToSave">
-  <button ng-click="saveData(dataToSave)">Сохранить</button>
-</div>
-
-<div ng-controller="SecondController">
-  <button ng-click="getData()">Получить данные</button>
-  <p>Данные: {{ data }}</p>
-</div>
-```
-
-Теперь, когда вы вводите данные и нажимаете кнопку "Сохранить" в первом контроллере, они сохраняются в сервисе `tempDataService`. Когда вы нажимаете кнопку "Получить данные" во втором контроллере, сохраненные данные выводятся.
+Затем в контроллере `MyController` мы отправляем GET запрос к серверу по адресу `'https://api.example.com/data'` и обрабатываем успешный ответ, сохраняя данные в `$scope.data`, или выводим сообщение об ошибке в случае неудачи.

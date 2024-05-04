@@ -1,18 +1,47 @@
-Чтобы использовать прокси при отправке POST запроса с помощью JavaScript, вы можете использовать объект XMLHttpRequest вместе с методом open() и указать адрес прокси как адрес назначения запроса. Вот пример:
+Понял. Для этого вам нужно настроить прокси-сервер таким образом, чтобы он перенаправлял ваши запросы на целевой URL. Это можно сделать с помощью различных технологий, таких как Node.js с использованием Express.js или любой другой серверной технологии.
+
+Вот пример настройки прокси-сервера с использованием Node.js и Express.js:
 
 ```javascript
-var xhr = new XMLHttpRequest();
-var url = "адрес_прокси";
-xhr.open("POST", url, true);
-xhr.setRequestHeader("Content-Type", "application/json");
-xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4 && xhr.status === 200) {
-        // Обработка успешного ответа
-        console.log(xhr.responseText);
+const express = require('express');
+const bodyParser = require('body-parser');
+const request = require('request');
+
+const app = express();
+const port = 3000;
+
+app.use(bodyParser.json());
+
+app.post('/your-route', (req, res) => {
+  // Получаем данные из запроса
+  const requestData = req.body;
+
+  // Адрес целевого URL
+  const targetUrl = 'адрес_целевого_URL';
+
+  // Опции для запроса к целевому URL
+  const options = {
+    url: targetUrl,
+    method: 'POST',
+    json: true,
+    body: requestData
+  };
+
+  // Отправляем запрос к целевому URL через прокси
+  request(options, (error, response, body) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Произошла ошибка');
+    } else {
+      // Отправляем ответ обратно клиенту
+      res.status(response.statusCode).json(body);
     }
-};
-var data = JSON.stringify({"ключ": "значение"});
-xhr.send(data);
+  });
+});
+
+app.listen(port, () => {
+  console.log(`Прокси-сервер запущен на порту ${port}`);
+});
 ```
 
-Замените "адрес_прокси" на адрес вашего прокси-сервера, а также замените {"ключ": "значение"} на ваш объект данных, который вы хотите отправить.
+Этот пример создает прокси-сервер, который принимает POST запросы на `/your-route`, извлекает данные из запроса и отправляет их на целевой URL через `request`. Вы можете настроить `/your-route` на любой URL вашего выбора.

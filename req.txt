@@ -1,32 +1,10 @@
-Если вы хотите использовать функции напрямую на странице AngularJS без создания сервиса, вы можете просто вызвать их из контроллера или из директивы. Вот пример, как вы можете сделать это:
-
-```javascript
-angular.module('myApp').controller('MyController', function($scope) {
-  $scope.connectWebSocket = function() {
-    connect().then(function() {
-      console.log("WebSocket connected!");
-    }).catch(function(error) {
-      console.error("Error connecting to WebSocket:", error);
-    });
-  };
-
-  $scope.sendRequest = function() {
-    request().then(function(response) {
-      console.log("Response:", response);
-    }).catch(function(error) {
-      console.error("Error sending request:", error);
-    });
-  };
-});
-```
-
-И на вашем HTML шаблоне вы можете вызвать эти функции напрямую:
-
-```html
-<div ng-controller="MyController">
-  <button ng-click="connectWebSocket()">Connect WebSocket</button>
-  <button ng-click="sendRequest()">Send Request</button>
-</div>
-```
-
-Таким образом, ваши функции `connect` и `request` будут вызываться напрямую из контроллера `MyController`, и вы сможете использовать их на странице AngularJS без необходимости создания сервиса.
+BEGIN
+  DBMS_SCHEDULER.CREATE_JOB (
+    job_name        => 'my_daily_job',
+    job_type        => 'PLSQL_BLOCK',
+    job_action      => 'BEGIN your_procedure_or_plsql_code; END;',
+    start_date      => SYSTIMESTAMP,
+    repeat_interval => 'FREQ=DAILY; BYHOUR=10; BYDAY=MON,TUE,WED,THU,FRI',
+    end_date        => NULL,
+    enabled         => TRUE);
+END;

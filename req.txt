@@ -1,4 +1,4 @@
-Вот как можно адаптировать вашу функцию `connect` для использования в AngularJS с использованием промисов:
+Для переноса вашего кода на AngularJS без использования контроллера, вы можете создать сервис, который будет содержать вашу логику соединения с веб-сокетом и отправки запросов. Вот как это можно сделать:
 
 ```javascript
 angular.module('myApp').factory('WebSocketService', function($q) {
@@ -19,6 +19,7 @@ angular.module('myApp').factory('WebSocketService', function($q) {
       };
 
       webSocket.onerror = function(err) {
+        unblockScreen();
         console.error("socket connection error : ", err);
         reject(err);
       };
@@ -28,32 +29,73 @@ angular.module('myApp').factory('WebSocketService', function($q) {
           console.error("socket connection is closed ");
         } else {
           console.log('Connection error');
+          openDialog();
         }
         console.log('Code: ' + event.code + ' Reason: ' + event.reason);
       };
     });
   }
 
+  function request() {
+    blockScreen();
+
+    // Ваш код обработки запроса
+
+    return connect().then((webSocket) => {
+      webSocket.send(JSON.stringify(signInfo));
+
+      return new Promise((resolve, reject) => {
+        webSocket.onmessage = ({ data }) => {
+          response = JSON.parse(data);
+          if (response != null) {
+            var responseStatus = response['status'];
+            if (responseStatus === true) {
+              var responseBody = response['body'];
+              if (responseBody != null) {
+                unblockScreen();
+                if (responseBody.hasOwnProperty('result')) {
+                  var result = responseBody.result;
+                  $("#signature").val(result);
+                }
+              }
+            } else if (responseStatus === false) {
+              unblockScreen();
+              var responseCode = response['code'];
+              alert(responseCode);
+            }
+          }
+          resolve(response);
+        };
+      });
+    }).catch(function(err) {
+      unblockScreen();
+      console.log(err);
+    });
+  }
+
   return {
-    connect: connect
+    request: request
   };
 });
 ```
 
-Затем вы можете использовать этот сервис в контроллерах или других компонентах AngularJS:
+Затем, вы можете использовать этот сервис в любом месте вашего приложения AngularJS, например, в директивах или сервисах:
 
 ```javascript
-angular.module('myApp').controller('MyController', function(WebSocketService) {
-  var vm = this;
-
-  vm.connectWebSocket = function() {
-    WebSocketService.connect().then(function(socket) {
-      // Делайте что-то с возвращенным объектом WebSocket
-    }).catch(function(error) {
-      // Обрабатывайте ошибки
-    });
+angular.module('myApp').directive('myDirective', function(WebSocketService) {
+  return {
+    restrict: 'E',
+    link: function(scope, element, attrs) {
+      element.on('click', function() {
+        WebSocketService.request().then(function(response) {
+          // Обработка ответа
+        }).catch(function(error) {
+          // Обработка ошибок
+        });
+      });
+    }
   };
 });
 ```
 
-В этом примере я использовал сервис AngularJS для создания WebSocket соединения и возвращения промиса. Затем промис используется в контроллере для управления соединением и обработки результатов.
+Это пример того, как вы можете использовать сервис для управления соединением с веб-сокетом и отправкой запросов, не используя контроллер напрямую.

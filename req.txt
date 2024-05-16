@@ -1,0 +1,42 @@
+В AngularJS вы можете определить сервис или фабрику для работы с WebSocket и затем использовать его в ваших контроллерах или сервисах. Вот пример, как это можно сделать:
+
+```javascript
+angular.module('myApp').factory('WebSocketService', function() {
+  var socket;
+
+  function connect(url) {
+    socket = new WebSocket(url);
+  }
+
+  function sendMessage(message) {
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send(message);
+    } else {
+      console.error('WebSocket is not open.');
+    }
+  }
+
+  return {
+    connect: connect,
+    sendMessage: sendMessage
+  };
+});
+```
+
+Затем вы можете использовать этот сервис в ваших контроллерах или других местах вашего приложения:
+
+```javascript
+angular.module('myApp').controller('MyController', function(WebSocketService) {
+  var vm = this;
+
+  vm.connectWebSocket = function() {
+    WebSocketService.connect('ws://example.com/socket');
+  };
+
+  vm.sendMessage = function(message) {
+    WebSocketService.sendMessage(message);
+  };
+});
+```
+
+В этом примере `WebSocketService` является фабрикой, которая предоставляет методы для установки соединения и отправки сообщений через WebSocket. В контроллере `MyController` эти методы используются для управления WebSocket соединением.

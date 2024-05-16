@@ -1,42 +1,59 @@
-В AngularJS вы можете определить сервис или фабрику для работы с WebSocket и затем использовать его в ваших контроллерах или сервисах. Вот пример, как это можно сделать:
+Вот как можно адаптировать вашу функцию `connect` для использования в AngularJS с использованием промисов:
 
 ```javascript
-angular.module('myApp').factory('WebSocketService', function() {
-  var socket;
+angular.module('myApp').factory('WebSocketService', function($q) {
+  var webSocket;
 
-  function connect(url) {
-    socket = new WebSocket(url);
-  }
-
-  function sendMessage(message) {
-    if (socket.readyState === WebSocket.OPEN) {
-      socket.send(message);
-    } else {
-      console.error('WebSocket is not open.');
+  function connect() {
+    if (webSocket && webSocket.readyState < 2) {
+      console.log("reusing the socket connection [state = " + webSocket.readyState + "]: " + webSocket.url);
+      return $q.resolve(webSocket);
     }
+
+    return $q(function(resolve, reject) {
+      webSocket = new WebSocket(SOCKET_URL);
+
+      webSocket.onopen = function() {
+        console.log("socket connection is opened [state = " + webSocket.readyState + "]: " + webSocket.url);
+        resolve(webSocket);
+      };
+
+      webSocket.onerror = function(err) {
+        console.error("socket connection error : ", err);
+        reject(err);
+      };
+
+      webSocket.onclose = function(event) {
+        if (event.wasClean) {
+          console.error("socket connection is closed ");
+        } else {
+          console.log('Connection error');
+        }
+        console.log('Code: ' + event.code + ' Reason: ' + event.reason);
+      };
+    });
   }
 
   return {
-    connect: connect,
-    sendMessage: sendMessage
+    connect: connect
   };
 });
 ```
 
-Затем вы можете использовать этот сервис в ваших контроллерах или других местах вашего приложения:
+Затем вы можете использовать этот сервис в контроллерах или других компонентах AngularJS:
 
 ```javascript
 angular.module('myApp').controller('MyController', function(WebSocketService) {
   var vm = this;
 
   vm.connectWebSocket = function() {
-    WebSocketService.connect('ws://example.com/socket');
-  };
-
-  vm.sendMessage = function(message) {
-    WebSocketService.sendMessage(message);
+    WebSocketService.connect().then(function(socket) {
+      // Делайте что-то с возвращенным объектом WebSocket
+    }).catch(function(error) {
+      // Обрабатывайте ошибки
+    });
   };
 });
 ```
 
-В этом примере `WebSocketService` является фабрикой, которая предоставляет методы для установки соединения и отправки сообщений через WebSocket. В контроллере `MyController` эти методы используются для управления WebSocket соединением.
+В этом примере я использовал сервис AngularJS для создания WebSocket соединения и возвращения промиса. Затем промис используется в контроллере для управления соединением и обработки результатов.

@@ -1,101 +1,32 @@
-Для переноса вашего кода на AngularJS без использования контроллера, вы можете создать сервис, который будет содержать вашу логику соединения с веб-сокетом и отправки запросов. Вот как это можно сделать:
+Если вы хотите использовать функции напрямую на странице AngularJS без создания сервиса, вы можете просто вызвать их из контроллера или из директивы. Вот пример, как вы можете сделать это:
 
 ```javascript
-angular.module('myApp').factory('WebSocketService', function($q) {
-  var webSocket;
-
-  function connect() {
-    if (webSocket && webSocket.readyState < 2) {
-      console.log("reusing the socket connection [state = " + webSocket.readyState + "]: " + webSocket.url);
-      return $q.resolve(webSocket);
-    }
-
-    return $q(function(resolve, reject) {
-      webSocket = new WebSocket(SOCKET_URL);
-
-      webSocket.onopen = function() {
-        console.log("socket connection is opened [state = " + webSocket.readyState + "]: " + webSocket.url);
-        resolve(webSocket);
-      };
-
-      webSocket.onerror = function(err) {
-        unblockScreen();
-        console.error("socket connection error : ", err);
-        reject(err);
-      };
-
-      webSocket.onclose = function(event) {
-        if (event.wasClean) {
-          console.error("socket connection is closed ");
-        } else {
-          console.log('Connection error');
-          openDialog();
-        }
-        console.log('Code: ' + event.code + ' Reason: ' + event.reason);
-      };
+angular.module('myApp').controller('MyController', function($scope) {
+  $scope.connectWebSocket = function() {
+    connect().then(function() {
+      console.log("WebSocket connected!");
+    }).catch(function(error) {
+      console.error("Error connecting to WebSocket:", error);
     });
-  }
+  };
 
-  function request() {
-    blockScreen();
-
-    // Ваш код обработки запроса
-
-    return connect().then((webSocket) => {
-      webSocket.send(JSON.stringify(signInfo));
-
-      return new Promise((resolve, reject) => {
-        webSocket.onmessage = ({ data }) => {
-          response = JSON.parse(data);
-          if (response != null) {
-            var responseStatus = response['status'];
-            if (responseStatus === true) {
-              var responseBody = response['body'];
-              if (responseBody != null) {
-                unblockScreen();
-                if (responseBody.hasOwnProperty('result')) {
-                  var result = responseBody.result;
-                  $("#signature").val(result);
-                }
-              }
-            } else if (responseStatus === false) {
-              unblockScreen();
-              var responseCode = response['code'];
-              alert(responseCode);
-            }
-          }
-          resolve(response);
-        };
-      });
-    }).catch(function(err) {
-      unblockScreen();
-      console.log(err);
+  $scope.sendRequest = function() {
+    request().then(function(response) {
+      console.log("Response:", response);
+    }).catch(function(error) {
+      console.error("Error sending request:", error);
     });
-  }
-
-  return {
-    request: request
   };
 });
 ```
 
-Затем, вы можете использовать этот сервис в любом месте вашего приложения AngularJS, например, в директивах или сервисах:
+И на вашем HTML шаблоне вы можете вызвать эти функции напрямую:
 
-```javascript
-angular.module('myApp').directive('myDirective', function(WebSocketService) {
-  return {
-    restrict: 'E',
-    link: function(scope, element, attrs) {
-      element.on('click', function() {
-        WebSocketService.request().then(function(response) {
-          // Обработка ответа
-        }).catch(function(error) {
-          // Обработка ошибок
-        });
-      });
-    }
-  };
-});
+```html
+<div ng-controller="MyController">
+  <button ng-click="connectWebSocket()">Connect WebSocket</button>
+  <button ng-click="sendRequest()">Send Request</button>
+</div>
 ```
 
-Это пример того, как вы можете использовать сервис для управления соединением с веб-сокетом и отправкой запросов, не используя контроллер напрямую.
+Таким образом, ваши функции `connect` и `request` будут вызываться напрямую из контроллера `MyController`, и вы сможете использовать их на странице AngularJS без необходимости создания сервиса.

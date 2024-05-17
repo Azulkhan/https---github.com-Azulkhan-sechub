@@ -1,83 +1,25 @@
-BEGIN
-  DBMS_SCHEDULER.CREATE_JOB (
-    job_name        => 'my_daily_job',
-    job_type        => 'PLSQL_BLOCK',
-    job_action      => 'BEGIN your_procedure_or_plsql_code; END;',
-    start_date      => SYSTIMESTAMP,
-    repeat_interval => 'FREQ=DAILY; BYHOUR=10; BYDAY=MON,TUE,WED,THU,FRI',
-    end_date        => NULL,
-    enabled         => TRUE);
-END;
+Вы хотите отправить HTTP POST запрос из JavaScript? Вот пример, как это можно сделать с использованием встроенного API `fetch`:
 
+```javascript
+const url = 'https://example.com/api/data'; // замените на ваш URL API
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Table Title Example</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        .table-title {
-            margin-left: 20px; /* Отступ слева */
-            font-size: 24px;
-            color: blue;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-        }
-        .info-icon {
-            margin-left: 10px;
-            font-size: 18px;
-            position: relative;
-            cursor: pointer;
-        }
-        .info-icon .tooltip {
-            visibility: hidden;
-            width: 200px;
-            background-color: white;
-            color: black;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px;
-            position: absolute;
-            z-index: 1;
-            top: 50%;
-            left: 110%; /* Смещение вправо */
-            transform: translateY(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            box-shadow: 0px 0px 5px rgba(0,0,0,0.1);
-            border: 1px solid black;
-        }
-        .info-icon .tooltip::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            right: 100%; /* Край подсказки */
-            margin-top: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: transparent white transparent transparent;
-            transform: translateY(-50%);
-        }
-        .info-icon:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
-    </style>
-</head>
-<body>
-    <div class="table-title">
-        Название таблицы
-        <i class="fas fa-info-circle info-icon">
-            <div class="tooltip">Гайд по таблице: здесь описывается содержание таблицы...</div>
-        </i>
-    </div>
-    <table border="1">
-        <!-- Ваше содержимое таблицы -->
-    </table>
-</body>
-</html>
+const data = {
+    key1: 'value1',
+    key2: 'value2'
+};
 
+const options = {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+};
 
+fetch(url, options)
+    .then(response => response.json())
+    .then(data => console.log('Успешно отправлено:', data))
+    .catch(error => console.error('Произошла ошибка:', error));
+```
+
+Этот код отправляет POST запрос на указанный URL с данными в формате JSON. Важно заметить, что замените `url` на реальный адрес вашего API, и укажите корректные данные и заголовки в объекте `data` и `options` соответственно.

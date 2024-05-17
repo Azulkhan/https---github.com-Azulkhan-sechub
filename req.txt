@@ -43,7 +43,7 @@ END;
             position: absolute;
             z-index: 1;
             top: 50%;
-            right: 110%; /* Смещение вправо */
+            left: 110%; /* Смещение влево */
             transform: translateY(-50%);
             opacity: 0;
             transition: opacity 0.3s;
@@ -52,11 +52,11 @@ END;
             content: "";
             position: absolute;
             top: 50%;
-            left: 100%; /* Край подсказки */
+            right: 100%; /* Край подсказки */
             margin-top: -5px;
             border-width: 5px;
             border-style: solid;
-            border-color: transparent transparent transparent black;
+            border-color: transparent black transparent transparent;
             transform: translateY(-50%);
         }
         .info-icon:hover .tooltip {
@@ -77,3 +77,4 @@ END;
     </table>
 </body>
 </html>
+

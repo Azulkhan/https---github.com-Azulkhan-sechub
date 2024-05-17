@@ -10,7 +10,10 @@ BEGIN
 END;
 
 
-<meta charset="UTF-8">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Table Title Example</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -39,31 +42,38 @@ END;
             padding: 5px;
             position: absolute;
             z-index: 1;
-            bottom: 125%; /* Смещение вверх на 125% от высоты иконки */
-            left: 50%;
-            margin-left: -100px; /* Смещение влево на половину ширины подсказки */
+            top: 50%;
+            right: 110%; /* Смещение вправо */
+            transform: translateY(-50%);
             opacity: 0;
             transition: opacity 0.3s;
         }
         .info-icon .tooltip::after {
             content: "";
             position: absolute;
-            top: 100%; /* Нижний край подсказки */
-            left: 50%;
-            margin-left: -5px;
+            top: 50%;
+            left: 100%; /* Край подсказки */
+            margin-top: -5px;
             border-width: 5px;
             border-style: solid;
-            border-color: black transparent transparent transparent;
+            border-color: transparent transparent transparent black;
+            transform: translateY(-50%);
         }
         .info-icon:hover .tooltip {
             visibility: visible;
             opacity: 1;
         }
     </style>
-
-<div class="table-title">
+</head>
+<body>
+    <div class="table-title">
         Название таблицы
         <i class="fas fa-info-circle info-icon">
             <div class="tooltip">Гайд по таблице: здесь описывается содержание таблицы...</div>
         </i>
     </div>
+    <table border="1">
+        <!-- Ваше содержимое таблицы -->
+    </table>
+</body>
+</html>

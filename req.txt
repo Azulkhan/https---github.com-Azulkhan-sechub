@@ -18,4 +18,47 @@ END;
         }
 
 <div class="table-title">Название таблицы</div>
-margin-left: 20px; /* Отступ слева */
+margin-left: 20px; /* Отступ слева 
+
+
+.info-icon {
+            margin-left: 10px;
+            font-size: 18px;
+            position: relative;
+            cursor: pointer;
+        }
+        .info-icon .tooltip {
+            visibility: hidden;
+            width: 200px;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Смещение вверх на 125% от высоты иконки */
+            left: 50%;
+            margin-left: -100px; /* Смещение влево на половину ширины подсказки */
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .info-icon .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%; /* Нижний край подсказки */
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: black transparent transparent transparent;
+        }
+        .info-icon:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+<div class="info-icon">
+            <i class="fas fa-info-circle"></i>
+            <div class="tooltip">Гайд по таблице: здесь описывается содержание таблицы...</div>
+        </div>

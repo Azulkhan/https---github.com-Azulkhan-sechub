@@ -18,3 +18,4 @@ END;
         }
 
 <div class="table-title">Название таблицы</div>
+margin-left: 20px; /* Отступ слева */

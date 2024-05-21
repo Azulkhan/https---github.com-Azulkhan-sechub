@@ -13,3 +13,28 @@ function toggleDivVisibility(variable) {
 ```
 
 Здесь `yourDivId` должен быть заменен на реальный ID вашего `div` элемента. Вызовите эту функцию, передавая вашу переменную в качестве аргумента, чтобы изменить видимость `div` в соответствии с условием.
+
+
+Если вы хотите, чтобы `div` изначально был скрытым, вы можете установить его стиль `display` в `none` в HTML или через CSS. Вот как выглядит измененный пример с учетом этого:
+
+HTML:
+```html
+<div id="yourDivId" style="display: none;">
+    Содержимое вашего div
+</div>
+```
+
+JavaScript:
+```javascript
+function toggleDivVisibility(variable) {
+    var divElement = document.getElementById('yourDivId');
+
+    if (variable !== null) {
+        divElement.style.display = 'block'; // показать div, если переменная не null
+    } else {
+        divElement.style.display = 'none'; // скрыть div, если переменная null
+    }
+}
+```
+
+Теперь `div` будет скрыт при загрузке страницы, и функция `toggleDivVisibility` будет изменять его видимость в зависимости от значения переменной, которую вы передадите в функцию.

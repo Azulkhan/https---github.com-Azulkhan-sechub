@@ -1,31 +1,14 @@
-Чтобы сделать элемент `div` видимым или невидимым в зависимости от того, является ли переменная null, можно использовать JavaScript. Вот пример функции, которая проверяет переменную и скрывает или показывает `div`:
+Вы можете вызывать функцию `toggleDivVisibility` из другой функции следующим образом. Вот пример:
 
 ```javascript
-function toggleDivVisibility(variable) {
-    var divElement = document.getElementById('yourDivId'); // замените 'yourDivId' на ID вашего элемента div
+function mainFunction() {
+    // Ваша логика здесь для определения переменной
+    var myVariable = someCondition ? someValue : null;
 
-    if (variable !== null) {
-        divElement.style.display = 'block'; // показать div, если переменная не null
-    } else {
-        divElement.style.display = 'none'; // скрыть div, если переменная null
-    }
+    // Вызываем функцию toggleDivVisibility и передаем переменную в качестве аргумента
+    toggleDivVisibility(myVariable);
 }
-```
 
-Здесь `yourDivId` должен быть заменен на реальный ID вашего `div` элемента. Вызовите эту функцию, передавая вашу переменную в качестве аргумента, чтобы изменить видимость `div` в соответствии с условием.
-
-
-Если вы хотите, чтобы `div` изначально был скрытым, вы можете установить его стиль `display` в `none` в HTML или через CSS. Вот как выглядит измененный пример с учетом этого:
-
-HTML:
-```html
-<div id="yourDivId" style="display: none;">
-    Содержимое вашего div
-</div>
-```
-
-JavaScript:
-```javascript
 function toggleDivVisibility(variable) {
     var divElement = document.getElementById('yourDivId');
 
@@ -37,4 +20,6 @@ function toggleDivVisibility(variable) {
 }
 ```
 
-Теперь `div` будет скрыт при загрузке страницы, и функция `toggleDivVisibility` будет изменять его видимость в зависимости от значения переменной, которую вы передадите в функцию.
+В этом примере `mainFunction` представляет вашу основную функцию, которая выполняет какую-то логику для определения переменной `myVariable`. Затем она вызывает функцию `toggleDivVisibility`, передавая ей `myVariable` в качестве аргумента. Функция `toggleDivVisibility` определяет видимость `div` в зависимости от значения переменной.
+
+Вы можете адаптировать `mainFunction` для выполнения любой нужной вам логики, которая определяет, должен ли `div` быть видимым или скрытым.

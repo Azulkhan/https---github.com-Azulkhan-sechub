@@ -1,25 +1,18 @@
-Вы можете вызывать функцию `toggleDivVisibility` из другой функции следующим образом. Вот пример:
+Для переворота строки в Lua вы можете использовать следующий подход:
 
-```javascript
-function mainFunction() {
-    // Ваша логика здесь для определения переменной
-    var myVariable = someCondition ? someValue : null;
+```lua
+function reverseString(str)
+    local reversed = {}
+    for i = #str, 1, -1 do
+        table.insert(reversed, string.sub(str, i, i))
+    end
+    return table.concat(reversed)
+end
 
-    // Вызываем функцию toggleDivVisibility и передаем переменную в качестве аргумента
-    toggleDivVisibility(myVariable);
-}
-
-function toggleDivVisibility(variable) {
-    var divElement = document.getElementById('yourDivId');
-
-    if (variable !== null) {
-        divElement.style.display = 'block'; // показать div, если переменная не null
-    } else {
-        divElement.style.display = 'none'; // скрыть div, если переменная null
-    }
-}
+-- Пример использования:
+local originalString = "Hello, Lua!"
+local reversedString = reverseString(originalString)
+print(reversedString)  -- Выведет: "!auL ,olleH"
 ```
 
-В этом примере `mainFunction` представляет вашу основную функцию, которая выполняет какую-то логику для определения переменной `myVariable`. Затем она вызывает функцию `toggleDivVisibility`, передавая ей `myVariable` в качестве аргумента. Функция `toggleDivVisibility` определяет видимость `div` в зависимости от значения переменной.
-
-Вы можете адаптировать `mainFunction` для выполнения любой нужной вам логики, которая определяет, должен ли `div` быть видимым или скрытым.
+Этот код создаёт функцию `reverseString`, которая принимает строку `str`, разбивает её на символы, сохраняет их в обратном порядке в таблице `reversed`, а затем объединяет их с помощью `table.concat` для формирования результирующей строки.

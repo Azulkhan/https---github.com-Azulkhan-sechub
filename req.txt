@@ -1,29 +1,83 @@
-Кажется, что вы имели в виду метод `fetch` в JavaScript, который используется для отправки запросов HTTP. Этот метод асинхронный и возвращает объект `Promise`, который разрешается с объектом `Response`, представляющим ответ на запрос.
+Для создания мультивыбора в AngularJS с использованием dropdown select и фильтра для вывода текста можно использовать следующий подход:
 
-Вот пример использования метода `fetch`:
+### HTML шаблон
 
-```javascript
-fetch('https://api.example.com/data')
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log('Received data:', data);
-  })
-  .catch(error => {
-    console.error('Error fetching data:', error);
-  });
+```html
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+    <title>AngularJS Multiselect Dropdown</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        .multiselect-dropdown {
+            width: 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+        .selected-items {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div ng-controller="myCtrl">
+    <div class="multiselect-dropdown" ng-click="toggleDropdown()">
+        {{ selectedItems.length > 0 ? selectedItems.join(', ') : 'Select Items' }}
+        <ul ng-show="dropdownOpen">
+            <li ng-repeat="item in items">
+                <label>
+                    <input type="checkbox" ng-model="selected[item]" ng-change="updateSelection(item)"> {{ item }}
+                </label>
+            </li>
+        </ul>
+    </div>
+    <div class="selected-items" ng-show="selectedItems.length > 0">
+        <p>Selected items:</p>
+        <ul>
+            <li ng-repeat="item in selectedItems">{{ item }}</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope) {
+    $scope.items = ['Option 1', 'Option 2', 'Option 3', 'Option 4', 'Option 5'];
+    $scope.selected = {};
+    $scope.selectedItems = [];
+    $scope.dropdownOpen = false;
+
+    $scope.toggleDropdown = function() {
+        $scope.dropdownOpen = !$scope.dropdownOpen;
+    };
+
+    $scope.updateSelection = function(item) {
+        if ($scope.selected[item]) {
+            $scope.selectedItems.push(item);
+        } else {
+            var index = $scope.selectedItems.indexOf(item);
+            if (index !== -1) {
+                $scope.selectedItems.splice(index, 1);
+            }
+        }
+    };
+});
+</script>
+
+</body>
+</html>
 ```
 
-В этом примере:
+### Объяснение кода:
 
-- Мы отправляем GET-запрос по адресу `https://api.example.com/data`.
-- Метод `fetch` возвращает объект `Promise`, который разрешается с объектом `Response`.
-- Мы проверяем, что ответ `response` от сервера успешный с помощью `response.ok`.
-- Если ответ успешный, мы вызываем метод `response.json()`, который также возвращает `Promise` и разрешается с JSON-парсированными данными.
-- В конце мы обрабатываем полученные данные в блоке `then` и ловим ошибки в блоке `catch`.
+1. **HTML шаблон**: 
+   - Используется контроллер `myCtrl`, который содержит массив `items` с вариантами выбора.
+   - В блоке `.multiselect-dropdown` реализован dropdown с возможностью мультивыбора. При клике на блок отображается список вариантов в виде чекбоксов.
+   - Выбранные элементы выводятся в блоке `.selected-items`.
 
-Этот метод `fetch` широко используется для обмена данными с сервером в современных веб-приложениях на JavaScript.
+2. **AngularJS контроллер**:
+   - В контроллере определены методы `toggleDropdown()` для открытия/закрытия dropdown и `updateSelection(item)`, который обновляет выбранные элементы в массиве `selectedItems`.
+
+Этот пример демонстрирует основные принципы мультивыбора с использованием AngularJS и фильтрации вывода текста. Вы можете дополнить функционал или стилизацию в соответствии с вашими требованиями.

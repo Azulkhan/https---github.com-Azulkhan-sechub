@@ -1,3 +1,7 @@
+
+
+
+
 Для создания мультивыбора в AngularJS с использованием dropdown select и фильтра для вывода текста можно использовать следующий подход:
 
 ### HTML шаблон
@@ -81,3 +85,108 @@ app.controller('myCtrl', function($scope) {
    - В контроллере определены методы `toggleDropdown()` для открытия/закрытия dropdown и `updateSelection(item)`, который обновляет выбранные элементы в массиве `selectedItems`.
 
 Этот пример демонстрирует основные принципы мультивыбора с использованием AngularJS и фильтрации вывода текста. Вы можете дополнить функционал или стилизацию в соответствии с вашими требованиями.
+
+
+
+Чтобы передать два значения из AngularJS в SQL запрос с использованием параметров `WITH`, вы можете сделать следующее:
+
+### Пример SQL запроса с параметрами из AngularJS
+
+Предположим, что вы хотите передать два параметра `param` и `param1` из AngularJS в SQL запрос с использованием параметров `WITH`. Вот как это можно сделать:
+
+```sql
+WITH params AS (
+    SELECT ? AS param,
+           ? AS param1
+    FROM dual
+)
+SELECT *
+FROM files
+WHERE id IN (SELECT param FROM params)
+  AND filed IN (SELECT param1 FROM params);
+```
+
+### AngularJS код
+
+Для передачи значений `param` и `param1` из AngularJS в этот SQL запрос вам нужно выполнить следующие шаги:
+
+1. **Формирование SQL запроса на стороне AngularJS**: Создайте запрос, который будет отправлен на сервер, включая значения параметров `param` и `param1`.
+
+2. **Использование AngularJS для отправки запроса на сервер**: Используйте AngularJS для отправки HTTP запроса на сервер с включенными значениями параметров. Вот пример как это может выглядеть:
+
+```javascript
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope, $http) {
+    $scope.paramValue = 'value1'; // Пример значения param из AngularJS
+    $scope.param1Value = 'value2'; // Пример значения param1 из AngularJS
+
+    $scope.executeQuery = function() {
+        var config = {
+            params: {
+                param: $scope.paramValue,
+                param1: $scope.param1Value
+            }
+        };
+
+        $http.get('/api/query', config)
+            .then(function(response) {
+                $scope.results = response.data;
+            })
+            .catch(function(error) {
+                console.error('Error fetching data:', error);
+            });
+    };
+});
+```
+
+3. **Обработка запроса на сервере**: На стороне сервера (в вашем API) обработайте запрос с параметрами `param` и `param1`, передайте их в SQL запрос, используя методы своего серверного языка программирования (например, в случае Node.js это может быть через библиотеку для работы с базой данных, такую как `mysql` или `pg`).
+
+Примерный код на Node.js с использованием библиотеки `mysql`:
+
+```javascript
+const mysql = require('mysql');
+const express = require('express');
+const bodyParser = require('body-parser');
+
+const app = express();
+app.use(bodyParser.json());
+
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'your_username',
+    password: 'your_password',
+    database: 'your_database'
+});
+
+app.get('/api/query', (req, res) => {
+    const { param, param1 } = req.query;
+
+    const sql = `
+        WITH params AS (
+            SELECT ? AS param,
+                   ? AS param1
+            FROM dual
+        )
+        SELECT *
+        FROM files
+        WHERE id IN (SELECT param FROM params)
+          AND filed IN (SELECT param1 FROM params);
+    `;
+
+    connection.query(sql, [param, param1], (error, results, fields) => {
+        if (error) {
+            console.error('Error executing query:', error);
+            res.status(500).json({ error: 'Error executing query' });
+        } else {
+            res.json(results);
+        }
+    });
+});
+
+const port = 3000;
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+});
+```
+
+Этот пример показывает основные шаги для передачи двух значений из AngularJS в SQL запрос с использованием параметров `WITH`. Ваша специфика реализации может варьироваться в зависимости от используемых технологий и структуры вашего проекта.

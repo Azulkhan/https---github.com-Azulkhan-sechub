@@ -1,63 +1,55 @@
-Для создания выпадающего списка (dropdown list) в AngularJS с данными, полученными из запроса, вам нужно выполнить несколько шагов:
+Если вы хотите создать простой выпадающий список (dropdown) с множественным выбором в AngularJS, используя чистый JavaScript (без создания собственного компонента), вот как это можно сделать:
 
-1. **Создание сервиса для запроса данных**: Напишите сервис AngularJS, который будет делать запрос к вашему API или серверу для получения данных.
-
-2. **Контроллер или компонент**: Создайте контроллер или компонент AngularJS, который будет использовать данные, полученные из сервиса, и сохранять их в переменной для использования в выпадающем списке.
-
-3. **Шаблон**: В шаблоне вашего контроллера или компонента используйте директиву `ng-options` для создания выпадающего списка.
-
-Вот примерный код, как это может выглядеть:
-
-### HTML (шаблон):
+### Пример HTML:
 
 ```html
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <title>AngularJS Multiple Select Example</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<body>
+
 <div ng-controller="DropdownController">
-    <select ng-model="selectedItem" ng-options="item.code as item.name for item in items">
-        <option value="">Выберите элемент</option>
+    <select ng-model="selectedItems" multiple>
+        <option ng-repeat="item in items" value="{{ item.code }}">{{ item.name }}</option>
     </select>
-    <p>Выбранный элемент: {{ selectedItem }}</p>
+    <p>Выбранные элементы: {{ selectedItems }}</p>
 </div>
+
+<script>
+    // Создаем модуль AngularJS
+    var myApp = angular.module('myApp', []);
+
+    // Создаем контроллер AngularJS
+    myApp.controller('DropdownController', ['$scope', function($scope) {
+        // Пример данных, которые вы можете написать на странице
+        $scope.items = [
+            { code: '1', name: 'Элемент 1' },
+            { code: '2', name: 'Элемент 2' },
+            { code: '3', name: 'Элемент 3' },
+            { code: '4', name: 'Элемент 4' }
+        ];
+
+        // Необязательное начальное значение для выбора
+        $scope.selectedItems = ['1', '3']; // Пример начального выбора
+    }]);
+</script>
+
+</body>
+</html>
 ```
 
-### JavaScript (AngularJS контроллер и сервис):
+### Объяснение:
 
-```javascript
-// Создаем модуль AngularJS
-var myApp = angular.module('myApp', []);
+- **ng-model="selectedItems"**: Это связывает выбранные элементы из выпадающего списка с переменной `selectedItems` в вашем контроллере AngularJS. Поскольку мы используем атрибут `multiple`, `selectedItems` будет массивом выбранных значений.
+  
+- **ng-repeat="item in items"**: Директива `ng-repeat` создает опции для выпадающего списка на основе массива `items`.
 
-// Создаем сервис для выполнения запроса данных
-myApp.factory('DataService', ['$http', function($http) {
-    var service = {};
+- **$scope.items**: Это массив объектов, представляющих элементы списка. Вы можете добавить и изменить эти данные, как вам угодно.
 
-    service.getItems = function() {
-        // Здесь выполняется запрос к API или серверу
-        return $http.get('/api/items').then(function(response) {
-            return response.data; // Возвращаем данные из ответа
-        });
-    };
+- **$scope.selectedItems**: Это массив начальных выбранных элементов. Здесь представлен пример начального выбора элементов с кодами '1' и '3'. Вы можете изменить это значение в соответствии с вашими требованиями.
 
-    return service;
-}]);
-
-// Создаем контроллер AngularJS для работы с данными
-myApp.controller('DropdownController', ['$scope', 'DataService', function($scope, DataService) {
-    $scope.items = [];
-
-    // Загружаем данные с помощью DataService
-    DataService.getItems().then(function(data) {
-        $scope.items = data; // Сохраняем полученные данные в $scope.items
-    });
-
-    // Необязательно: начальное значение для выбора
-    $scope.selectedItem = '';
-
-}]);
-```
-
-### Краткое объяснение:
-
-- **ng-model="selectedItem"**: Это связывает выбранный элемент из выпадающего списка с переменной `selectedItem` в вашем контроллере.
-- **ng-options="item.code as item.name for item in items"**: Эта директива создает опции для выпадающего списка. `item.code` будет значением, которое выбирается, а `item.name` будет текстом, отображаемым пользователю.
-- **DataService**: Это сервис, который используется для получения данных. Вызов `DataService.getItems()` выполняет запрос к вашему API и возвращает данные.
-
-Вы можете адаптировать этот код под вашу специфическую ситуацию, изменяя сервис `DataService` для выполнения запроса к вашему API и изменяя логику в контроллере или компоненте AngularJS в зависимости от структуры возвращаемых данных и вашей логики отображения.
+Этот пример демонстрирует базовый подход к созданию выпадающего списка с множественным выбором в AngularJS, используя чистый JavaScript и HTML.

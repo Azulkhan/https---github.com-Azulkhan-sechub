@@ -1,192 +1,63 @@
+Для создания выпадающего списка (dropdown list) в AngularJS с данными, полученными из запроса, вам нужно выполнить несколько шагов:
 
+1. **Создание сервиса для запроса данных**: Напишите сервис AngularJS, который будет делать запрос к вашему API или серверу для получения данных.
 
+2. **Контроллер или компонент**: Создайте контроллер или компонент AngularJS, который будет использовать данные, полученные из сервиса, и сохранять их в переменной для использования в выпадающем списке.
 
+3. **Шаблон**: В шаблоне вашего контроллера или компонента используйте директиву `ng-options` для создания выпадающего списка.
 
-Для создания мультивыбора в AngularJS с использованием dropdown select и фильтра для вывода текста можно использовать следующий подход:
+Вот примерный код, как это может выглядеть:
 
-### HTML шаблон
+### HTML (шаблон):
 
 ```html
-<!DOCTYPE html>
-<html ng-app="myApp">
-<head>
-    <title>AngularJS Multiselect Dropdown</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
-    <style>
-        .multiselect-dropdown {
-            width: 200px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            cursor: pointer;
-        }
-        .selected-items {
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-
-<div ng-controller="myCtrl">
-    <div class="multiselect-dropdown" ng-click="toggleDropdown()">
-        {{ selectedItems.length > 0 ? selectedItems.join(', ') : 'Select Items' }}
-        <ul ng-show="dropdownOpen">
-            <li ng-repeat="item in items">
-                <label>
-                    <input type="checkbox" ng-model="selected[item]" ng-change="updateSelection(item)"> {{ item }}
-                </label>
-            </li>
-        </ul>
-    </div>
-    <div class="selected-items" ng-show="selectedItems.length > 0">
-        <p>Selected items:</p>
-        <ul>
-            <li ng-repeat="item in selectedItems">{{ item }}</li>
-        </ul>
-    </div>
+<div ng-controller="DropdownController">
+    <select ng-model="selectedItem" ng-options="item.code as item.name for item in items">
+        <option value="">Выберите элемент</option>
+    </select>
+    <p>Выбранный элемент: {{ selectedItem }}</p>
 </div>
-
-<script>
-var app = angular.module('myApp', []);
-app.controller('myCtrl', function($scope) {
-    $scope.items = ['Option 1', 'Option 2', 'Option 3', 'Option 4', 'Option 5'];
-    $scope.selected = {};
-    $scope.selectedItems = [];
-    $scope.dropdownOpen = false;
-
-    $scope.toggleDropdown = function() {
-        $scope.dropdownOpen = !$scope.dropdownOpen;
-    };
-
-    $scope.updateSelection = function(item) {
-        if ($scope.selected[item]) {
-            $scope.selectedItems.push(item);
-        } else {
-            var index = $scope.selectedItems.indexOf(item);
-            if (index !== -1) {
-                $scope.selectedItems.splice(index, 1);
-            }
-        }
-    };
-});
-</script>
-
-</body>
-</html>
 ```
 
-### Объяснение кода:
-
-1. **HTML шаблон**: 
-   - Используется контроллер `myCtrl`, который содержит массив `items` с вариантами выбора.
-   - В блоке `.multiselect-dropdown` реализован dropdown с возможностью мультивыбора. При клике на блок отображается список вариантов в виде чекбоксов.
-   - Выбранные элементы выводятся в блоке `.selected-items`.
-
-2. **AngularJS контроллер**:
-   - В контроллере определены методы `toggleDropdown()` для открытия/закрытия dropdown и `updateSelection(item)`, который обновляет выбранные элементы в массиве `selectedItems`.
-
-Этот пример демонстрирует основные принципы мультивыбора с использованием AngularJS и фильтрации вывода текста. Вы можете дополнить функционал или стилизацию в соответствии с вашими требованиями.
-
-
-
-Чтобы передать два значения из AngularJS в SQL запрос с использованием параметров `WITH`, вы можете сделать следующее:
-
-### Пример SQL запроса с параметрами из AngularJS
-
-Предположим, что вы хотите передать два параметра `param` и `param1` из AngularJS в SQL запрос с использованием параметров `WITH`. Вот как это можно сделать:
-
-```sql
-WITH params AS (
-    SELECT ? AS param,
-           ? AS param1
-    FROM dual
-)
-SELECT *
-FROM files
-WHERE id IN (SELECT param FROM params)
-  AND filed IN (SELECT param1 FROM params);
-```
-
-### AngularJS код
-
-Для передачи значений `param` и `param1` из AngularJS в этот SQL запрос вам нужно выполнить следующие шаги:
-
-1. **Формирование SQL запроса на стороне AngularJS**: Создайте запрос, который будет отправлен на сервер, включая значения параметров `param` и `param1`.
-
-2. **Использование AngularJS для отправки запроса на сервер**: Используйте AngularJS для отправки HTTP запроса на сервер с включенными значениями параметров. Вот пример как это может выглядеть:
+### JavaScript (AngularJS контроллер и сервис):
 
 ```javascript
-var app = angular.module('myApp', []);
-app.controller('myCtrl', function($scope, $http) {
-    $scope.paramValue = 'value1'; // Пример значения param из AngularJS
-    $scope.param1Value = 'value2'; // Пример значения param1 из AngularJS
+// Создаем модуль AngularJS
+var myApp = angular.module('myApp', []);
 
-    $scope.executeQuery = function() {
-        var config = {
-            params: {
-                param: $scope.paramValue,
-                param1: $scope.param1Value
-            }
-        };
+// Создаем сервис для выполнения запроса данных
+myApp.factory('DataService', ['$http', function($http) {
+    var service = {};
 
-        $http.get('/api/query', config)
-            .then(function(response) {
-                $scope.results = response.data;
-            })
-            .catch(function(error) {
-                console.error('Error fetching data:', error);
-            });
+    service.getItems = function() {
+        // Здесь выполняется запрос к API или серверу
+        return $http.get('/api/items').then(function(response) {
+            return response.data; // Возвращаем данные из ответа
+        });
     };
-});
-```
 
-3. **Обработка запроса на сервере**: На стороне сервера (в вашем API) обработайте запрос с параметрами `param` и `param1`, передайте их в SQL запрос, используя методы своего серверного языка программирования (например, в случае Node.js это может быть через библиотеку для работы с базой данных, такую как `mysql` или `pg`).
+    return service;
+}]);
 
-Примерный код на Node.js с использованием библиотеки `mysql`:
+// Создаем контроллер AngularJS для работы с данными
+myApp.controller('DropdownController', ['$scope', 'DataService', function($scope, DataService) {
+    $scope.items = [];
 
-```javascript
-const mysql = require('mysql');
-const express = require('express');
-const bodyParser = require('body-parser');
-
-const app = express();
-app.use(bodyParser.json());
-
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'your_username',
-    password: 'your_password',
-    database: 'your_database'
-});
-
-app.get('/api/query', (req, res) => {
-    const { param, param1 } = req.query;
-
-    const sql = `
-        WITH params AS (
-            SELECT ? AS param,
-                   ? AS param1
-            FROM dual
-        )
-        SELECT *
-        FROM files
-        WHERE id IN (SELECT param FROM params)
-          AND filed IN (SELECT param1 FROM params);
-    `;
-
-    connection.query(sql, [param, param1], (error, results, fields) => {
-        if (error) {
-            console.error('Error executing query:', error);
-            res.status(500).json({ error: 'Error executing query' });
-        } else {
-            res.json(results);
-        }
+    // Загружаем данные с помощью DataService
+    DataService.getItems().then(function(data) {
+        $scope.items = data; // Сохраняем полученные данные в $scope.items
     });
-});
 
-const port = 3000;
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+    // Необязательно: начальное значение для выбора
+    $scope.selectedItem = '';
+
+}]);
 ```
 
-Этот пример показывает основные шаги для передачи двух значений из AngularJS в SQL запрос с использованием параметров `WITH`. Ваша специфика реализации может варьироваться в зависимости от используемых технологий и структуры вашего проекта.
+### Краткое объяснение:
+
+- **ng-model="selectedItem"**: Это связывает выбранный элемент из выпадающего списка с переменной `selectedItem` в вашем контроллере.
+- **ng-options="item.code as item.name for item in items"**: Эта директива создает опции для выпадающего списка. `item.code` будет значением, которое выбирается, а `item.name` будет текстом, отображаемым пользователю.
+- **DataService**: Это сервис, который используется для получения данных. Вызов `DataService.getItems()` выполняет запрос к вашему API и возвращает данные.
+
+Вы можете адаптировать этот код под вашу специфическую ситуацию, изменяя сервис `DataService` для выполнения запроса к вашему API и изменяя логику в контроллере или компоненте AngularJS в зависимости от структуры возвращаемых данных и вашей логики отображения.

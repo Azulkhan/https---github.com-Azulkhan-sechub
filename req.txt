@@ -1,49 +1,52 @@
-Для подписи данных в формате "raw" с использованием библиотеки `signxml` в Python, вам потребуется следовать примерно такому подходу:
+Понял вас. В теле SOAP-запроса вам нужно будет указать конкретные параметры операции, которую вы планируете вызвать на веб-службе. Вот как вы можете адаптировать предыдущий пример для добавления конкретных параметров в тело SOAP-запроса:
 
-1. **Установка библиотеки `signxml`:** Убедитесь, что у вас установлена библиотека `signxml`. Вы можете установить её с помощью pip, выполнив команду:
+```javascript
+const axios = require('axios');
+const xml2js = require('xml2js');
 
-   ```
-   pip install signxml
-   ```
+// Пример SOAP-запроса с параметрами
+const soapRequest = `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://ws.api1.AuthService">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ws:yourOperationName>
+         <param1>value1</param1>
+         <param2>value2</param2>
+         <!-- Добавьте другие параметры, если нужно -->
+      </ws:yourOperationName>
+   </soapenv:Body>
+</soapenv:Envelope>`;
 
-2. **Подготовка сертификата и закрытого ключа:** У вас должен быть X.509 сертификат и соответствующий закрытый ключ, который будет использоваться для подписи данных.
+// Адрес веб-службы WSDL
+const url = 'http://esf.gov.kz:8080/esf-web/ws/api1/AuthService?wsdl';
 
-3. **Пример кода для подписи данных:**
+// Опции для запроса
+const headers = {
+    'Content-Type': 'text/xml;charset=UTF-8',
+    'SOAPAction': 'yourSOAPAction'  // Замените на нужное действие SOAP
+};
 
-   Вот пример кода, который подписывает данные в формате "raw" с использованием библиотеки `signxml`:
+// Отправка SOAP-запроса
+axios.post(url, soapRequest, { headers: headers })
+    .then(response => {
+        // Преобразование XML-ответа в JavaScript объект
+        xml2js.parseString(response.data, (err, result) => {
+            if (err) {
+                console.error(err);
+            } else {
+                console.log(result);
+                // Обработка ответа здесь
+            }
+        });
+    })
+    .catch(error => {
+        console.error(error);
+    });
+```
 
-   ```python
-   from signxml import XMLSigner, XMLVerifier
-   from lxml import etree
-   from cryptography.hazmat.backends import default_backend
-   from cryptography.hazmat.primitives import hashes
-   from cryptography.hazmat.primitives.serialization import load_pem_private_key
+В этом примере:
 
-   # Путь к вашему закрытому ключу в формате PEM
-   private_key_path = 'path/to/your/private_key.pem'
+- `param1`, `param2` и другие элементы внутри `<ws:yourOperationName>` представляют собой параметры операции, которые вы отправляете на веб-службу. Замените `value1`, `value2` и другие значения на фактические данные, которые нужно передать.
 
-   # Путь к вашему X.509 сертификату в формате PEM
-   cert_path = 'path/to/your/certificate.pem'
+- `soapRequest` содержит XML-тело запроса, в котором определена операция `yourOperationName` с необходимыми параметрами.
 
-   # Данные для подписи в формате raw
-   raw_data = b'This is the data to sign.'
-
-   # Загрузка закрытого ключа
-   with open(private_key_path, 'rb') as key_file:
-       private_key = load_pem_private_key(key_file.read(), password=None, backend=default_backend())
-
-   # Создание XMLSigner с использованием закрытого ключа и сертификата
-   signer = XMLSigner(key=private_key, cert=open(cert_path).read(), digest_algorithm=hashes.SHA256)
-
-   # Подпись данных
-   signed_data = signer.sign(raw_data)
-
-   print(f"Signed data: {signed_data}")
-   ```
-
-   В этом примере:
-   - Вы загружаете закрытый ключ из файла PEM и X.509 сертификат.
-   - Создаёте экземпляр `XMLSigner`, указывая ключ, сертификат и алгоритм хеширования (в примере используется SHA-256).
-   - Подписываете данные `raw_data` с помощью метода `sign`.
-
-Этот код подписывает данные в формате "raw". Убедитесь, что ваш закрытый ключ и сертификат соответствуют правильному формату и алгоритму, используемому в вашем контексте.
+Этот шаблон можно доработать в зависимости от структуры и требований конкретной веб-службы, с которой вы работаете.

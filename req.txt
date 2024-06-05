@@ -1,17 +1,49 @@
-Вот краткие объяснения терминов, связанных с Angular или AngularJS:
+В AngularJS и в простом JavaScript вы можете использовать метод `slice()` для получения последних четырёх символов строки.
 
-1. **ng-class**: Директива AngularJS (Angular 1.x), позволяющая динамически применять классы к элементам на основе выражений JavaScript.
+### Простой JavaScript
 
-2. **ng-bind**: Директива AngularJS (Angular 1.x), используемая для связывания данных с HTML элементом. Она обновляет содержимое элемента согласно модели данных в контроллере.
+```javascript
+let str = "Пример строки";
+let lastFourChars = str.slice(-4);
+console.log(lastFourChars); // "роки"
+```
 
-3. **ng-if**: Директива AngularJS (или Angular), которая условно добавляет или удаляет элементы из DOM в зависимости от выражения, переданного в неё.
+### AngularJS
 
-4. **ng-model**: Директива AngularJS (или Angular), связывающая значение элемента формы (input, select, textarea) с моделью данных приложения. Изменения в элементе формы автоматически отражаются в модели и наоборот.
+В AngularJS вы можете использовать этот же подход внутри контроллера или директивы.
 
-5. **$cacheFactory**: Сервис в AngularJS, предназначенный для создания объектов, которые могут кэшировать данные в памяти браузера. Это помогает ускорить доступ к данным, снижая количество запросов на сервер.
+```javascript
+angular.module('myApp', [])
+  .controller('MyController', ['$scope', function($scope) {
+    $scope.myString = "Пример строки";
+    $scope.lastFourChars = function() {
+      return $scope.myString.slice(-4);
+    };
+  }]);
+```
 
-6. **$compile**: Сервис AngularJS, который компилирует HTML строку или DOM элемент в шаблон и возвращает функцию компиляции, которая может быть выполнена в контексте определённого scope.
+### Пример использования в HTML с AngularJS
 
-7. **$rootScope**: В AngularJS (Angular 1.x) это глобальный объект, доступный всему приложению Angular. Он используется для обмена данными и событиями между различными компонентами приложения.
+```html
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script>
+    angular.module('myApp', [])
+      .controller('MyController', ['$scope', function($scope) {
+        $scope.myString = "Пример строки";
+        $scope.lastFourChars = function() {
+          return $scope.myString.slice(-4);
+        };
+      }]);
+  </script>
+</head>
+<body ng-controller="MyController">
+  <p>Исходная строка: {{myString}}</p>
+  <p>Последние четыре символа: {{lastFourChars()}}</p>
+</body>
+</html>
+```
 
-Каждый из этих терминов представляет собой часть API или функциональности Angular или AngularJS, которая используется для управления состоянием приложения, связывания данных и управления DOM.
+Этот пример показывает, как получить последние четыре символа строки как в простом JavaScript, так и в AngularJS.

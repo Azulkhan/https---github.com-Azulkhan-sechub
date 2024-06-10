@@ -1,66 +1,38 @@
-Для создания 15 полей ввода (input) с уникальными стилями на странице, можно использовать HTML и CSS. Вот пример кода:
+Чтобы добавить небольшой пробел между двумя кнопками (button) в HTML и CSS, можно воспользоваться несколькими способами. Вот два простых метода:
 
-### HTML:
+1. **Использование margin в CSS:**
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form with Unique Styles</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Buttons with Space</title>
+    <style>
+        .button {
+            margin-right: 10px; /* Задает пространство справа от кнопки */
+        }
+    </style>
 </head>
 <body>
-    <form>
-        <div class="input-container">
-            <label for="input1">Label 1</label>
-            <input type="text" id="input1" class="input-style-1">
-        </div>
-        <div class="input-container">
-            <label for="input2">Label 2</label>
-            <input type="text" id="input2" class="input-style-2">
-        </div>
-        <!-- Добавьте остальные поля ввода здесь -->
-        <div class="input-container">
-            <label for="input15">Label 15</label>
-            <input type="text" id="input15" class="input-style-15">
-        </div>
-    </form>
+    <button class="button">Button 1</button>
+    <button>Button 2</button>
 </body>
 </html>
 ```
 
-### CSS (styles.css):
-```css
-body {
-    font-family: Arial, sans-serif;
-}
+В этом примере класс `.button` применяется к первой кнопке, и для неё задаётся отступ справа в 10 пикселей.
 
-.input-container {
-    margin-bottom: 15px;
-}
+2. **Использование пробела или неразрывного пробела ( ) в HTML:**
 
-label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.input-style-1 {
-    border: 2px solid #ff0000;
-    padding: 5px;
-}
-
-.input-style-2 {
-    border: 2px solid #00ff00;
-    padding: 5px;
-}
-
-/* Добавьте остальные стили здесь */
-
-.input-style-15 {
-    border: 2px solid #0000ff;
-    padding: 5px;
-}
-```
-
-Этот пример создаёт 15 полей ввода с разными стилями. Вы можете добавить свои уникальные стили для каждого поля ввода, изменяя соответствующие классы в CSS.
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buttons with Space</title>
+</head>
+<body>
+    <button>Button 1</button>&

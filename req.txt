@@ -1,38 +1,36 @@
-Чтобы добавить небольшой пробел между двумя кнопками (button) в HTML и CSS, можно воспользоваться несколькими способами. Вот два простых метода:
+Чтобы функция `os.getenv("damu_crypto_enabled")` возвращала значение `"1"`, необходимо убедиться, что переменная окружения `damu_crypto_enabled` установлена в значение `"1"`. В Unix-подобных системах это можно сделать следующим образом:
 
-1. **Использование margin в CSS:**
+1. В командной строке установите переменную окружения:
+   ```sh
+   export damu_crypto_enabled=1
+   ```
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buttons with Space</title>
-    <style>
-        .button {
-            margin-right: 10px; /* Задает пространство справа от кнопки */
-        }
-    </style>
-</head>
-<body>
-    <button class="button">Button 1</button>
-    <button>Button 2</button>
-</body>
-</html>
+2. Запустите ваш Lua-скрипт из этой же командной строки:
+   ```sh
+   lua ваш_скрипт.lua
+   ```
+
+Если вы используете Windows, вы можете установить переменную окружения так:
+
+1. В командной строке установите переменную окружения:
+   ```cmd
+   set damu_crypto_enabled=1
+   ```
+
+2. Запустите ваш Lua-скрипт из этой же командной строки:
+   ```cmd
+   lua ваш_скрипт.lua
+   ```
+
+В самом Lua-скрипте вы можете проверить значение переменной следующим образом:
+
+```lua
+local damu_crypto_enabled = os.getenv("damu_crypto_enabled")
+if damu_crypto_enabled == "1" then
+    print("Crypto enabled")
+else
+    print("Crypto not enabled")
+end
 ```
 
-В этом примере класс `.button` применяется к первой кнопке, и для неё задаётся отступ справа в 10 пикселей.
-
-2. **Использование пробела или неразрывного пробела ( ) в HTML:**
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buttons with Space</title>
-</head>
-<body>
-    <button>Button 1</button>&
+Убедитесь, что переменная окружения установлена до запуска скрипта.

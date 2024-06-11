@@ -1,14 +1,6 @@
-Для записи содержимого сертификата в другой текстовый файл вы можете использовать стандартные возможности Lua для работы с файлами. Вот как это можно сделать:
+Если вам нужно выполнить команду `openssl` с указанием файла для записи вывода (`out`) и временного файла (`tempfile`), то вам потребуется немного изменить скрипт. Вот как это можно сделать:
 
 ```lua
--- Функция для чтения вывода команды
-local function read_command_output(command)
-    local handle = io.popen(command)
-    local result = handle:read("*a")
-    handle:close()
-    return result
-end
-
 -- Функция для записи данных в файл
 local function write_to_file(filename, content)
     local file = io.open(filename, "w")
@@ -24,31 +16,43 @@ end
 -- Путь к файлу сертификата
 local certificate_path = "boi.crt"
 
--- Команда для чтения сертификата с помощью openssl
-local command = "openssl x509 -in " .. certificate_path .. " -text -noout"
-
--- Чтение содержимого сертификата
-local certificate_content = read_command_output(command)
-
 -- Путь к файлу, в который мы хотим записать содержимое сертификата
 local output_file = "certificate_info.txt"
 
--- Запись содержимого сертификата в файл
-local success, error_message = write_to_file(output_file, certificate_content)
+-- Временный файл для openssl (если необходимо)
+local tempfile = "temp_output.txt"
+
+-- Команда для чтения сертификата с помощью openssl
+local command = string.format("openssl x509 -in %s -text -noout > %s 2>%s", certificate_path, output_file, tempfile)
+
+-- Выполнение команды openssl
+local success = os.execute(command)
 
 if success then
     print("Содержимое сертификата успешно записано в файл: " .. output_file)
 else
-    print("Ошибка при записи в файл: " .. error_message)
+    print("Ошибка при выполнении команды openssl")
+    -- Показать ошибку из временного файла, если есть
+    local error_message = io.open(tempfile):read("*a")
+    print("Ошибка openssl:", error_message)
 end
+
+-- Удаление временного файла, если он был создан
+os.remove(tempfile)
 ```
 
-В этом скрипте:
+### Краткое объяснение:
 
-1. `read_command_output` используется для выполнения команды `openssl` и чтения содержимого сертификата.
-2. `write_to_file` открывает файл `certificate_info.txt` для записи и записывает туда содержимое сертификата.
-3. После выполнения скрипта, содержимое вашего сертификата будет записано в файл `certificate_info.txt` в текущем рабочем каталоге.
+1. **write_to_file**: Эта функция осталась той же самой. Она открывает файл для записи и записывает в него переданный контент.
 
-Примечание:
-- Убедитесь, что у вас есть разрешения на запись в каталог, где будет создан файл `certificate_info.txt`.
-- Путь к файлу сертификата `boi.crt` должен быть корректным и доступным для чтения вашим скриптом Lua.
+2. **output_file**: Это путь к файлу, в который мы хотим записать содержимое сертификата.
+
+3. **tempfile**: Это временный файл, который можно использовать для записи потенциальных ошибок `openssl`.
+
+4. **command**: В строке команды `openssl` используется оператор `>` для направления вывода в файл `output_file` и `2>` для направления stderr в `tempfile`.
+
+5. **os.execute(command)**: Выполняет команду `openssl`. Если команда выполнена успешно, `os.execute` вернет `true`, и содержимое сертификата будет записано в `output_file`.
+
+6. **os.remove(tempfile)**: Удаляет временный файл после того, как он больше не нужен.
+
+Этот скрипт позволяет выполнить команду `openssl` с указанием файлов `out` и `tempfile` для записи вывода и временных данных ошибок соответственно.

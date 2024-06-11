@@ -1,6 +1,4 @@
-Для того чтобы открыть и прочитать данные сертификата в файле `boi.crt` на Linux с использованием Lua, вы можете использовать команду `openssl` через `os.execute` или `io.popen`. 
-
-Команда `openssl` позволяет прочитать и декодировать содержимое сертификата. Вот пример скрипта Lua, который открывает и выводит содержимое файла сертификата:
+Для записи содержимого сертификата в другой текстовый файл вы можете использовать стандартные возможности Lua для работы с файлами. Вот как это можно сделать:
 
 ```lua
 -- Функция для чтения вывода команды
@@ -11,23 +9,46 @@ local function read_command_output(command)
     return result
 end
 
+-- Функция для записи данных в файл
+local function write_to_file(filename, content)
+    local file = io.open(filename, "w")
+    if file then
+        file:write(content)
+        file:close()
+        return true
+    else
+        return false, "Unable to open file for writing"
+    end
+end
+
 -- Путь к файлу сертификата
 local certificate_path = "boi.crt"
 
 -- Команда для чтения сертификата с помощью openssl
 local command = "openssl x509 -in " .. certificate_path .. " -text -noout"
 
--- Чтение и вывод содержимого сертификата
+-- Чтение содержимого сертификата
 local certificate_content = read_command_output(command)
-print(certificate_content)
+
+-- Путь к файлу, в который мы хотим записать содержимое сертификата
+local output_file = "certificate_info.txt"
+
+-- Запись содержимого сертификата в файл
+local success, error_message = write_to_file(output_file, certificate_content)
+
+if success then
+    print("Содержимое сертификата успешно записано в файл: " .. output_file)
+else
+    print("Ошибка при записи в файл: " .. error_message)
+end
 ```
 
-Этот скрипт выполняет команду `openssl x509 -in boi.crt -text -noout` для чтения и вывода содержимого сертификата в текстовом формате.
+В этом скрипте:
 
-Убедитесь, что `openssl` установлен на вашем Linux-системе. Если его нет, установите его с помощью пакетного менеджера, например:
+1. `read_command_output` используется для выполнения команды `openssl` и чтения содержимого сертификата.
+2. `write_to_file` открывает файл `certificate_info.txt` для записи и записывает туда содержимое сертификата.
+3. После выполнения скрипта, содержимое вашего сертификата будет записано в файл `certificate_info.txt` в текущем рабочем каталоге.
 
-```bash
-sudo apt-get install openssl
-```
-
-Этот скрипт должен быть выполнен на Linux-системе с установленным `openssl`, и он выведет информацию о сертификате в читаемом текстовом формате.
+Примечание:
+- Убедитесь, что у вас есть разрешения на запись в каталог, где будет создан файл `certificate_info.txt`.
+- Путь к файлу сертификата `boi.crt` должен быть корректным и доступным для чтения вашим скриптом Lua.

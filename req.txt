@@ -1,90 +1,34 @@
-Сообщение об ошибке "xml.children is undefined" означает, что объект `xml` не имеет свойства `children`. Это может произойти по нескольким причинам:
-
-1. **Неправильный объект XML**: Убедитесь, что переменная `xml` действительно является корректным XML-объектом.
-2. **Неправильный метод или свойство**: В зависимости от используемой библиотеки или языка программирования может потребоваться другой метод или свойство для доступа к дочерним элементам.
-
-Приведу примеры для разных языков и библиотек, чтобы показать, как правильно работать с XML:
-
-### JavaScript (DOM API)
-В JavaScript, используя DOM API, убедитесь, что вы правильно получили элемент и обращаетесь к его свойству `children`.
-
-```javascript
-let parser = new DOMParser();
-let xmlString = `<root><child1/><child2/><child3/></root>`;
-let xmlDoc = parser.parseFromString(xmlString, "application/xml");
-
-let root = xmlDoc.getElementsByTagName("root")[0];
-if (root) {
-    console.log(root.children.length);  // Выведет 3
-} else {
-    console.log("root is undefined");
-}
-```
-
-### Python (lxml)
-В Python, используя библиотеку `lxml`, убедитесь, что вы правильно анализировали XML-строку и получили корневой элемент.
-
-```python
-from lxml import etree
-
-xml_string = '<root><child1/><child2/><child3/></root>'
-root = etree.fromstring(xml_string)
-
-if root is not None:
-    print(len(root))  // Выведет 3
-else:
-    print("root is undefined")
-```
-
-### Lua (xml2lua)
-В Lua, используя библиотеку `xml2lua`, убедитесь, что вы правильно проанализировали XML и получили корневой элемент.
+Если вы хотите, чтобы таблица Lua автоматически конвертировалась в строку, вам нужно реализовать функцию для преобразования таблицы в строку. В Lua можно использовать рекурсивную функцию для этого:
 
 ```lua
-local xml2lua = require("xml2lua")
-local handler = require("xmlhandler.tree")
-
-local parser = xml2lua.parser(handler)
-local xmlString = [[<root><child1/><child2/><child3/></root>]]
-
-parser:parse(xmlString)
-local root = handler.root.root
-
-if root then
-    print(#root)  -- Выведет 3
-else
-    print("root is undefined")
+function tableToString(tbl)
+    local result = "{"
+    local first = true
+    for k, v in pairs(tbl) do
+        if not first then
+            result = result .. ", "
+        end
+        first = false
+        if type(k) == "number" then
+            result = result .. "[" .. k .. "] = "
+        else
+            result = result .. k .. " = "
+        end
+        if type(v) == "table" then
+            result = result .. tableToString(v)
+        elseif type(v) == "string" then
+            result = result .. "\"" .. v .. "\""
+        else
+            result = result .. tostring(v)
+        end
+    end
+    result = result .. "}"
+    return result
 end
+
+-- Пример использования
+local myTable = { key1 = "value1", key2 = { subKey = "subValue" }, 3, "test" }
+print(tableToString(myTable))
 ```
 
-### Java (javax.xml.parsers)
-В Java убедитесь, что вы правильно проанализировали XML и получили корневой элемент.
-
-```java
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-
-public class Main {
-    public static void main(String[] args) throws Exception {
-        String xmlString = "<root><child1/><child2/><child3/></root>";
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        Document doc = factory.newDocumentBuilder().parse(new ByteArrayInputStream(xmlString.getBytes()));
-        
-        Element root = doc.getDocumentElement();
-        if (root != null) {
-            NodeList children = root.getChildNodes();
-            int elementCount = 0;
-            for (int i = 0; i < children.getLength(); i++) {
-                if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                    elementCount++;
-                }
-            }
-            System.out.println(elementCount);  // Выведет 3
-        } else {
-            System.out.println("root is undefined");
-        }
-    }
-}
-```
-
-В зависимости от языка программирования и используемой библиотеки, убедитесь, что вы правильно инициализировали и проанализировали XML-строку, и что обращаетесь к правильным свойствам и методам для получения дочерних элементов.
+Эта функция рекурсивно обрабатывает таблицу и ее подтаблицы, корректно форматируя строки и числа.

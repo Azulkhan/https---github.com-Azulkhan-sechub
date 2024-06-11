@@ -1,107 +1,61 @@
-Сообщение об ошибке "unable to load certificate" указывает на проблему с форматом сертификата или его содержимым. Ошибка `PEM_read_bio:no start line` обычно означает, что OpenSSL не нашел ожидаемую строку начала сертификата (`-----BEGIN CERTIFICATE-----`).
+Похоже, вы хотите получить определенные значения из сертификата, такие как серийный номер и хеш субъекта. Чтобы извлечь эти значения из сертификата с использованием OpenSSL и Lua, вы можете использовать команду `openssl` для извлечения этих данных, а затем обрабатывать их в Lua.
 
-Чтобы обработать эту ошибку в Lua, можно использовать следующий скрипт:
-
-1. Попробуем прочитать и вывести файл сертификата перед его обработкой командой `openssl` для диагностики.
-2. Если файл корректен, мы снова вызовем команду `openssl` и обработаем возможные ошибки.
+Вот пример скрипта, который выполняет команду `openssl` для извлечения серийного номера и хеша субъекта, а затем обрабатывает вывод, чтобы вывести эти значения:
 
 ```lua
-local function read_file(file_path)
-    local file = io.open(file_path, "r")
-    if not file then
-        return nil, "Unable to open file: " .. file_path
-    end
-
-    local content = file:read("*a")
-    file:close()
-    return content
-end
-
-local function execute_openssl_x509(input_file, output_file)
-    -- Формирование команды openssl
-    local command = string.format("openssl x509 -in %s -text -noout > %s", input_file, output_file)
-
-    -- Выполнение команды
+-- Функция для чтения вывода команды
+local function read_command_output(command)
     local handle = io.popen(command)
     local result = handle:read("*a")
-    local success, _, errtext = handle:close()
-
-    if success then
-        print("Команда успешно выполнена.")
-        return true
-    else
-        print("Ошибка выполнения команды openssl x509:")
-        print("Текст ошибки:", errtext)
-        print("Вывод команды:")
-        print(result)  -- Вывод команды, если нужно дополнительное диагностирование
-        return false, errtext
-    end
+    handle:close()
+    return result
 end
 
--- Пример использования функции
-local input_file = "boi.crt"
-local output_file = "certificate_info.txt"
+-- Функция для извлечения серийного номера и хеша субъекта из сертификата
+local function extract_certificate_info(certificate_path)
+    local info = {}
 
--- Прочитаем содержимое файла сертификата для диагностики
-local content, err = read_file(input_file)
-if not content then
-    print("Ошибка при чтении файла сертификата:", err)
+    -- Команда для получения серийного номера
+    local serial_number_command = string.format("openssl x509 -in %s -noout -serial", certificate_path)
+    local serial_number_output = read_command_output(serial_number_command)
+    info.serial_number = serial_number_output:match("serial=([%x]+)")
+
+    -- Команда для получения хеша субъекта
+    local subject_hash_command = string.format("openssl x509 -in %s -noout -subject_hash", certificate_path)
+    local subject_hash_output = read_command_output(subject_hash_command)
+    info.subject_hash = subject_hash_output:match("(%x+)")
+
+    return info
+end
+
+-- Путь к файлу сертификата
+local certificate_path = "boi.crt"
+
+-- Извлечение информации о сертификате
+local cert_info = extract_certificate_info(certificate_path)
+
+-- Вывод информации о сертификате
+if cert_info.serial_number then
+    print("Серийный номер сертификата: " .. cert_info.serial_number)
 else
-    print("Содержимое файла сертификата:")
-    print(content)
-    
-    -- Попробуем выполнить команду openssl
-    local success, errtext = execute_openssl_x509(input_file, output_file)
-    if not success then
-        print("Не удалось обработать сертификат:", errtext)
-    end
+    print("Не удалось извлечь серийный номер сертификата")
+end
+
+if cert_info.subject_hash then
+    print("Хеш субъекта сертификата: " .. cert_info.subject_hash)
+else
+    print("Не удалось извлечь хеш субъекта сертификата")
 end
 ```
 
 ### Объяснение:
-1. **read_file**: Эта функция читает содержимое файла и возвращает его. Если файл не может быть открыт, возвращается ошибка.
-2. **execute_openssl_x509**: Эта функция формирует и выполняет команду `openssl x509`, направляя вывод в указанный файл `output_file`. Ошибки выполнения команды обрабатываются и выводятся.
-3. **Пример использования**: Мы сначала читаем и выводим содержимое файла сертификата для диагностики. Если содержимое корректно, выполняем команду `openssl x509`.
 
-### Диагностика проблемы:
-1. Проверьте содержимое файла `boi.crt` в выводе скрипта. Убедитесь, что файл содержит строки `-----BEGIN CERTIFICATE-----` и `-----END CERTIFICATE-----`.
-2. Убедитесь, что файл действительно является файлом сертификата в формате PEM.
+1. **read_command_output**: Эта функция выполняет команду и возвращает ее вывод в виде строки.
+2. **extract_certificate_info**: Эта функция выполняет команды `openssl` для извлечения серийного номера и хеша субъекта из сертификата.
+   - `openssl x509 -in <cert> -noout -serial`: Эта команда извлекает серийный номер сертификата.
+   - `openssl x509 -in <cert> -noout -subject_hash`: Эта команда извлекает хеш субъекта сертификата.
+3. **certificate_path**: Указывает путь к файлу сертификата.
+4. **cert_info**: Содержит извлеченную информацию о сертификате.
+5. **Вывод информации**: Проверяется, удалось ли извлечь серийный номер и хеш субъекта, и выводятся соответствующие сообщения.
 
-Если файл не в формате PEM, вы можете конвертировать его с помощью `openssl` перед выполнением основной команды:
-
-```lua
-local function convert_to_pem(input_file, temp_pem_file)
-    -- Команда для конвертации сертификата в формат PEM
-    local command = string.format("openssl pkcs12 -in %s -out %s -nodes -clcerts", input_file, temp_pem_file)
-
-    -- Выполнение команды
-    local handle = io.popen(command)
-    local result = handle:read("*a")
-    local success, _, errtext = handle:close()
-
-    if success then
-        print("Конвертация в PEM формат успешно выполнена.")
-        return true
-    else
-        print("Ошибка конвертации в PEM формат:")
-        print("Текст ошибки:", errtext)
-        print("Вывод команды:")
-        print(result)
-        return false, errtext
-    end
-end
-
--- Пример использования функции для конвертации
-local temp_pem_file = "temp_certificate.pem"
-local success, errtext = convert_to_pem(input_file, temp_pem_file)
-if success then
-    -- После успешной конвертации продолжаем обработку
-    execute_openssl_x509(temp_pem_file, output_file)
-    -- Удаление временного файла, если он был создан
-    os.remove(temp_pem_file)
-else
-    print("Не удалось конвертировать файл в PEM формат:", errtext)
-end
-```
-
-Этот скрипт поможет вам диагностировать и решить проблемы с форматом файла сертификата и его содержимым. 
+Этот скрипт поможет вам извлечь и вывести серийный номер и хеш субъекта сертификата, используя Lua и команду `openssl`.

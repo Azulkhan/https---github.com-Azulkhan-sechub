@@ -1,29 +1,56 @@
-Похоже, вы хотите получить определенные значения из сертификата, такие как серийный номер и хеш субъекта. Чтобы извлечь эти значения из сертификата с использованием OpenSSL и Lua, вы можете использовать команду `openssl` для извлечения этих данных, а затем обрабатывать их в Lua.
+Понял. Если установка дополнительных библиотек невозможна и `io.popen` недоступен, то остаётся вариант использования стандартного способа записи данных в файл и их последующего чтения. Вы можете записать результаты команды `openssl` в файл и затем прочитать этот файл в Lua.
 
-Вот пример скрипта, который выполняет команду `openssl` для извлечения серийного номера и хеша субъекта, а затем обрабатывает вывод, чтобы вывести эти значения:
+Вот как это можно сделать:
+
+1. Выполнить команду `openssl` и записать результаты в файл.
+2. Прочитать результаты из файла и обработать их.
 
 ```lua
--- Функция для чтения вывода команды
-local function read_command_output(command)
-    local handle = io.popen(command)
-    local result = handle:read("*a")
-    handle:close()
-    return result
+-- Функция для выполнения команды и записи вывода в файл
+local function execute_command_to_file(command, output_file)
+    local complete_command = command .. " > " .. output_file .. " 2>&1"
+    os.execute(complete_command)
+end
+
+-- Функция для чтения содержимого файла
+local function read_file(file_path)
+    local file = io.open(file_path, "r")
+    if not file then
+        return nil, "Unable to open file: " .. file_path
+    end
+
+    local content = file:read("*a")
+    file:close()
+    return content
 end
 
 -- Функция для извлечения серийного номера и хеша субъекта из сертификата
 local function extract_certificate_info(certificate_path)
     local info = {}
+    local temp_file = "temp_output.txt"
 
     -- Команда для получения серийного номера
     local serial_number_command = string.format("openssl x509 -in %s -noout -serial", certificate_path)
-    local serial_number_output = read_command_output(serial_number_command)
-    info.serial_number = serial_number_output:match("serial=([%x]+)")
+    execute_command_to_file(serial_number_command, temp_file)
+    local serial_number_output, err = read_file(temp_file)
+    if serial_number_output then
+        info.serial_number = serial_number_output:match("serial=([%x]+)")
+    else
+        print("Ошибка при чтении серийного номера:", err)
+    end
 
     -- Команда для получения хеша субъекта
     local subject_hash_command = string.format("openssl x509 -in %s -noout -subject_hash", certificate_path)
-    local subject_hash_output = read_command_output(subject_hash_command)
-    info.subject_hash = subject_hash_output:match("(%x+)")
+    execute_command_to_file(subject_hash_command, temp_file)
+    local subject_hash_output, err = read_file(temp_file)
+    if subject_hash_output then
+        info.subject_hash = subject_hash_output:match("(%x+)")
+    else
+        print("Ошибка при чтении хеша субъекта:", err)
+    end
+
+    -- Удаление временного файла
+    os.remove(temp_file)
 
     return info
 end
@@ -49,13 +76,11 @@ end
 ```
 
 ### Объяснение:
+1. **execute_command_to_file**: Эта функция выполняет команду и записывает вывод в файл.
+2. **read_file**: Эта функция читает содержимое файла и возвращает его.
+3. **extract_certificate_info**: Эта функция выполняет команды `openssl` для извлечения серийного номера и хеша субъекта, записывая вывод в временный файл и читая его для обработки.
+4. **Удаление временного файла**: После завершения операций временный файл удаляется.
+5. **certificate_path**: Путь к файлу сертификата.
+6. **Вывод информации**: Проверяется, удалось ли извлечь серийный номер и хеш субъекта, и выводятся соответствующие сообщения.
 
-1. **read_command_output**: Эта функция выполняет команду и возвращает ее вывод в виде строки.
-2. **extract_certificate_info**: Эта функция выполняет команды `openssl` для извлечения серийного номера и хеша субъекта из сертификата.
-   - `openssl x509 -in <cert> -noout -serial`: Эта команда извлекает серийный номер сертификата.
-   - `openssl x509 -in <cert> -noout -subject_hash`: Эта команда извлекает хеш субъекта сертификата.
-3. **certificate_path**: Указывает путь к файлу сертификата.
-4. **cert_info**: Содержит извлеченную информацию о сертификате.
-5. **Вывод информации**: Проверяется, удалось ли извлечь серийный номер и хеш субъекта, и выводятся соответствующие сообщения.
-
-Этот скрипт поможет вам извлечь и вывести серийный номер и хеш субъекта сертификата, используя Lua и команду `openssl`.
+Этот подход должен работать в среде без установки дополнительных библиотек, используя только стандартные возможности Lua и команды `openssl`.

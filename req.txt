@@ -1,86 +1,49 @@
-Понял. Если установка дополнительных библиотек невозможна и `io.popen` недоступен, то остаётся вариант использования стандартного способа записи данных в файл и их последующего чтения. Вы можете записать результаты команды `openssl` в файл и затем прочитать этот файл в Lua.
+Для извлечения информации из сертификата `.cer` в Linux и записи её во временный файл с использованием Lua, можно воспользоваться следующими шагами:
 
-Вот как это можно сделать:
+1. Извлечь информацию из сертификата с помощью утилиты `openssl`.
+2. Записать эту информацию во временный файл с помощью Lua-скрипта.
 
-1. Выполнить команду `openssl` и записать результаты в файл.
-2. Прочитать результаты из файла и обработать их.
+Примерный сценарий может выглядеть так:
 
-```lua
--- Функция для выполнения команды и записи вывода в файл
-local function execute_command_to_file(command, output_file)
-    local complete_command = command .. " > " .. output_file .. " 2>&1"
-    os.execute(complete_command)
-end
+1. **Извлечь информацию с помощью `openssl`:**
 
--- Функция для чтения содержимого файла
-local function read_file(file_path)
-    local file = io.open(file_path, "r")
-    if not file then
-        return nil, "Unable to open file: " .. file_path
-    end
+   ```bash
+   openssl x509 -in сертификат.cer -noout -subject > temp.txt
+   ```
 
-    local content = file:read("*a")
-    file:close()
-    return content
-end
+   Эта команда извлечет информацию о субъекте из сертификата и запишет её в файл `temp.txt`.
 
--- Функция для извлечения серийного номера и хеша субъекта из сертификата
-local function extract_certificate_info(certificate_path)
-    local info = {}
-    local temp_file = "temp_output.txt"
+2. **Написать Lua-скрипт для чтения и обработки файла:**
 
-    -- Команда для получения серийного номера
-    local serial_number_command = string.format("openssl x509 -in %s -noout -serial", certificate_path)
-    execute_command_to_file(serial_number_command, temp_file)
-    local serial_number_output, err = read_file(temp_file)
-    if serial_number_output then
-        info.serial_number = serial_number_output:match("serial=([%x]+)")
-    else
-        print("Ошибка при чтении серийного номера:", err)
-    end
+   ```lua
+   -- Открываем временный файл для чтения
+   local file = io.open("temp.txt", "r")
+   
+   if not file then
+       print("Не удалось открыть файл")
+       return
+   end
 
-    -- Команда для получения хеша субъекта
-    local subject_hash_command = string.format("openssl x509 -in %s -noout -subject_hash", certificate_path)
-    execute_command_to_file(subject_hash_command, temp_file)
-    local subject_hash_output, err = read_file(temp_file)
-    if subject_hash_output then
-        info.subject_hash = subject_hash_output:match("(%x+)")
-    else
-        print("Ошибка при чтении хеша субъекта:", err)
-    end
+   -- Читаем данные из файла
+   local subject = file:read("*a")
 
-    -- Удаление временного файла
-    os.remove(temp_file)
+   -- Закрываем файл
+   file:close()
 
-    return info
-end
+   -- Обработка или вывод данных
+   print("Субъект сертификата: ", subject)
 
--- Путь к файлу сертификата
-local certificate_path = "boi.crt"
+   -- Записываем данные в новый файл
+   local out_file = io.open("output.txt", "w")
+   out_file:write("Субъект сертификата: ", subject)
+   out_file:close()
+   ```
 
--- Извлечение информации о сертификате
-local cert_info = extract_certificate_info(certificate_path)
+   Этот Lua-скрипт:
+   - Открывает временный файл `temp.txt`, созданный ранее.
+   - Читает данные из файла.
+   - Закрывает временный файл.
+   - Выводит данные на экран.
+   - Записывает данные в новый файл `output.txt`.
 
--- Вывод информации о сертификате
-if cert_info.serial_number then
-    print("Серийный номер сертификата: " .. cert_info.serial_number)
-else
-    print("Не удалось извлечь серийный номер сертификата")
-end
-
-if cert_info.subject_hash then
-    print("Хеш субъекта сертификата: " .. cert_info.subject_hash)
-else
-    print("Не удалось извлечь хеш субъекта сертификата")
-end
-```
-
-### Объяснение:
-1. **execute_command_to_file**: Эта функция выполняет команду и записывает вывод в файл.
-2. **read_file**: Эта функция читает содержимое файла и возвращает его.
-3. **extract_certificate_info**: Эта функция выполняет команды `openssl` для извлечения серийного номера и хеша субъекта, записывая вывод в временный файл и читая его для обработки.
-4. **Удаление временного файла**: После завершения операций временный файл удаляется.
-5. **certificate_path**: Путь к файлу сертификата.
-6. **Вывод информации**: Проверяется, удалось ли извлечь серийный номер и хеш субъекта, и выводятся соответствующие сообщения.
-
-Этот подход должен работать в среде без установки дополнительных библиотек, используя только стандартные возможности Lua и команды `openssl`.
+Если у вас есть другие требования или вопросы, дайте знать!

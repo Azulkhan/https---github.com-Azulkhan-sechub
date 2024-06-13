@@ -1,60 +1,17 @@
-Понял, если у вас уже есть файл `certificate.crt`, сформированный из файла ЭЦП (`p12`), и вам нужно извлечь данные из этого сертификата и записать их в текстовый файл, можно воспользоваться следующими шагами:
+Для получения информации из сертификата X.509 и записи всех данных в один текстовый файл с помощью команды `openssl`, выполните следующие шаги:
 
-1. **Извлечение полного содержимого сертификата и запись в текстовый файл**:
-    ```bash
-    openssl x509 -in certificate.crt -text -noout > certificate_details.txt
-    ```
+1. Скачайте или скопируйте ваш сертификат в файл, например `certificate.crt`.
+2. Выполните следующую команду в терминале:
 
-2. **Извлечение конкретных данных и добавление их в файл**:
-    - Извлечение Subject:
-        ```bash
-        openssl x509 -in certificate.crt -noout -subject >> certificate_details.txt
-        ```
-
-    - Извлечение Issuer:
-        ```bash
-        openssl x509 -in certificate.crt -noout -issuer >> certificate_details.txt
-        ```
-
-    - Извлечение даты начала действия (notBefore):
-        ```bash
-        openssl x509 -in certificate.crt -noout -startdate >> certificate_details.txt
-        ```
-
-    - Извлечение даты окончания действия (notAfter):
-        ```bash
-        openssl x509 -in certificate.crt -noout -enddate >> certificate_details.txt
-        ```
-
-    - Извлечение серийного номера:
-        ```bash
-        openssl x509 -in certificate.crt -noout -serial >> certificate_details.txt
-        ```
-
-    - Извлечение отпечатка сертификата (SHA1):
-        ```bash
-        openssl x509 -in certificate.crt -noout -fingerprint >> certificate_details.txt
-        ```
-
-    - Извлечение открытого ключа:
-        ```bash
-        openssl x509 -in certificate.crt -noout -pubkey >> certificate_details.txt
-        ```
-
-Полный пример последовательных команд для извлечения данных из сертификата и записи их в текстовый файл:
-
-```bash
-# Извлечение полного содержимого сертификата
-openssl x509 -in certificate.crt -text -noout > certificate_details.txt
-
-# Извлечение и добавление конкретных данных
-openssl x509 -in certificate.crt -noout -subject >> certificate_details.txt
-openssl x509 -in certificate.crt -noout -issuer >> certificate_details.txt
-openssl x509 -in certificate.crt -noout -startdate >> certificate_details.txt
-openssl x509 -in certificate.crt -noout -enddate >> certificate_details.txt
-openssl x509 -in certificate.crt -noout -serial >> certificate_details.txt
-openssl x509 -in certificate.crt -noout -fingerprint >> certificate_details.txt
-openssl x509 -in certificate.crt -noout -pubkey >> certificate_details.txt
+```sh
+openssl x509 -in certificate.crt -text -noout > certificate_info.txt
 ```
 
-Эти команды помогут вам извлечь нужные данные из x509 сертификата и записать их в текстовый файл.
+Эта команда делает следующее:
+- `openssl x509`: команда для работы с сертификатами X.509.
+- `-in certificate.crt`: указывает входной файл с сертификатом.
+- `-text`: выводит все данные сертификата в читаемом текстовом формате.
+- `-noout`: подавляет вывод самого сертификата в base64 формате.
+- `> certificate_info.txt`: перенаправляет вывод в файл `certificate_info.txt`.
+
+После выполнения команды, вся информация о сертификате будет записана в файл `certificate_info.txt`.

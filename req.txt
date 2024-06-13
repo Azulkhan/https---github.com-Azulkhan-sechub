@@ -1,31 +1,31 @@
-Если ваш сертификат не имеет строк `-----BEGIN CERTIFICATE-----` и `-----END CERTIFICATE-----`, это, скорее всего, означает, что он не в формате PEM, а в бинарном формате DER. В таком случае, нужно использовать параметр `-inform DER` для `openssl`, чтобы он смог корректно обработать файл.
+Да, вы можете использовать опцию `-out` вместо `-noout` в команде `openssl x509`, чтобы сохранить преобразованный сертификат в файл. 
 
-Вот как это сделать:
+Вот пример скрипта, который выполняет команду `openssl` и сохраняет информацию о сертификате в выходной файл:
 
-1. Убедитесь, что ваш файл сертификата действительно в формате DER.
-2. Выполните следующую команду, чтобы получить информацию о сертификате и записать ее в текстовый файл:
+```python
+import subprocess
 
-```sh
-openssl x509 -inform DER -in certificate.der -text -noout > certificate_info.txt
+def extract_certificate_info(input_file, output_file, input_format='PEM'):
+    try:
+        if input_format == 'DER':
+            cmd = ["openssl", "x509", "-inform", "DER", "-in", input_file, "-text", "-out", output_file]
+        else:  # default to PEM format
+            cmd = ["openssl", "x509", "-in", input_file, "-text", "-out", output_file]
+        
+        subprocess.run(cmd, check=True)
+        print(f"Certificate information saved to {output_file}")
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred: {e}")
+
+# Example usage
+extract_certificate_info('certificate.der', 'certificate_info.txt', 'DER')
 ```
 
-Эта команда делает следующее:
-- `-inform DER`: указывает, что входной файл в формате DER.
-- `-in certificate.der`: указывает путь к входному файлу сертификата.
-- `-text`: выводит все данные сертификата в читаемом текстовом формате.
-- `-noout`: подавляет вывод самого сертификата в base64 формате.
-- `> certificate_info.txt`: перенаправляет вывод в файл `certificate_info.txt`.
+Этот скрипт:
+1. Импортирует модуль `subprocess`.
+2. Определяет функцию `extract_certificate_info`, которая принимает три аргумента: путь к входному файлу сертификата (`input_file`), путь к выходному файлу (`output_file`) и формат входного файла (`input_format`, по умолчанию `'PEM'`).
+3. Проверяет формат входного файла и формирует соответствующую команду `openssl`.
+4. Выполняет команду с помощью `subprocess.run`, что вызывает команду `openssl` и сохраняет вывод в указанный файл.
+5. В случае успешного выполнения выводит сообщение об успешном сохранении информации, в противном случае выводит сообщение об ошибке.
 
-Если ваш сертификат в другом формате, например, PFX (PKCS#12), вы можете сначала его конвертировать:
-
-```sh
-openssl pkcs12 -in certificate.pfx -out certificate.pem -nodes
-```
-
-А затем получить информацию о сертификате:
-
-```sh
-openssl x509 -in certificate.pem -text -noout > certificate_info.txt
-```
-
-Если файл сертификата не содержит строки `BEGIN` и `END`, важно правильно указать формат сертификата при использовании команды `openssl`, чтобы избежать ошибок.
+Пример использования функции `extract_certificate_info` приведен в конце скрипта. Вы можете изменить пути к файлам и формат входного файла в соответствии с вашими требованиями.

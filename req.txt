@@ -1,31 +1,41 @@
-Да, вы можете использовать опцию `-out` вместо `-noout` в команде `openssl x509`, чтобы сохранить преобразованный сертификат в файл. 
+Для извлечения сертификатов с помощью `openssl x509` и записи их в текстовый файл с использованием Lua, вам понадобится скрипт, который выполнит необходимые команды и обработает результаты. Вот пример такого скрипта:
 
-Вот пример скрипта, который выполняет команду `openssl` и сохраняет информацию о сертификате в выходной файл:
+1. Создайте Lua скрипт, который выполнит команду `openssl x509` и запишет результат в файл:
 
-```python
-import subprocess
+```lua
+-- Имя файла сертификата
+local cert_file = "cert.pem"
+-- Имя файла для сохранения сертификатов
+local output_file = "certs.txt"
 
-def extract_certificate_info(input_file, output_file, input_format='PEM'):
-    try:
-        if input_format == 'DER':
-            cmd = ["openssl", "x509", "-inform", "DER", "-in", input_file, "-text", "-out", output_file]
-        else:  # default to PEM format
-            cmd = ["openssl", "x509", "-in", input_file, "-text", "-out", output_file]
-        
-        subprocess.run(cmd, check=True)
-        print(f"Certificate information saved to {output_file}")
-    except subprocess.CalledProcessError as e:
-        print(f"An error occurred: {e}")
+-- Функция для выполнения команды и получения результата
+local function execute_command(cmd)
+    local handle = io.popen(cmd)
+    local result = handle:read("*a")
+    handle:close()
+    return result
+end
 
-# Example usage
-extract_certificate_info('certificate.der', 'certificate_info.txt', 'DER')
+-- Команда для получения сертификатов
+local command = "openssl x509 -in " .. cert_file .. " -text -noout"
+
+-- Выполнение команды и получение сертификатов
+local certs = execute_command(command)
+
+-- Запись сертификатов в файл
+local file = io.open(output_file, "w")
+file:write(certs)
+file:close()
+
+print("Сертификаты сохранены в файл " .. output_file)
 ```
 
-Этот скрипт:
-1. Импортирует модуль `subprocess`.
-2. Определяет функцию `extract_certificate_info`, которая принимает три аргумента: путь к входному файлу сертификата (`input_file`), путь к выходному файлу (`output_file`) и формат входного файла (`input_format`, по умолчанию `'PEM'`).
-3. Проверяет формат входного файла и формирует соответствующую команду `openssl`.
-4. Выполняет команду с помощью `subprocess.run`, что вызывает команду `openssl` и сохраняет вывод в указанный файл.
-5. В случае успешного выполнения выводит сообщение об успешном сохранении информации, в противном случае выводит сообщение об ошибке.
+2. Убедитесь, что у вас установлен `openssl` и сертификат доступен по пути, указанному в `cert_file`.
 
-Пример использования функции `extract_certificate_info` приведен в конце скрипта. Вы можете изменить пути к файлам и формат входного файла в соответствии с вашими требованиями.
+3. Запустите Lua скрипт:
+
+```sh
+lua ваш_скрипт.lua
+```
+
+Этот скрипт выполнит команду `openssl x509`, извлечет информацию о сертификате и запишет ее в указанный текстовый файл. Если вам нужно работать с несколькими сертификатами, можно доработать скрипт, чтобы он обрабатывал их по списку.

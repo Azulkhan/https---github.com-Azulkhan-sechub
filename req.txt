@@ -1,31 +1,101 @@
-Да, вы можете использовать опцию `-out` вместо `-noout` в команде `openssl x509`, чтобы сохранить преобразованный сертификат в файл. 
+Да, это возможно. Если у вас есть подписанный XML-документ, содержащий данные сертификата X.509, вы можете извлечь этот сертификат и затем использовать `openssl x509` для анализа и извлечения данных из сертификата. Вот пошаговый подход, как это можно сделать:
 
-Вот пример скрипта, который выполняет команду `openssl` и сохраняет информацию о сертификате в выходной файл:
+1. **Извлечь сертификат из XML**: Обычно сертификат в XML-документе хранится в виде Base64-строки в элементе `<X509Certificate>`. Используйте любой парсер XML, чтобы извлечь содержимое этого элемента.
 
-```python
-import subprocess
+2. **Сохранить сертификат в файл**: Декодируйте Base64-строку и сохраните результат в файл.
 
-def extract_certificate_info(input_file, output_file, input_format='PEM'):
-    try:
-        if input_format == 'DER':
-            cmd = ["openssl", "x509", "-inform", "DER", "-in", input_file, "-text", "-out", output_file]
-        else:  # default to PEM format
-            cmd = ["openssl", "x509", "-in", input_file, "-text", "-out", output_file]
-        
-        subprocess.run(cmd, check=True)
-        print(f"Certificate information saved to {output_file}")
-    except subprocess.CalledProcessError as e:
-        print(f"An error occurred: {e}")
+3. **Использовать `openssl x509` для анализа сертификата**.
 
-# Example usage
-extract_certificate_info('certificate.der', 'certificate_info.txt', 'DER')
+Вот пример Lua-скрипта, который выполняет эти шаги:
+
+```lua
+local lxp = require "lxp"  -- Зависимость для работы с XML
+
+-- Функция для декодирования Base64
+local function base64_decode(data)
+    local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+    data = string.gsub(data, '[^'..b..'=]', '')
+    return (data:gsub('.', function(x)
+        if (x == '=') then return '' end
+        local r,f='',(b:find(x)-1)
+        for i=6,1,-1 do r=r..(f%2^i-f%2^(i-1)>0 and '1' or '0') end
+        return r;
+    end):gsub('%d%d%d%d%d%d%d%d', function(x)
+        if (#x ~= 8) then return '' end
+        local c=0
+        for i=1,8 do c=c+(x:sub(i,i)=='1' and 2^(8-i) or 0) end
+        return string.char(c)
+    end))
+end
+
+-- Функция для извлечения данных из XML
+local function extract_certificate_from_xml(xml_data)
+    local certificate_data = nil
+
+    local parser = lxp.new({
+        StartElement = function(parser, name, attr)
+            if name == "X509Certificate" then
+                certificate_data = ""
+            end
+        end,
+        CharacterData = function(parser, text)
+            if certificate_data then
+                certificate_data = certificate_data .. text
+            end
+        end,
+        EndElement = function(parser, name)
+            if name == "X509Certificate" then
+                parser:stop()
+            end
+        end
+    })
+
+    parser:parse(xml_data)
+    parser:close()
+
+    return certificate_data
+end
+
+-- Чтение XML файла
+local xml_file = "signed.xml"
+local file = io.open(xml_file, "r")
+local xml_data = file:read("*a")
+file:close()
+
+-- Извлечение и декодирование сертификата
+local cert_base64 = extract_certificate_from_xml(xml_data)
+local cert_pem = base64_decode(cert_base64)
+
+-- Сохранение сертификата в файл
+local cert_file = "cert.pem"
+local file = io.open(cert_file, "w")
+file:write(cert_pem)
+file:close()
+
+-- Выполнение команды openssl для анализа сертификата
+local function execute_command(cmd)
+    local handle = io.popen(cmd)
+    local result = handle:read("*a")
+    handle:close()
+    return result
+end
+
+local command = "openssl x509 -in " .. cert_file .. " -text -noout"
+local cert_info = execute_command(command)
+
+-- Сохранение информации о сертификате в файл
+local output_file = "certs.txt"
+local file = io.open(output_file, "w")
+file:write(cert_info)
+file:close()
+
+print("Информация о сертификате сохранена в файл " .. output_file)
 ```
 
-Этот скрипт:
-1. Импортирует модуль `subprocess`.
-2. Определяет функцию `extract_certificate_info`, которая принимает три аргумента: путь к входному файлу сертификата (`input_file`), путь к выходному файлу (`output_file`) и формат входного файла (`input_format`, по умолчанию `'PEM'`).
-3. Проверяет формат входного файла и формирует соответствующую команду `openssl`.
-4. Выполняет команду с помощью `subprocess.run`, что вызывает команду `openssl` и сохраняет вывод в указанный файл.
-5. В случае успешного выполнения выводит сообщение об успешном сохранении информации, в противном случае выводит сообщение об ошибке.
+Этот скрипт выполняет следующие действия:
+1. Парсит XML-документ, чтобы извлечь данные сертификата из элемента `<X509Certificate>`.
+2. Декодирует Base64 данные и сохраняет сертификат в файл `cert.pem`.
+3. Выполняет команду `openssl x509` для извлечения информации о сертификате.
+4. Сохраняет информацию о сертификате в текстовый файл `certs.txt`.
 
-Пример использования функции `extract_certificate_info` приведен в конце скрипта. Вы можете изменить пути к файлам и формат входного файла в соответствии с вашими требованиями.
+Перед запуском этого скрипта убедитесь, что у вас установлена библиотека LuaExpat (`lxp`) для работы с XML.

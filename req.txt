@@ -1,101 +1,50 @@
-Да, это возможно. Если у вас есть подписанный XML-документ, содержащий данные сертификата X.509, вы можете извлечь этот сертификат и затем использовать `openssl x509` для анализа и извлечения данных из сертификата. Вот пошаговый подход, как это можно сделать:
+Для отображения полного значения поля ввода при наведении курсора мыши можно использовать HTML и CSS. Вот пример, как это можно сделать:
 
-1. **Извлечь сертификат из XML**: Обычно сертификат в XML-документе хранится в виде Base64-строки в элементе `<X509Certificate>`. Используйте любой парсер XML, чтобы извлечь содержимое этого элемента.
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Tooltip</title>
+    <style>
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
 
-2. **Сохранить сертификат в файл**: Декодируйте Base64-строку и сохраните результат в файл.
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: auto;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Позиция всплывающего окна */
+            left: 50%;
+            margin-left: -50px; /* Сдвиг для центрирования */
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
 
-3. **Использовать `openssl x509` для анализа сертификата**.
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
 
-Вот пример Lua-скрипта, который выполняет эти шаги:
+<div class="tooltip">
+    <input type="text" value="Очень длинное значение, которое не помещается полностью">
+    <span class="tooltiptext">Очень длинное значение, которое не помещается полностью</span>
+</div>
 
-```lua
-local lxp = require "lxp"  -- Зависимость для работы с XML
-
--- Функция для декодирования Base64
-local function base64_decode(data)
-    local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-    data = string.gsub(data, '[^'..b..'=]', '')
-    return (data:gsub('.', function(x)
-        if (x == '=') then return '' end
-        local r,f='',(b:find(x)-1)
-        for i=6,1,-1 do r=r..(f%2^i-f%2^(i-1)>0 and '1' or '0') end
-        return r;
-    end):gsub('%d%d%d%d%d%d%d%d', function(x)
-        if (#x ~= 8) then return '' end
-        local c=0
-        for i=1,8 do c=c+(x:sub(i,i)=='1' and 2^(8-i) or 0) end
-        return string.char(c)
-    end))
-end
-
--- Функция для извлечения данных из XML
-local function extract_certificate_from_xml(xml_data)
-    local certificate_data = nil
-
-    local parser = lxp.new({
-        StartElement = function(parser, name, attr)
-            if name == "X509Certificate" then
-                certificate_data = ""
-            end
-        end,
-        CharacterData = function(parser, text)
-            if certificate_data then
-                certificate_data = certificate_data .. text
-            end
-        end,
-        EndElement = function(parser, name)
-            if name == "X509Certificate" then
-                parser:stop()
-            end
-        end
-    })
-
-    parser:parse(xml_data)
-    parser:close()
-
-    return certificate_data
-end
-
--- Чтение XML файла
-local xml_file = "signed.xml"
-local file = io.open(xml_file, "r")
-local xml_data = file:read("*a")
-file:close()
-
--- Извлечение и декодирование сертификата
-local cert_base64 = extract_certificate_from_xml(xml_data)
-local cert_pem = base64_decode(cert_base64)
-
--- Сохранение сертификата в файл
-local cert_file = "cert.pem"
-local file = io.open(cert_file, "w")
-file:write(cert_pem)
-file:close()
-
--- Выполнение команды openssl для анализа сертификата
-local function execute_command(cmd)
-    local handle = io.popen(cmd)
-    local result = handle:read("*a")
-    handle:close()
-    return result
-end
-
-local command = "openssl x509 -in " .. cert_file .. " -text -noout"
-local cert_info = execute_command(command)
-
--- Сохранение информации о сертификате в файл
-local output_file = "certs.txt"
-local file = io.open(output_file, "w")
-file:write(cert_info)
-file:close()
-
-print("Информация о сертификате сохранена в файл " .. output_file)
+</body>
+</html>
 ```
 
-Этот скрипт выполняет следующие действия:
-1. Парсит XML-документ, чтобы извлечь данные сертификата из элемента `<X509Certificate>`.
-2. Декодирует Base64 данные и сохраняет сертификат в файл `cert.pem`.
-3. Выполняет команду `openssl x509` для извлечения информации о сертификате.
-4. Сохраняет информацию о сертификате в текстовый файл `certs.txt`.
-
-Перед запуском этого скрипта убедитесь, что у вас установлена библиотека LuaExpat (`lxp`) для работы с XML.
+Этот пример использует HTML и CSS для создания всплывающей подсказки. Когда вы наведете курсор на поле ввода, всплывающая подсказка отобразит полное значение этого поля. Вы можете изменить стиль и позиционирование подсказки по своему усмотрению.

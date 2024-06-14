@@ -1,4 +1,6 @@
-Извините за недоразумение. Давайте немного изменим код, чтобы сделать его проще и убрать невидимые поля. Вот исправленный вариант:
+Понял вас. Давайте сделаем так, чтобы при наведении на поле ввода всплывала подсказка, отображающая значение поля ввода.
+
+Вот пример HTML и CSS кода, который делает это:
 
 ```html
 <!DOCTYPE html>
@@ -11,10 +13,6 @@
         .tooltip {
             position: relative;
             display: inline-block;
-        }
-
-        .tooltip input {
-            width: 200px;
         }
 
         .tooltip .tooltiptext {
@@ -35,7 +33,7 @@
             white-space: nowrap;
         }
 
-        .tooltip:hover .tooltiptext {
+        .tooltip input:hover + .tooltiptext {
             visibility: visible;
             opacity: 1;
         }
@@ -44,12 +42,21 @@
 <body>
 
 <div class="tooltip">
-    <input type="text" value="Очень длинное значение, которое не помещается полностью" title="Очень длинное значение, которое не помещается полностью">
-    <span class="tooltiptext">Очень длинное значение, которое не помещается полностью</span>
+    <input type="text" value="Очень длинное значение, которое не помещается полностью" id="inputField">
+    <span class="tooltiptext" id="tooltipText">Очень длинное значение, которое не помещается полностью</span>
 </div>
+
+<script>
+    const inputField = document.getElementById('inputField');
+    const tooltipText = document.getElementById('tooltipText');
+
+    inputField.addEventListener('input', () => {
+        tooltipText.textContent = inputField.value;
+    });
+</script>
 
 </body>
 </html>
 ```
 
-В этом примере мы использовали атрибут `title` для отображения подсказки при наведении на поле ввода. Это стандартное решение, которое не требует дополнительного CSS или JavaScript, и оно автоматически показывает значение, когда вы наводите курсор на поле ввода.
+Этот пример создает всплывающую подсказку, которая отображает значение поля ввода при наведении на него. Мы добавили обработчик события `input` для поля ввода, чтобы обновлять текст подсказки при изменении значения поля.

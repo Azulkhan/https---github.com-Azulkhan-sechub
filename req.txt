@@ -1,14 +1,3 @@
-# Преобразование из DER в PEM
-openssl x509 -inform der -in path\to\your\certificate.der -out path\to\your\certificate.pem
-
-# Просмотр содержимого PEM файла
-openssl x509 -in path\to\your\certificate.pem -text -noout
-
-
-Чтобы выполнить операции с сертификатом на сервере CentOS с помощью Lua, вам понадобится использовать команду openssl через Lua. Вот пример скрипта на Lua, который может помочь вам выполнить конвертацию и просмотр сертификата:
-
-lua
-Копировать код
 local function execute_command(command)
     local handle = io.popen(command)
     local result = handle:read("*a")
@@ -16,18 +5,12 @@ local function execute_command(command)
     return result
 end
 
--- Пути к файлам сертификата
-local certPathDER = "/path/to/your/certificate.der"
-local certPathPEM = "/path/to/your/certificate.pem"
+-- Путь к вашему файлу сертификата
+local certPathCER = "/path/to/your/certificate.cer"
 
--- Команда для преобразования из DER в PEM
-local openssl_command = string.format("openssl x509 -inform der -in %s -out %s", certPathDER, certPathPEM)
-local convert_result = execute_command(openssl_command)
-print("Conversion result:", convert_result)
-
--- Команда для просмотра содержимого PEM файла
+-- Команда для просмотра информации о сертификате
 local tempFilePath = os.tmpname()
-openssl_command = string.format("openssl x509 -in %s -text -out %s", certPathPEM, tempFilePath)
+local openssl_command = string.format("openssl x509 -in %s -inform der -text -noout > %s", certPathCER, tempFilePath)
 local view_result = execute_command(openssl_command)
 
 -- Чтение и вывод содержимого временного файла
@@ -35,29 +18,17 @@ local tempFile = io.open(tempFilePath, "r")
 if tempFile then
     local content = tempFile:read("*a")
     tempFile:close()
-    print("Certificate information:\n", content)
+
+    -- Извлечение информации о субъекте (фамилия, имя и т.д.)
+    local subject_info = content:match("Subject:%s*(.-)\n")
+    if subject_info then
+        print("Subject Information:\n", subject_info)
+    else
+        print("Subject information not found.")
+    end
 else
     print("Failed to read temporary file:", tempFilePath)
 end
 
 -- Удаление временного файла
 os.remove(tempFilePath)
-Как это работает:
-Функция execute_command выполняет команду через io.popen и читает результат.
-Задаются пути к файлам сертификата в форматах DER и PEM.
-Выполняется команда OpenSSL для конвертации сертификата из DER в PEM.
-Выполняется команда OpenSSL для просмотра содержимого PEM файла, результат сохраняется во временный файл.
-Содержимое временного файла считывается и выводится на экран.
-Временный файл удаляется после использования.
-Примечания:
-Убедитесь, что на сервере установлен OpenSSL.
-Замените /path/to/your/certificate.der и /path/to/your/certificate.pem на реальные пути к вашим файлам сертификата.
-Проверьте права доступа к файлам сертификата для пользователя, под которым запускается скрипт Lua.
-Код также учитывает создание и удаление временного файла для вывода содержимого PEM файла, чтобы не засорять рабочее пространство.
-Этот скрипт поможет вам выполнить задачи конвертации и просмотра сертификата на сервере CentOS через Lua.
-
-
-
-
-
-

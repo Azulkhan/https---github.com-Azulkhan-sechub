@@ -1,35 +1,38 @@
-Конечно, вот пример использования `Promise` для выполнения одной функции после другой в AngularJS:
+В JavaScript, если вы хотите вызвать внутреннюю функцию, определенную в одном методе, из другого метода, вам нужно обеспечить доступ к этой функции. Вот как можно это сделать:
+
+1. Определите внутреннюю функцию в качестве свойства объекта или элемента.
+2. Убедитесь, что она доступна для других методов или функций.
+
+Пример:
 
 ```javascript
-app.controller('MyController', function($scope, $q) {
-  function firstFunction() {
-    return new Promise(function(resolve, reject) {
-      // Асинхронная операция
-      setTimeout(function() {
-        console.log('First function executed');
-        resolve('First function result');
-      }, 1000);
-    });
-  }
+function sign($scope) {
+  // Определяем метод last внутри $scope
+  $scope.last = function() {
+    console.log('last function executed');
+    // Дополнительные действия
+  };
+}
 
-  function secondFunction(result) {
-    console.log('Second function executed with result:', result);
+// Определяем другую функцию, которая будет использовать метод last
+function anolog($scope) {
+  if ($scope.last) {
+    $scope.last(); // Вызов метода last
+  } else {
+    console.log('last function is not defined');
   }
+}
 
-  // Запуск первой функции и ожидание её завершения
-  firstFunction().then(function(result) {
-    // Запуск второй функции после завершения первой
-    secondFunction(result);
-  }).catch(function(error) {
-    console.error('Error:', error);
-  });
-});
+// Пример использования
+let $scope = {};
+sign($scope); // Определяем метод last в $scope
+anolog($scope); // Вызываем метод last через anolog
 ```
 
 В этом примере:
 
-1. `firstFunction` возвращает новый `Promise`, который разрешается после выполнения асинхронной операции (`setTimeout`).
-2. В `then` обработчике обещания `firstFunction` вызывается `secondFunction`, которая принимает результат первой функции в качестве параметра.
-3. В `catch` обработчике можно обрабатывать возможные ошибки.
+1. В `sign` функция `last` определяется как метод объекта `$scope`.
+2. В `anolog` функция проверяет, существует ли метод `last` в объекте `$scope`, и если да, то вызывает его.
+3. Затем создается объект `$scope`, метод `last` определяется с помощью функции `sign`, и затем вызывается через `anolog`.
 
-Таким образом, `secondFunction` выполнится только после завершения `firstFunction`, и весь процесс построен на стандартных промисах JavaScript.
+Этот подход гарантирует, что вы можете вызывать метод `last` из другой функции без необходимости повторять его код.

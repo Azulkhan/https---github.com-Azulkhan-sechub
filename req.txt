@@ -1,17 +1,15 @@
-В AngularJS, для выполнения одной функции после завершения другой, можно воспользоваться обещаниями (promises) или цепочкой функций с использованием `$q` сервиса. Вот пример с использованием `$q` для цепочки функций:
+Конечно, вот пример использования `Promise` для выполнения одной функции после другой в AngularJS:
 
 ```javascript
 app.controller('MyController', function($scope, $q) {
   function firstFunction() {
-    var deferred = $q.defer();
-
-    // Асинхронная операция
-    setTimeout(function() {
-      console.log('First function executed');
-      deferred.resolve('First function result');
-    }, 1000);
-
-    return deferred.promise;
+    return new Promise(function(resolve, reject) {
+      // Асинхронная операция
+      setTimeout(function() {
+        console.log('First function executed');
+        resolve('First function result');
+      }, 1000);
+    });
   }
 
   function secondFunction(result) {
@@ -22,13 +20,16 @@ app.controller('MyController', function($scope, $q) {
   firstFunction().then(function(result) {
     // Запуск второй функции после завершения первой
     secondFunction(result);
+  }).catch(function(error) {
+    console.error('Error:', error);
   });
 });
 ```
 
 В этом примере:
 
-1. `firstFunction` возвращает обещание (promise), которое разрешается после выполнения асинхронной операции (в данном случае через `setTimeout`).
+1. `firstFunction` возвращает новый `Promise`, который разрешается после выполнения асинхронной операции (`setTimeout`).
 2. В `then` обработчике обещания `firstFunction` вызывается `secondFunction`, которая принимает результат первой функции в качестве параметра.
+3. В `catch` обработчике можно обрабатывать возможные ошибки.
 
-Таким образом, `secondFunction` выполнится только после завершения `firstFunction`.
+Таким образом, `secondFunction` выполнится только после завершения `firstFunction`, и весь процесс построен на стандартных промисах JavaScript.

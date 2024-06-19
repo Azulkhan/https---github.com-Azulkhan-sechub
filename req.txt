@@ -1,34 +1,34 @@
-local function execute_command(command)
-    local handle = io.popen(command)
-    local result = handle:read("*a")
-    handle:close()
-    return result
-end
+В AngularJS, для выполнения одной функции после завершения другой, можно воспользоваться обещаниями (promises) или цепочкой функций с использованием `$q` сервиса. Вот пример с использованием `$q` для цепочки функций:
 
--- Путь к вашему файлу сертификата
-local certPathCER = "/path/to/your/certificate.cer"
+```javascript
+app.controller('MyController', function($scope, $q) {
+  function firstFunction() {
+    var deferred = $q.defer();
 
--- Команда для просмотра информации о сертификате
-local tempFilePath = os.tmpname()
-local openssl_command = string.format("openssl x509 -in %s -inform der -text -noout > %s", certPathCER, tempFilePath)
-local view_result = execute_command(openssl_command)
+    // Асинхронная операция
+    setTimeout(function() {
+      console.log('First function executed');
+      deferred.resolve('First function result');
+    }, 1000);
 
--- Чтение и вывод содержимого временного файла
-local tempFile = io.open(tempFilePath, "r")
-if tempFile then
-    local content = tempFile:read("*a")
-    tempFile:close()
+    return deferred.promise;
+  }
 
-    -- Извлечение информации о субъекте (фамилия, имя и т.д.)
-    local subject_info = content:match("Subject:%s*(.-)\n")
-    if subject_info then
-        print("Subject Information:\n", subject_info)
-    else
-        print("Subject information not found.")
-    end
-else
-    print("Failed to read temporary file:", tempFilePath)
-end
+  function secondFunction(result) {
+    console.log('Second function executed with result:', result);
+  }
 
--- Удаление временного файла
-os.remove(tempFilePath)
+  // Запуск первой функции и ожидание её завершения
+  firstFunction().then(function(result) {
+    // Запуск второй функции после завершения первой
+    secondFunction(result);
+  });
+});
+```
+
+В этом примере:
+
+1. `firstFunction` возвращает обещание (promise), которое разрешается после выполнения асинхронной операции (в данном случае через `setTimeout`).
+2. В `then` обработчике обещания `firstFunction` вызывается `secondFunction`, которая принимает результат первой функции в качестве параметра.
+
+Таким образом, `secondFunction` выполнится только после завершения `firstFunction`.

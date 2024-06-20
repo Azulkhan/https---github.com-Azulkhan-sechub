@@ -70,3 +70,16 @@ var newWindow = window.open(url, '_blank');
     }
 
 
+scope.openFile = function(url) {
+    var newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+    if (newWindow) {
+        var interval = setInterval(function() {
+            if (newWindow.document.readyState === 'complete') {
+                clearInterval(interval);
+                newWindow.document.title = "file142";
+            }
+        }, 100); // Проверяем каждые 100 миллисекунд
+    } else {
+        alert('Не удалось открыть новое окно. Возможно, ваш браузер заблокировал всплывающие окна.');
+    }
+};

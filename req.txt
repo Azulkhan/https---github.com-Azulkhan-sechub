@@ -1,15 +1,28 @@
-Понял. Допустим, вам нужно создать функцию в Lua, которая выполняет определённое действие в цикле `for` от 1 до заданного значения. Вот пример такой функции:
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open File</title>
+</head>
+<body ng-controller="myController">
+    <button ng-click="openFile('/restapi/getfile?code=fgdfgdfgd&filename=desired-filename.pdf')">Open File in New Tab</button>
 
-```lua
-function doSomething(n)
-    for i = 1, n do
-        print("Iteration: " .. i)
-        -- Здесь можно добавить другие действия, которые должны выполняться в цикле
-    end
-end
+    <!-- AngularJS Library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
 
--- Вызов функции с n = 5
-doSomething(5)
-```
-
-Эта функция `doSomething` принимает один аргумент `n` и выполняет цикл `for` от 1 до `n`, выводя номер текущей итерации на каждом шаге. Вы можете заменить `print` и добавить любые действия, которые вам нужны внутри цикла.
+    <!-- Your AngularJS App -->
+    <script>
+        var app = angular.module('myApp', []);
+        app.controller('myController', function($scope) {
+            $scope.openFile = function(url) {
+                var newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+                newWindow.onload = function() {
+                    var filename = new URL(url).searchParams.get('filename');
+                    newWindow.document.title = filename ? filename : 'File';
+                };
+            };
+        });
+    </script>
+</body>
+</html>

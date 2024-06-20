@@ -58,3 +58,15 @@ scope.openFile = function(url) {
     newWindow.location.href = url;
 };
 
+
+
+var newWindow = window.open(url, '_blank');
+    if (newWindow) {
+        newWindow.addEventListener('load', function() {
+            newWindow.document.title = "file142";
+        });
+    } else {
+        alert('Не удалось открыть новое окно. Возможно, ваш браузер заблокировал всплывающие окна.');
+    }
+
+

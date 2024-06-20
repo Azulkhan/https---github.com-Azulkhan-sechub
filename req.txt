@@ -1,99 +1,19 @@
-<!DOCTYPE html>
-<html ng-app="myApp">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open File</title>
-</head>
-<body ng-controller="myController">
-    <button ng-click="openFile('/restapi/getfile?code=fgdfgdfgd&filename=desired-filename.pdf')">Open File in New Tab</button>
-
-    <!-- AngularJS Library -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
-
-    <!-- Your AngularJS App -->
-    <script>
-        var app = angular.module('myApp', []);
-        app.controller('myController', function($scope) {
-            $scope.openFile = function(url) {
-                var newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-                newWindow.onload = function() {
-                    var filename = new URL(url).searchParams.get('filename');
-                    newWindow.document.title = filename ? filename : 'File';
-                };
-            };
-        });
-    </script>
-</body>
-</html>
-
-
 scope.openFile = function(url) {
-    var newWindow = window.open('', '_blank', 'noopener,noreferrer');
-    newWindow.document.title = "file142"; // Установка заголовка до загрузки документа
-
-    // Переход по URL после того как заголовок установлен
-    newWindow.location.href = url;
-};
-
-
-
-scope.openFile = function(url) {
-    var newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-
-    // Ждем загрузки нового окна
-    var checkWindowLoaded = setInterval(function() {
-        if (newWindow.document.readyState === 'complete') {
-            clearInterval(checkWindowLoaded);
-            // Устанавливаем заголовок после загрузки
-            newWindow.document.title = "file142";
-        }
-    }, 100); // Проверяем каждые 100 миллисекунд
-};
-
-
-scope.openFile = function(url) {
+    var htmlContent = `
+        <html>
+        <head>
+            <title>file142</title>
+        </head>
+        <body>
+            <script>
+                window.location.href = '${url}';
+            </script>
+        </body>
+        </html>
+    `;
+    
     var newWindow = window.open();
-    newWindow.document.write('<html><head><title>file142</title></head><body></body></html>');
-    newWindow.location.href = url;
-};
-
-
-
-var newWindow = window.open(url, '_blank');
-    if (newWindow) {
-        newWindow.addEventListener('load', function() {
-            newWindow.document.title = "file142";
-        });
-    } else {
-        alert('Не удалось открыть новое окно. Возможно, ваш браузер заблокировал всплывающие окна.');
-    }
-
-
-scope.openFile = function(url) {
-    var newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-    if (newWindow) {
-        var interval = setInterval(function() {
-            if (newWindow.document.readyState === 'complete') {
-                clearInterval(interval);
-                newWindow.document.title = "file142";
-            }
-        }, 100); // Проверяем каждые 100 миллисекунд
-    } else {
-        alert('Не удалось открыть новое окно. Возможно, ваш браузер заблокировал всплывающие окна.');
-    }
-};
-
-
-scope.openFile = function(url) {
-    var newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-    if (newWindow) {
-        newWindow.addEventListener('load', function() {
-            setTimeout(function() {
-                newWindow.document.title = "file142";
-            }, 100); // Задержка в 100 миллисекунд
-        });
-    } else {
-        alert('Не удалось открыть новое окно. Возможно, ваш браузер заблокировал всплывающие окна.');
-    }
+    newWindow.document.open();
+    newWindow.document.write(htmlContent);
+    newWindow.document.close();
 };

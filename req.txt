@@ -35,3 +35,21 @@ scope.openFile = function(url) {
     // Переход по URL после того как заголовок установлен
     newWindow.location.href = url;
 };
+
+
+
+scope.openFile = function(url) {
+    var newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+
+    // Ждем загрузки нового окна
+    var checkWindowLoaded = setInterval(function() {
+        if (newWindow.document.readyState === 'complete') {
+            clearInterval(checkWindowLoaded);
+            // Устанавливаем заголовок после загрузки
+            newWindow.document.title = "file142";
+        }
+    }, 100); // Проверяем каждые 100 миллисекунд
+};
+
+
+

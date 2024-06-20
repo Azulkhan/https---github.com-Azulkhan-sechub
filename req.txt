@@ -52,4 +52,9 @@ scope.openFile = function(url) {
 };
 
 
+scope.openFile = function(url) {
+    var newWindow = window.open();
+    newWindow.document.write('<html><head><title>file142</title></head><body></body></html>');
+    newWindow.location.href = url;
+};
 

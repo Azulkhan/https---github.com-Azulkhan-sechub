@@ -83,3 +83,17 @@ scope.openFile = function(url) {
         alert('Не удалось открыть новое окно. Возможно, ваш браузер заблокировал всплывающие окна.');
     }
 };
+
+
+scope.openFile = function(url) {
+    var newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+    if (newWindow) {
+        newWindow.addEventListener('load', function() {
+            setTimeout(function() {
+                newWindow.document.title = "file142";
+            }, 100); // Задержка в 100 миллисекунд
+        });
+    } else {
+        alert('Не удалось открыть новое окно. Возможно, ваш браузер заблокировал всплывающие окна.');
+    }
+};

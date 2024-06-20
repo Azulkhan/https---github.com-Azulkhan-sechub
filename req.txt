@@ -1,17 +1,15 @@
 scope.openFile = function(url) {
-    var htmlContent = `
-        <html>
-        <head>
-            <title>file142</title>
-        </head>
-        <body>
-            <script>
-                window.location.href = '${url}';
-            </script>
-        </body>
-        </html>
-    `;
-    
+    var htmlContent = '<html>' +
+        '<head>' +
+        '<title>file142</title>' +
+        '</head>' +
+        '<body>' +
+        '<script>' +
+        'window.location.href = \'' + url + '\';' +
+        '</script>' +
+        '</body>' +
+        '</html>';
+
     var newWindow = window.open();
     newWindow.document.open();
     newWindow.document.write(htmlContent);

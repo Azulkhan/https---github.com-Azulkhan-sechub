@@ -26,3 +26,12 @@
     </script>
 </body>
 </html>
+
+
+scope.openFile = function(url) {
+    var newWindow = window.open('', '_blank', 'noopener,noreferrer');
+    newWindow.document.title = "file142"; // Установка заголовка до загрузки документа
+
+    // Переход по URL после того как заголовок установлен
+    newWindow.location.href = url;
+};

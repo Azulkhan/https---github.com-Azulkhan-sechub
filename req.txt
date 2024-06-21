@@ -1,61 +1,60 @@
-Для того чтобы сравнить `user_id` из `details.eaws_list` с `sessioninfo.id` и условно отобразить кнопку в AngularJS, можно использовать директиву `ng-if`. Пример кода:
+В CentOS, для извлечения информации из сертификата `.cer` (или `.crt`) файла с использованием OpenSSL и записи этой информации в текстовый файл, можно использовать следующий сценарий:
 
-```html
-<div ng-repeat="detail in details.eaws_list">
-    <button ng-if="detail.user_id === sessioninfo.id">Кнопка</button>
-</div>
+1. Убедитесь, что OpenSSL установлен. Если нет, установите его командой:
+    ```sh
+    sudo yum install openssl
+    ```
+
+2. Извлеките информацию из сертификата и запишите её в текстовый файл.
+
+Предположим, у вас есть сертификат `certificate.cer`. Чтобы извлечь информацию, используйте следующую команду:
+```sh
+openssl x509 -in certificate.cer -noout -subject
 ```
 
-Здесь:
-- `ng-repeat` используется для итерации по элементам в `details.eaws_list`.
-- Директива `ng-if` проверяет, равен ли `user_id` в текущем объекте `detail` значению `sessioninfo.id`.
+Эта команда выведет строку с информацией о субъекте, включая ФИО, если оно присутствует в сертификате.
 
-Таким образом, кнопка будет отображаться только в том случае, если условие `detail.user_id === sessioninfo.id` выполняется.
-
-
-
-Если вы хотите избежать множественных кнопок и показывать кнопку только один раз, когда есть хотя бы один элемент, где `user_id` равен `sessioninfo.id`, можно использовать функцию в контроллере для проверки этого условия и хранить результат в переменной. Пример:
-
-### Контроллер:
-
-```javascript
-app.controller('MyController', function($scope) {
-    $scope.sessioninfo = {
-        id: 'desired_user_id' // замените на реальный ID сессии
-    };
-
-    // Функция для проверки наличия совпадения user_id
-    $scope.checkUserMatch = function(details) {
-        return details.eaws_list.some(function(detail) {
-            return detail.user_id === $scope.sessioninfo.id;
-        });
-    };
-
-    // Предположим, что details уже определены где-то в коде
-    $scope.details = {
-        eaws_list: [
-            { user_id: 'id1' },
-            { user_id: 'id2' },
-            // добавьте другие элементы списка
-        ]
-    };
-
-    // Определяем переменную для использования в шаблоне
-    $scope.isUserMatched = $scope.checkUserMatch($scope.details);
-});
+3. Чтобы записать эту информацию в текстовый файл, можно перенаправить вывод команды в файл:
+```sh
+openssl x509 -in certificate.cer -noout -subject > subject_info.txt
 ```
 
-### Шаблон:
-
-```html
-<div ng-controller="MyController">
-    <button ng-if="isUserMatched">Кнопка</button>
-</div>
+Если вам нужно извлечь только ФИО (если оно указано в формате `CN`), то можно использовать команду `grep` и `cut` для фильтрации:
+```sh
+openssl x509 -in certificate.cer -noout -subject | grep 'CN=' | cut -d'=' -f2 > fio.txt
 ```
 
-Здесь:
-1. В контроллере определяется функция `checkUserMatch`, которая проверяет, есть ли в `details.eaws_list` элемент с `user_id`, равным `sessioninfo.id`.
-2. Результат этой проверки сохраняется в `$scope.isUserMatched`.
-3. В шаблоне используется `ng-if="isUserMatched"` для отображения кнопки только в случае, если условие выполнено.
+Этот сценарий предположительно будет работать, если `CN` (Common Name) содержит ФИО субъекта. Команда `cut -d'=' -f2` извлекает значение, которое следует после `CN=`.
 
-Таким образом, кнопка будет отображаться только один раз, если хотя бы один элемент в списке удовлетворяет условию.
+Вот пример полного сценария:
+```sh
+#!/bin/bash
+
+# Убедитесь, что файл сертификата указан
+if [ -z "$1" ]; then
+    echo "Usage: $0 <certificate.cer>"
+    exit 1
+fi
+
+# Имя файла сертификата
+CERT_FILE="$1"
+
+# Извлечение информации о субъекте
+SUBJECT=$(openssl x509 -in "$CERT_FILE" -noout -subject)
+
+# Извлечение ФИО (если находится в CN)
+FIO=$(echo "$SUBJECT" | grep 'CN=' | cut -d'=' -f2)
+
+# Запись ФИО в файл
+echo "$FIO" > fio.txt
+
+echo "ФИО субъекта записано в fio.txt"
+```
+
+Сохраните этот сценарий в файл, например `extract_fio.sh`, сделайте его исполняемым и запустите:
+```sh
+chmod +x extract_fio.sh
+./extract_fio.sh certificate.cer
+```
+
+Этот скрипт извлечёт информацию о субъекте сертификата и запишет ФИО в файл `fio.txt`.

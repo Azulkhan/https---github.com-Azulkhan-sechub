@@ -1,20 +1,61 @@
-scope.openFile = function(url) {
-    var newWindow = window.open('', '_blank', 'noopener,noreferrer');
+Для того чтобы сравнить `user_id` из `details.eaws_list` с `sessioninfo.id` и условно отобразить кнопку в AngularJS, можно использовать директиву `ng-if`. Пример кода:
 
-    // Ожидаем, пока окно не загрузится и не будет доступно
-    var checkWindowLoaded = setInterval(function() {
-        if (newWindow && newWindow.document && newWindow.document.readyState === 'complete') {
-            clearInterval(checkWindowLoaded);
-            
-            // Устанавливаем заголовок с небольшой задержкой
-            setTimeout(function() {
-                if (newWindow) {
-                    newWindow.document.title = "file142";
-                }
-            }, 100); // Задержка в 100 миллисекунд
-        }
-    }, 100); // Проверяем каждые 100 миллисекунд
+```html
+<div ng-repeat="detail in details.eaws_list">
+    <button ng-if="detail.user_id === sessioninfo.id">Кнопка</button>
+</div>
+```
 
-    // Переходим по URL в новом окне
-    newWindow.location.href = url;
-};
+Здесь:
+- `ng-repeat` используется для итерации по элементам в `details.eaws_list`.
+- Директива `ng-if` проверяет, равен ли `user_id` в текущем объекте `detail` значению `sessioninfo.id`.
+
+Таким образом, кнопка будет отображаться только в том случае, если условие `detail.user_id === sessioninfo.id` выполняется.
+
+
+
+Если вы хотите избежать множественных кнопок и показывать кнопку только один раз, когда есть хотя бы один элемент, где `user_id` равен `sessioninfo.id`, можно использовать функцию в контроллере для проверки этого условия и хранить результат в переменной. Пример:
+
+### Контроллер:
+
+```javascript
+app.controller('MyController', function($scope) {
+    $scope.sessioninfo = {
+        id: 'desired_user_id' // замените на реальный ID сессии
+    };
+
+    // Функция для проверки наличия совпадения user_id
+    $scope.checkUserMatch = function(details) {
+        return details.eaws_list.some(function(detail) {
+            return detail.user_id === $scope.sessioninfo.id;
+        });
+    };
+
+    // Предположим, что details уже определены где-то в коде
+    $scope.details = {
+        eaws_list: [
+            { user_id: 'id1' },
+            { user_id: 'id2' },
+            // добавьте другие элементы списка
+        ]
+    };
+
+    // Определяем переменную для использования в шаблоне
+    $scope.isUserMatched = $scope.checkUserMatch($scope.details);
+});
+```
+
+### Шаблон:
+
+```html
+<div ng-controller="MyController">
+    <button ng-if="isUserMatched">Кнопка</button>
+</div>
+```
+
+Здесь:
+1. В контроллере определяется функция `checkUserMatch`, которая проверяет, есть ли в `details.eaws_list` элемент с `user_id`, равным `sessioninfo.id`.
+2. Результат этой проверки сохраняется в `$scope.isUserMatched`.
+3. В шаблоне используется `ng-if="isUserMatched"` для отображения кнопки только в случае, если условие выполнено.
+
+Таким образом, кнопка будет отображаться только один раз, если хотя бы один элемент в списке удовлетворяет условию.

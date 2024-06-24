@@ -1,60 +1,17 @@
-Да, я понимаю, как работает ваш код. Давайте адаптируем его для использования с сертификатами X.509.
+В PostgreSQL нумерация строк может быть достигнута с использованием оконных функций. Одна из самых распространенных функций для этого — это `ROW_NUMBER()`. Вот пример того, как можно использовать `ROW_NUMBER()` для нумерации строк в результате запроса:
 
-Ваш пример выполняет команду `openssl pkcs12` с определенными параметрами через функцию `Command()`. Аналогично, для сертификатов X.509 мы будем использовать команду `openssl x509` и аналогичную структуру команды через `Command()`.
-
-Вот как это может выглядеть:
-
-```lua
--- Функция для выполнения команды через API Command() и возврата результата
-local function execute_command(command, ...)
-    local args = {...}
-    local cmd = Command(command, table.unpack(args))
-    local result = cmd:read("*a")
-    cmd:close()
-    return result
-end
-
--- Основная функция для извлечения информации о субъекте и записи в файл
-local function extract_subject_info(cert_file, output_file)
-    -- Временный файл для хранения вывода команды
-    local tempfile = "/tmp/temp_cert_info.txt"
-    
-    -- Выполнение команды для извлечения информации о субъекте
-    execute_command("openssl", "x509", "-in", cert_file, "-noout", "-subject", "-out", tempfile)
-    
-    -- Чтение результата из временного файла
-    local infile = io.open(tempfile, "r")
-    local result = infile:read("*a")
-    infile:close()
-    
-    -- Извлечение ФИО (если находится в CN)
-    local fio = result:match("CN=([^,]+)")
-    
-    -- Запись ФИО в выходной файл
-    if fio then
-        local outfile = io.open(output_file, "w")
-        outfile:write(fio)
-        outfile:close()
-        print(string.format("ФИО субъекта записано в %s", output_file))
-    else
-        print("ФИО не найдено в сертификате.")
-    end
-end
-
--- Пример использования
-local cert_file = "certificate.cer"
-local output_file = "fio.txt"
-extract_subject_info(cert_file, output_file)
+```sql
+SELECT 
+    ROW_NUMBER() OVER (ORDER BY some_column) AS row_num,
+    some_column,
+    another_column
+FROM 
+    your_table;
 ```
 
-Объяснение:
+В этом запросе:
+- `ROW_NUMBER() OVER (ORDER BY some_column)` создаёт нумерацию строк, основываясь на сортировке по `some_column`.
+- `AS row_num` даёт имя созданной колонке с номерами строк.
+- `some_column` и `another_column` — это столбцы из таблицы `your_table`.
 
-1. **execute_command()**: Эта функция принимает команду и её аргументы, выполняет её через API `Command()` и возвращает результат.
-2. **extract_subject_info()**:
-   - Создаёт временный файл для хранения вывода команды `openssl x509`.
-   - Выполняет команду `openssl x509` с помощью `execute_command()`, чтобы извлечь информацию о субъекте сертификата и записать её во временный файл.
-   - Читает содержимое временного файла, чтобы получить информацию о субъекте.
-   - Извлекает значение `CN` (Common Name), если оно присутствует.
-   - Записывает извлечённое значение `CN` в выходной файл.
-
-Этот скрипт аналогичен вашему примеру с `pkcs12`, но адаптирован для использования с сертификатами X.509.
+Вы можете изменять выражение в `ORDER BY` на любое другое выражение или несколько выражений, чтобы достигнуть нужной вам сортировки.

@@ -1,8 +1,12 @@
-Пожалуйста, попробуйте следующий исправленный код, который должен корректно применять стили к заголовкам и данным в Excel-файле:
+Если вы используете библиотеку `xlsx` для создания Excel-файлов в JavaScript, то стилизация ячеек и заголовков несколько ограничена по сравнению с более продвинутыми инструментами. В `xlsx` вы можете устанавливать основные стили, такие как шрифт, цвет фона и рамки, но объединение ячеек и другие продвинутые возможности могут быть ограничены.
+
+Вот пример кода с использованием `xlsx`, который позволяет установить основные стили для заголовков и данных:
 
 ```javascript
-// Подключаем библиотеку xlsx
 const XLSX = require('xlsx');
+
+// Создаем новую книгу
+let wb = XLSX.utils.book_new();
 
 // Ваши заголовки
 let xlsHeader = [
@@ -26,11 +30,11 @@ let createxlsxformat = [];
 
 // Создаем объединенные заголовки
 let mergedHeader = [
-  { v: "Группа 1", s: { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } } }, null, null, null, null, null, null, null, null, null, null,
-  { v: "Группа 2", s: { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } } }, null, null,
-  { v: "Группа 3", s: { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } } }, null, null,
-  { v: "Группа 4", s: { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } } }, null,
-  { v: "Группа 5", s: { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } } },
+  { v: "Группа 1", s: { font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } } }, null, null, null, null, null, null, null, null, null, null,
+  { v: "Группа 2", s: { font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } } }, null, null,
+  { v: "Группа 3", s: { font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } } }, null, null,
+  { v: "Группа 4", s: { font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } } }, null,
+  { v: "Группа 5", s: { font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } } },
   null, null
 ];
 
@@ -42,34 +46,11 @@ data.forEach(row => createxlsxformat.push(row));
 // Создаем рабочий лист из массива данных
 let ws = XLSX.utils.aoa_to_sheet(createxlsxformat);
 
-// Определяем стили
-const defaultFont = { name: "Times New Roman", sz: 10 };
-const headerStyle = {
-  font: { ...defaultFont, bold: true },
-  fill: { fgColor: { rgb: "D9D9D9" } },
-  border: {
-    top: { style: "thin", color: { rgb: "000000" } },
-    bottom: { style: "thin", color: { rgb: "000000" } },
-    left: { style: "thin", color: { rgb: "000000" } },
-    right: { style: "thin", color: { rgb: "000000" } }
-  },
-  alignment: { horizontal: "center", vertical: "center" }
-};
-const cellStyle = {
-  font: defaultFont,
-  border: {
-    top: { style: "thin", color: { rgb: "000000" } },
-    bottom: { style: "thin", color: { rgb: "000000" } },
-    left: { style: "thin", color: { rgb: "000000" } },
-    right: { style: "thin", color: { rgb: "000000" } }
-  }
-};
-
 // Применяем стили к заголовкам
 for (let c = 0; c < xlsHeader.length; c++) {
   const cellAddress = XLSX.utils.encode_cell({ r: 1, c: c });
   if (!ws[cellAddress]) ws[cellAddress] = {};
-  Object.assign(ws[cellAddress], headerStyle);
+  ws[cellAddress].s = { font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } };
 }
 
 // Применяем стили к данным
@@ -77,37 +58,15 @@ for (let r = 2; r < createxlsxformat.length; r++) {
   for (let c = 0; c < createxlsxformat[r].length; c++) {
     const cellAddress = XLSX.utils.encode_cell({ r: r, c: c });
     if (!ws[cellAddress]) ws[cellAddress] = {};
-    Object.assign(ws[cellAddress], cellStyle);
+    ws[cellAddress].s = { font: { name: "Times New Roman", sz: 10 }, border: { top: { style: "thin", color: { rgb: "000000" } }, bottom: { style: "thin", color: { rgb: "000000" } }, left: { style: "thin", color: { rgb: "000000" } }, right: { style: "thin", color: { rgb: "000000" } } } };
   }
 }
 
-// Применяем серый фон к последнему полю
-for (let r = 2; r < createxlsxformat.length; r++) {
-  const lastCellAddress = XLSX.utils.encode_cell({ r: r, c: createxlsxformat[r].length - 1 });
-  if (!ws[lastCellAddress]) ws[lastCellAddress] = {};
-  ws[lastCellAddress].s = { ...cellStyle, fill: { fgColor: { rgb: "D9D9D9" } } };
-}
-
-// Объединяем ячейки для заголовков
-ws['!merges'] = [
-  { s: { r: 0, c: 0 }, e: { r: 0, c: 10 } },  // Объединение ячеек "Группа 1"
-  { s: { r: 0, c: 11 }, e: { r: 0, c: 13 } }, // Объединение ячеек "Группа 2"
-  { s: { r: 0, c: 14 }, e: { r: 0, c: 16 } }, // Объединение ячеек "Группа 3"
-  { s: { r: 0, c: 17 }, e: { r: 0, c: 18 } }, // Объединение ячеек "Группа 4"
-  { s: { r: 0, c: 19 }, e: { r: 0, c: 19 } }  // Объединение ячеек "Группа 5"
-];
-
 // Создаем новую книгу и добавляем в нее лист
-let wb = XLSX.utils.book_new();
 XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
 // Сохраняем книгу в файл
 XLSX.writeFile(wb, 'example.xlsx');
 ```
 
-В этом исправленном коде:
-
-- Применение стилей к заголовкам и данным осуществляется через `Object.assign`, чтобы корректно объединить предыдущие стили с новыми.
-- Для ясности и соответствия стилизации данных и заголовков в Excel-файле рекомендуется использовать `Object.assign` для каждой ячейки.
-
-Этот код должен правильно применять стили, включая жирный шрифт, шрифт Times New Roman размером 10, серый фон для заголовков и черные границы для ячеек с данными в Excel-документе.
+Этот код создаст Excel-файл с заданными стилями для заголовков и данных. Обратите внимание, что стилизация в `xlsx` ограничена и не поддерживает такие возможности, как объединение ячеек и более сложные настройки стилей, которые могут быть доступны в более продвинутых библиотеках.

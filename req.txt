@@ -1,4 +1,6 @@
-Чтобы заголовки групп были в середине и стилизованы, можно использовать библиотеку `xlsx` с дополнительными настройками для стилей ячеек. В `xlsx` вы можете задать стили, такие как выравнивание по центру и жирный шрифт. Вот пример, который включает стилизацию заголовков:
+Для создания Excel-файла с заданным форматированием, включая серый фон для заголовков, жирный шрифт, шрифт Times New Roman размером 10 и черные границы для всех ячеек с данными, можно использовать библиотеку `xlsx` с настройками стилей.
+
+Вот пример кода:
 
 ```javascript
 // Подключаем библиотеку xlsx
@@ -26,21 +28,67 @@ let createxlsxformat = [];
 
 // Создаем объединенные заголовки
 let mergedHeader = [
-  { v: "Группа 1", s: { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true } } }, null, null, null, null, null, null, null, null, null, null,
-  { v: "Группа 2", s: { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true } } }, null, null,
-  { v: "Группа 3", s: { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true } } }, null, null,
-  { v: "Группа 4", s: { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true } } }, null,
-  { v: "Группа 5", s: { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true } } },
+  { v: "Группа 1", s: { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } } }, null, null, null, null, null, null, null, null, null, null,
+  { v: "Группа 2", s: { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } } }, null, null,
+  { v: "Группа 3", s: { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } } }, null, null,
+  { v: "Группа 4", s: { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } } }, null,
+  { v: "Группа 5", s: { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true }, fill: { fgColor: { rgb: "D9D9D9" } } } },
   null, null
 ];
+
+// Добавляем заголовки и данные в createxlsxformat
 createxlsxformat.push(mergedHeader); // Добавляем объединенные заголовки
 createxlsxformat.push(xlsHeader); // Добавляем основные заголовки
-
-// Добавляем данные в массив
 data.forEach(row => createxlsxformat.push(row));
 
 // Создаем рабочий лист из массива данных
 let ws = XLSX.utils.aoa_to_sheet(createxlsxformat);
+
+// Определяем стили
+const defaultFont = { name: "Times New Roman", sz: 10 };
+const headerStyle = {
+  font: { ...defaultFont, bold: true },
+  fill: { fgColor: { rgb: "D9D9D9" } },
+  border: {
+    top: { style: "thin", color: { rgb: "000000" } },
+    bottom: { style: "thin", color: { rgb: "000000" } },
+    left: { style: "thin", color: { rgb: "000000" } },
+    right: { style: "thin", color: { rgb: "000000" } }
+  },
+  alignment: { horizontal: "center", vertical: "center" }
+};
+const cellStyle = {
+  font: defaultFont,
+  border: {
+    top: { style: "thin", color: { rgb: "000000" } },
+    bottom: { style: "thin", color: { rgb: "000000" } },
+    left: { style: "thin", color: { rgb: "000000" } },
+    right: { style: "thin", color: { rgb: "000000" } }
+  }
+};
+
+// Применяем стили к заголовкам
+for (let c = 0; c < xlsHeader.length; c++) {
+  const cellAddress = XLSX.utils.encode_cell({ r: 1, c: c });
+  if (!ws[cellAddress]) ws[cellAddress] = {};
+  ws[cellAddress].s = headerStyle;
+}
+
+// Применяем стили к данным
+for (let r = 2; r < createxlsxformat.length; r++) {
+  for (let c = 0; c < createxlsxformat[r].length; c++) {
+    const cellAddress = XLSX.utils.encode_cell({ r: r, c: c });
+    if (!ws[cellAddress]) ws[cellAddress] = {};
+    ws[cellAddress].s = cellStyle;
+  }
+}
+
+// Применяем серый фон к последнему полю
+for (let r = 2; r < createxlsxformat.length; r++) {
+  const lastCellAddress = XLSX.utils.encode_cell({ r: r, c: createxlsxformat[r].length - 1 });
+  if (!ws[lastCellAddress]) ws[lastCellAddress] = {};
+  ws[lastCellAddress].s = { ...cellStyle, fill: { fgColor: { rgb: "D9D9D9" } } };
+}
 
 // Объединяем ячейки для заголовков
 ws['!merges'] = [
@@ -59,15 +107,17 @@ XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 XLSX.writeFile(wb, 'example.xlsx');
 ```
 
-Этот код делает следующее:
+Этот код:
 
-1. **Определяет заголовки и данные**: Создает массив `xlsHeader` для заголовков и `data` для данных.
-2. **Создает массив для хранения данных**: Создает пустой массив `createxlsxformat`.
-3. **Создает и добавляет объединенные заголовки с центровкой и стилями**: Создает массив `mergedHeader` для объединенных заголовков с выравниванием по центру и жирным шрифтом.
-4. **Добавляет основные заголовки и данные**: Добавляет `xlsHeader` и данные из `data` в `createxlsxformat`.
-5. **Создает рабочий лист**: Создает рабочий лист из массива данных с помощью `XLSX.utils.aoa_to_sheet`.
-6. **Объединяет ячейки заголовков**: Использует `ws['!merges']` для объединения ячеек заголовков.
-7. **Создает книгу и добавляет лист**: Создает новую книгу и добавляет в нее рабочий лист.
-8. **Сохраняет книгу в файл**: Сохраняет файл с названием `example.xlsx`.
+1. **Определяет заголовки и данные**.
+2. **Создает объединенные заголовки с выравниванием по центру и серым фоном**.
+3. **Добавляет заголовки и данные в массив `createxlsxformat`**.
+4. **Создает рабочий лист из массива данных**.
+5. **Определяет стили для заголовков и ячеек с данными**.
+6. **Применяет стили к заголовкам и ячейкам с данными**.
+7. **Применяет серый фон к последнему полю в каждой строке данных**.
+8. **Объединяет ячейки для заголовков**.
+9. **Создает книгу и добавляет в нее рабочий лист**.
+10. **Сохраняет книгу в файл `example.xlsx`**.
 
-Таким образом, заголовки групп будут выровнены по центру и будут иметь жирный шрифт.
+Таким образом, заголовки будут выровнены по центру, иметь серый фон и жирный шрифт, шрифт всего документа будет Times New Roman размером 10, все ячейки с данными будут иметь черные границы, и последнее поле будет с серым фоном.

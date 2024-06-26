@@ -3,6 +3,10 @@ local ltn12 = require("ltn12")
 
 -- Функция для URL-кодирования строк
 function urlencode(str)
+    if not str then
+        return ""
+    end
+    
     str = string.gsub(str, "([^%w%-_%.%~])",
         function(c)
             return string.format("%%%02X", string.byte(c))

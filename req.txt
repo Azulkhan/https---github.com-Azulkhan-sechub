@@ -1,8 +1,12 @@
 function urlencode(str)
-    if str then
-        str = string.gsub(str, "+", "%%2B")
-        str = string.gsub(str, "=", "%%3D")
-        str = string.gsub(str, "/", "%%2F")
-    end
+    -- Замена символов +, =, /
+    str = string.gsub(str, "+", "%%2B")
+    str = string.gsub(str, "=", "%%3D")
+    str = string.gsub(str, "/", "%%2F")
     return str
 end
+
+-- Пример использования
+local username = "my+name=is/awesome="
+local encoded_username = urlencode(username)
+print(encoded_username)  -- выводит "my%2Bname%3Dis%2Fawesome%3D"

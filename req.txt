@@ -1,13 +1,18 @@
--- Загрузка стандартной библиотеки string
-local string = require("string")
-
--- Функция для кодирования строки в формате x-www-form-urlencoded
 function urlencode(str)
-    -- Замена символов +, =, /
-    str = string.gsub(str, "+", "%%2B")
-    str = string.gsub(str, "=", "%%3D")
-    str = string.gsub(str, "/", "%%2F")
-    return str
+    local encoded = ""
+    for i = 1, #str do
+        local c = str:sub(i, i)
+        if c == "+" then
+            encoded = encoded .. "%2B"
+        elseif c == "=" then
+            encoded = encoded .. "%3D"
+        elseif c == "/" then
+            encoded = encoded .. "%2F"
+        else
+            encoded = encoded .. c
+        end
+    end
+    return encoded
 end
 
 -- Пример использования

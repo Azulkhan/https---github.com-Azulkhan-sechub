@@ -3,14 +3,17 @@ local ltn12 = require("ltn12")
 
 -- Функция для URL-кодирования строк
 function urlencode(str)
-    if type(str) ~= "string" or str == "" then
+    -- Проверка на nil и пустую строку
+    if not str or type(str) ~= "string" or str == "" then
         return ""
     end
     
+    -- URL-кодирование специальных символов
     str = string.gsub(str, "([^%w%-_%.%~])",
         function(c)
             return string.format("%%%02X", string.byte(c))
         end)
+    
     return str
 end
 

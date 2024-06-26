@@ -1,16 +1,15 @@
-local str = "your_string_here"
-local found_non_alphanumeric = false
-
-for i = 1, #str do
-    local char = str:sub(i, i)
-    if not char:find("[%w%-_%.%~]") then
-        found_non_alphanumeric = true
-        break
+function urlencode(str)
+    if str then
+        str = string.gsub(str, "\n", "\r\n")
+        str = string.gsub(str, "([^%w%-_%.%~])",
+            function(c)
+                return string.format("%%%02X", string.byte(c))
+            end)
     end
+    return str
 end
 
-if found_non_alphanumeric then
-    print("Найден символ, не входящий в набор [%w%-_%.%~]")
-else
-    print("В строке нет символов, не входящих в набор [%w%-_%.%~]")
-end
+-- Пример использования
+local data = "username=johndoe&password=secret"
+local encoded_data = urlencode(data)
+print(encoded_data)

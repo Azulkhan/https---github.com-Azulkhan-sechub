@@ -1,15 +1,8 @@
 function urlencode(str)
     if str then
-        str = string.gsub(str, "\n", "\r\n")
-        str = string.gsub(str, "([^%w%-_%.%~])",
-            function(c)
-                return string.format("%%%02X", string.byte(c))
-            end)
+        str = string.gsub(str, "+", "%%2B")
+        str = string.gsub(str, "=", "%%3D")
+        str = string.gsub(str, "/", "%%2F")
     end
     return str
 end
-
--- Пример использования
-local data = "username=johndoe&password=secret"
-local encoded_data = urlencode(data)
-print(encoded_data)

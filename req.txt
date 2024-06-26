@@ -7,12 +7,17 @@ function urlencode(str)
         return ""
     end
     
-    str = string.gsub(str, "([^%w%-_%.%~])",
-        function(c)
-            return string.format("%%%02X", string.byte(c))
-        end)
+    local encoded = {}
+    for i = 1, #str do
+        local char = str:sub(i, i)
+        if char:match("[^%w%-_%.%~]") then
+            encoded[#encoded + 1] = string.format("%%%02X", char:byte())
+        else
+            encoded[#encoded + 1] = char
+        end
+    end
     
-    return str
+    return table.concat(encoded)
 end
 
 -- Функция для выполнения POST-запроса

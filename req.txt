@@ -39,3 +39,46 @@ if res then
 else
     print("HTTP request failed: " .. code)
 end
+
+
+local http = require("socket.http")
+local ltn12 = require("ltn12")
+
+function urlencode(str)
+    if str then
+        str = string.gsub(str, "([^%w ])",
+            function(c) return string.format("%%%02X", string.byte(c)) end)
+        str = string.gsub(str, " ", "+")
+    end
+    return str
+end
+
+function httppost2(url, headers, data)
+    local response_body = {}
+    local res, code, response_headers, status = http.request{
+        url = url,
+        method = "POST",
+        headers = headers,
+        source = ltn12.source.string(data),
+        sink = ltn12.sink.table(response_body)
+    }
+    return res, code, response_headers, status, table.concat(response_body)
+end
+
+local url = "http://your-url-here.com/endpoint"
+local post_data = "username=" .. urlencode("johndoe") .. "&password=" .. urlencode("secret")
+local headers = {
+    ["Content-Type"] = "application/x-www-form-urlencoded",
+    ["Content-Length"] = tostring(#post_data)
+}
+
+local res, code, response_headers, status, response_body = httppost2(url, headers, post_data)
+
+-- Вывод результата
+if res then
+    print("Response code: " .. code)
+    print("Response body: " .. response_body)
+else
+    print("HTTP request failed: " .. code)
+end
+

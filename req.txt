@@ -10,8 +10,9 @@ function urlencode(str)
     local encoded = {}
     for i = 1, #str do
         local char = str:sub(i, i)
-        if char:match("[^%w%-_%.%~]") then
-            encoded[#encoded + 1] = string.format("%%%02X", char:byte())
+        local byte = char:byte()
+        if byte < 32 or byte > 126 or char:match("[^%w%-_%.%~]") then
+            encoded[#encoded + 1] = string.format("%%%02X", byte)
         else
             encoded[#encoded + 1] = char
         end

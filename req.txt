@@ -1,62 +1,16 @@
-local http = require("socket.http")
-local ltn12 = require("ltn12")
-
--- Функция для URL-кодирования строки
-function urlencode(str)
-    local encoded = {}
-    for i = 1, #str do
-        local char = str:sub(i, i)
-        local byte = char:byte()
-        if byte < 32 or byte > 126 or char:match("[^%w%-_%.%~]") then
-            encoded[#encoded + 1] = string.format("%%%02X", byte)
-        else
-            encoded[#encoded + 1] = char
-        end
-    end
-    return table.concat(encoded)
-end
-
--- Функция для выполнения POST-запроса
-function httppost2(url, headers, data)
-    local response_body = {}
-    local res, code, response_headers, status = http.request{
-        url = url,
-        method = "POST",
-        headers = headers,
-        source = ltn12.source.string(data),
-        sink = ltn12.sink.table(response_body)
-    }
-    return res, code, response_headers, status, table.concat(response_body)
-end
-
--- Данные для POST-запроса
-local url = "http://your-url-here.com/endpoint"
-local post_data = "code=" .. urlencode("8vsdsd==") .. "&code2=" .. urlencode("b8dfdfdf=")
-local headers = {
-    ["Content-Type"] = "application/x-www-form-urlencoded",
-    ["Content-Length"] = tostring(#post_data)
-}
-
--- Выполнение POST-запроса
-local res, code, response_headers, status, response_body = httppost2(url, headers, post_data)
-
--- Вывод результата
-if res then
-    print("Response code: " .. code)
-    print("Response body: " .. response_body)
-else
-    print("HTTP request failed: " .. code)
-end
-
-
 local str = "your_string_here"
+local found_non_alphanumeric = false
 
--- Поиск символов, не входящих в набор
-local result = string.match(str, "[^%w%-_%.%~]")
-
-if result then
-    print("Найден символ, не входящий в набор:", result)
-else
-    print("В строке нет символов, не входящих в набор.")
+for i = 1, #str do
+    local char = str:sub(i, i)
+    if not char:match("[%w%-_%.%~]") then
+        found_non_alphanumeric = true
+        break
+    end
 end
 
+if found_non_alphanumeric then
+    print("Найден символ, не входящий в набор [%w%-_%.%~]")
+else
+    print("В строке нет символов, не входящих в набор [%w%-_%.%~]")
+end

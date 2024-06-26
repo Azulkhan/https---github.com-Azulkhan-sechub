@@ -3,7 +3,7 @@ local ltn12 = require("ltn12")
 
 -- Функция для URL-кодирования строк
 function urlencode(str)
-    if not str then
+    if type(str) ~= "string" or str == "" then
         return ""
     end
     

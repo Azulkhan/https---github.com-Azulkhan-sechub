@@ -4,7 +4,7 @@ local ltn12 = require("ltn12")
 -- Функция для URL-кодирования строк
 function urlencode(str)
     if str then
-        str = string.gsub(str, "([^%w%-%.%_%~])", -- Кодирует все символы, кроме букв, цифр и некоторых специальных символов
+        str = string.gsub(str, "([^%w%-_%.%~])",
             function(c) return string.format("%%%02X", string.byte(c)) end)
     end
     return str
@@ -25,7 +25,7 @@ end
 
 -- Данные для POST-запроса
 local url = "http://your-url-here.com/endpoint"
-local post_data = "username=" .. urlencode("johndoe") .. "&password=" .. urlencode("secret")
+local post_data = "code=" .. urlencode("8vsdsd==") .. "&code2=" .. urlencode("b8dfdfdf=")
 local headers = {
     ["Content-Type"] = "application/x-www-form-urlencoded",
     ["Content-Length"] = tostring(#post_data)

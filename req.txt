@@ -47,3 +47,16 @@ if res then
 else
     print("HTTP request failed: " .. code)
 end
+
+
+local str = "your_string_here"
+
+-- Поиск символов, не входящих в набор
+local result = string.match(str, "[^%w%-_%.%~]")
+
+if result then
+    print("Найден символ, не входящий в набор:", result)
+else
+    print("В строке нет символов, не входящих в набор.")
+end
+

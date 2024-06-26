@@ -1,3 +1,7 @@
+-- Загрузка стандартной библиотеки string
+local string = require("string")
+
+-- Функция для кодирования строки в формате x-www-form-urlencoded
 function urlencode(str)
     -- Замена символов +, =, /
     str = string.gsub(str, "+", "%%2B")

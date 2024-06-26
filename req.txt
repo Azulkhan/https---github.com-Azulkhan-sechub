@@ -3,7 +3,7 @@ local found_non_alphanumeric = false
 
 for i = 1, #str do
     local char = str:sub(i, i)
-    if type(char) == "string" and not char:match("[%w%-_%.%~]") then
+    if not char:find("[\%w%-_%.%~]") then
         found_non_alphanumeric = true
         break
     end

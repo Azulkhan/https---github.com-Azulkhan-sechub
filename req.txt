@@ -22,3 +22,55 @@ request.input.signedXml = xmlString
 ```
 
 Если у вас другой случай, пожалуйста, предоставьте больше деталей или ваш код для более точной помощи.
+
+
+
+Спасибо за уточнение. Давайте разберемся, как именно вы передаете XML из JavaScript в Lua и как это обрабатывается на стороне Lua. 
+
+### JavaScript: Отправка XML
+
+В JavaScript вы, вероятно, используете `fetch` или `XMLHttpRequest` для отправки данных в ваш REST-сервис. Убедитесь, что вы отправляете строку, а не объект.
+
+Пример с использованием `fetch`:
+
+```javascript
+const xmlString = '<root><element>value</element></root>';
+
+fetch('https://your-rest-service-endpoint', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/xml',
+    },
+    body: xmlString
+})
+.then(response => response.text())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));
+```
+
+### Lua: Обработка полученного XML
+
+На стороне Lua, убедитесь, что вы правильно обрабатываете входные данные. Возможно, вам нужно использовать `request:read()` для получения тела запроса.
+
+Пример Lua скрипта для обработки XML:
+
+```lua
+-- Предполагая, что вы используете HTTP сервер, например, с помощью LuaSocket или другого
+local function handleRequest(request)
+    -- Чтение тела запроса
+    local body = request:read("*a")
+    
+    -- Проверка типа данных и преобразование в строку, если необходимо
+    if type(body) == "table" then
+        body = table.concat(body)
+    end
+    
+    -- Теперь body содержит строку XML
+    print("Received XML:", body)
+    
+    -- Далее вы можете работать с body как со строкой
+    -- Пример: request.input.signedXml = body
+end
+```
+
+Если вы используете конкретный фреймворк или библиотеку для обработки HTTP запросов, пожалуйста, предоставьте больше информации, чтобы я мог предложить более точное решение.

@@ -1,51 +1,51 @@
-В Lua можно проверить наличие определённых символов в строке, используя функцию `string.find` или метод `string.match`. Вот примеры использования обеих функций:
+В JavaScript проверка строки на равенство должна работать корректно, если строки действительно равны и нет пробелов или скрытых символов, которые могут помешать. Вот несколько вещей, которые стоит проверить:
 
-### Использование `string.find`
-Функция `string.find` возвращает начальную и конечную позицию первого вхождения подстроки или паттерна.
+1. **Тип данных**: Убедитесь, что `data.output.cn` является строкой. Можно использовать оператор `typeof` для проверки типа данных.
 
-```lua
-local str = "Hello, world!"
-local substring = "world"
+2. **Пробелы и скрытые символы**: Убедитесь, что нет пробелов или скрытых символов в строке. Можно использовать методы `trim` или `replace` для удаления пробелов.
 
-local start_pos, end_pos = string.find(str, substring)
+3. **Точное сравнение**: Используйте оператор `===`, чтобы убедиться, что сравнение происходит без приведения типов.
 
-if start_pos then
-    print("Substring found at position:", start_pos, "to", end_pos)
-else
-    print("Substring not found")
-end
+### Пример проверки строки на равенство:
+
+```javascript
+if (typeof data.output.cn === 'string' && data.output.cn.trim() === "CN (2022)") {
+    console.log("Match found");
+} else {
+    console.log("No match");
+}
 ```
 
-### Использование `string.match`
-Функция `string.match` возвращает подстроку, соответствующую заданному паттерну, или `nil`, если совпадений не найдено.
+### Удаление пробелов и скрытых символов:
 
-```lua
-local str = "Hello, world!"
-local pattern = "world"
-
-local match = string.match(str, pattern)
-
-if match then
-    print("Pattern found:", match)
-else
-    print("Pattern not found")
-end
+```javascript
+let cnValue = data.output.cn.trim(); // Убираем пробелы в начале и в конце
+if (cnValue === "CN (2022)") {
+    console.log("Match found");
+} else {
+    console.log("No match");
+}
 ```
 
-### Пример проверки наличия конкретного символа
-Если нужно проверить наличие конкретного символа в строке, можно использовать одну из вышеуказанных функций с паттерном, представляющим этот символ.
+### Проверка на скрытые символы:
 
-```lua
-local str = "Hello, world!"
-local char = "o"
-
-local found = string.find(str, char)
-
-if found then
-    print("Character found")
-else
-    print("Character not found")
-end
+```javascript
+let cnValue = data.output.cn.replace(/\s+/g, ''); // Убираем все пробелы
+if (cnValue === "CN(2022)") {
+    console.log("Match found");
+} else {
+    console.log("No match");
+}
 ```
 
-Этот код проверяет наличие символа "o" в строке `str` и выводит соответствующее сообщение.
+### Полный пример с проверкой типа и удалением пробелов:
+
+```javascript
+if (typeof data.output.cn === 'string' && data.output.cn.trim().replace(/\s+/g, '') === "CN(2022)") {
+    console.log("Match found");
+} else {
+    console.log("No match");
+}
+```
+
+Эти шаги помогут убедиться, что строка сравнивается корректно и что нет никаких скрытых символов или пробелов, которые могут помешать правильному сравнению.

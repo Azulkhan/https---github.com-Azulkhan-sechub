@@ -1,29 +1,7 @@
-Чтобы проверить последние четыре цифры строки в Lua и JavaScript, можно использовать функции для работы со строками.
+Для установки ограничения на количество вводимых символов в элементе `textarea` в HTML, можно использовать атрибут `maxlength`. Вот пример:
 
-### Lua
-В Lua можно использовать функцию `string.sub` для извлечения последних четырех символов строки и затем проверить их. Вот пример кода:
-
-```lua
-local function checkLastFourDigits(value)
-    local lastFour = string.sub(value, -4)
-    return lastFour
-end
-
-local value = "12345678"
-print(checkLastFourDigits(value))  -- Output: 5678
+```html
+<textarea maxlength="50"></textarea>
 ```
 
-### JavaScript
-В JavaScript можно использовать метод `slice` для аналогичной операции. Вот пример кода:
-
-```javascript
-function checkLastFourDigits(value) {
-    var lastFour = value.slice(-4);
-    return lastFour;
-}
-
-var value = "12345678";
-console.log(checkLastFourDigits(value));  // Output: 5678
-```
-
-В обоих примерах функция `checkLastFourDigits` принимает строку и возвращает последние четыре символа этой строки.
+Это ограничение автоматически предотвратит ввод более 50 символов.

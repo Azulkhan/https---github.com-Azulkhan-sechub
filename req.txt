@@ -1,189 +1,25 @@
-Вот краткое руководство по Angular, которое поможет понять основные концепции и структуру кода:
+Тег `<p-tabView>` относится к компоненту `TabView` библиотеки PrimeNG, которая используется в Angular приложениях для создания вкладок. Атрибут `scrollable="true"` указывает, что вкладки могут прокручиваться горизонтально, если их количество превышает доступное пространство.
 
-### 1. Основные концепции
+Пример использования компонента:
 
-**Angular** - это платформа и фреймворк для создания одностраничных веб-приложений на языке TypeScript. Он использует компоненты и директивы для построения интерфейсов.
-
-### 2. Структура проекта
-
-Типичный проект Angular включает следующие основные элементы:
-
-- **`src`** - корневая папка, содержащая исходный код.
-- **`app`** - главная папка приложения, внутри которой находятся компоненты, модули и сервисы.
-
-### 3. Основные файлы
-
-- **`main.ts`** - точка входа приложения, здесь происходит загрузка главного модуля.
-- **`app.module.ts`** - главный модуль приложения, где объявляются компоненты и сервисы.
-- **`app.component.ts`** - главный компонент приложения.
-- **`app.component.html`** - шаблон главного компонента.
-
-### 4. Компоненты
-
-Компоненты являются основными строительными блоками Angular-приложений. Они состоят из:
-
-- **Декоратора `@Component`**: определяет метаданные компонента (шаблон, стили и т.д.).
-- **Класса компонента**: содержит логику и данные.
-- **Шаблона (HTML)**: описывает представление компонента.
-- **Стили (CSS)**: задают стили для компонента.
-
-**Пример компонента:**
-
-```typescript
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
-})
-export class AppComponent {
-  title = 'my-angular-app';
-}
+```html
+<p-tabView [scrollable]="true">
+    <p-tabPanel header="Tab 1">
+        Content for Tab 1
+    </p-tabPanel>
+    <p-tabPanel header="Tab 2">
+        Content for Tab 2
+    </p-tabPanel>
+    <p-tabPanel header="Tab 3">
+        Content for Tab 3
+    </p-tabPanel>
+    <!-- More tabs -->
+</p-tabView>
 ```
 
-### 5. Модули
+### Описание:
+- `<p-tabView>`: Основной контейнер для вкладок.
+- `[scrollable]="true"`: Делает вкладки прокручиваемыми, если их слишком много для отображения в одном ряду.
+- `<p-tabPanel>`: Представляет отдельную вкладку с заголовком `header` и содержимым внутри.
 
-Модули организуют приложение в логические блоки. Главный модуль определяется декоратором `@NgModule`.
-
-**Пример модуля:**
-
-```typescript
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { AppComponent } from './app.component';
-
-@NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
-export class AppModule { }
-```
-
-### 6. Сервисы
-
-Сервисы используются для организации бизнес-логики и взаимодействия с внешними источниками данных.
-
-**Пример сервиса:**
-
-```typescript
-import { Injectable } from '@angular/core';
-
-@Injectable({
-  providedIn: 'root',
-})
-export class DataService {
-  getData() {
-    return ['Data1', 'Data2', 'Data3'];
-  }
-}
-```
-
-### 7. Директивы
-
-Директивы изменяют DOM. Они могут быть структурными (изменяют структуру DOM) или атрибутными (изменяют поведение или стиль элемента).
-
-**Пример директивы:**
-
-```typescript
-import { Directive, ElementRef, Renderer2 } from '@angular/core';
-
-@Directive({
-  selector: '[appHighlight]'
-})
-export class HighlightDirective {
-  constructor(el: ElementRef, renderer: Renderer2) {
-    renderer.setStyle(el.nativeElement, 'backgroundColor', 'yellow');
-  }
-}
-```
-
-### 8. Роутинг
-
-Роутинг позволяет навигировать между различными компонентами приложения.
-
-**Пример конфигурации маршрутов:**
-
-```typescript
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { HomeComponent } from './home/home.component';
-import { AboutComponent } from './about/about.component';
-
-const routes: Routes = [
-  { path: 'home', component: HomeComponent },
-  { path: 'about', component: AboutComponent },
-  { path: '', redirectTo: '/home', pathMatch: 'full' }
-];
-
-@NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
-})
-export class AppRoutingModule { }
-```
-
-### 9. Общий рабочий процесс
-
-1. **Создание компонента**: `ng generate component component-name`
-2. **Создание сервиса**: `ng generate service service-name`
-3. **Добавление маршрутов**: в `app-routing.module.ts`
-
-### 10. Запуск приложения
-
-Для запуска приложения используйте команду:
-
-```bash
-ng serve
-```
-
-Это откроет приложение на локальном сервере (по умолчанию на `http://localhost:4200`).
-
-Эти основы помогут вам начать разбираться в коде Angular-приложения.
-
-
-
-Этот код на Angular представляет собой попытку добавить объект в массив `this.field[query_code]`. Вот разбор:
-
-- `this.field[query_code]`: Обращение к массиву `field` с использованием значения переменной `query_code` в качестве индекса.
-- `push`: Метод массива JavaScript, который добавляет один или несколько элементов в конец массива.
-- `{ title: ..., alias: ..., show_gilter: ... }`: Объект, который добавляется в массив. Он включает три свойства: `title`, `alias` и `show_gilter`.
-
-Пример корректного кода:
-
-```javascript
-this.field[query_code].push({
-  title: 'Some Title',
-  alias: 'Some Alias',
-  show_gilter: true // or false, depending on the requirement
-});
-```
-
-Каждое из этих свойств должно иметь значение, например, строки или логического значения. В приведенном примере `title` и `alias` – это строки, а `show_gilter` – логическое значение (true или false).
-
-В этом фрагменте продолжается добавление свойств к объекту, который добавляется в массив `this.field[query_code]`. Полный объект может выглядеть следующим образом:
-
-```javascript
-this.field[query_code].push({
-  title: 'Some Title',
-  alias: 'Some Alias',
-  show_gilter: true, // or false
-  is_advanced: 0, // 0 or 1, likely indicating a boolean value in numeric form
-  _def_sel_query_code: null, // could be null or a string, depending on the requirement
-  _data_type_code: 'varchar' // string indicating the type of data
-});
-```
-
-Вот расшифровка новых свойств:
-
-- `is_advanced`: Числовое значение (0 или 1), вероятно, указывающее на булевый параметр.
-- `_def_sel_query_code`: Может быть `null` или строкой, в зависимости от требований.
-- `_data_type_code`: Строка, указывающая тип данных, в данном случае `'varchar'`.
-
-Этот объект теперь содержит полную информацию и добавляется в массив `this.field[query_code]`.
+Таким образом, данный тег и атрибуты позволяют создать интерфейс с вкладками, которые можно прокручивать, если их количество превышает ширину контейнера.

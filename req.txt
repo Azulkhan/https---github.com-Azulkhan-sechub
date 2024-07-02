@@ -146,3 +146,44 @@ ng serve
 Это откроет приложение на локальном сервере (по умолчанию на `http://localhost:4200`).
 
 Эти основы помогут вам начать разбираться в коде Angular-приложения.
+
+
+
+Этот код на Angular представляет собой попытку добавить объект в массив `this.field[query_code]`. Вот разбор:
+
+- `this.field[query_code]`: Обращение к массиву `field` с использованием значения переменной `query_code` в качестве индекса.
+- `push`: Метод массива JavaScript, который добавляет один или несколько элементов в конец массива.
+- `{ title: ..., alias: ..., show_gilter: ... }`: Объект, который добавляется в массив. Он включает три свойства: `title`, `alias` и `show_gilter`.
+
+Пример корректного кода:
+
+```javascript
+this.field[query_code].push({
+  title: 'Some Title',
+  alias: 'Some Alias',
+  show_gilter: true // or false, depending on the requirement
+});
+```
+
+Каждое из этих свойств должно иметь значение, например, строки или логического значения. В приведенном примере `title` и `alias` – это строки, а `show_gilter` – логическое значение (true или false).
+
+В этом фрагменте продолжается добавление свойств к объекту, который добавляется в массив `this.field[query_code]`. Полный объект может выглядеть следующим образом:
+
+```javascript
+this.field[query_code].push({
+  title: 'Some Title',
+  alias: 'Some Alias',
+  show_gilter: true, // or false
+  is_advanced: 0, // 0 or 1, likely indicating a boolean value in numeric form
+  _def_sel_query_code: null, // could be null or a string, depending on the requirement
+  _data_type_code: 'varchar' // string indicating the type of data
+});
+```
+
+Вот расшифровка новых свойств:
+
+- `is_advanced`: Числовое значение (0 или 1), вероятно, указывающее на булевый параметр.
+- `_def_sel_query_code`: Может быть `null` или строкой, в зависимости от требований.
+- `_data_type_code`: Строка, указывающая тип данных, в данном случае `'varchar'`.
+
+Этот объект теперь содержит полную информацию и добавляется в массив `this.field[query_code]`.

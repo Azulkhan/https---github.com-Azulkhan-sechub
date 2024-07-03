@@ -1,36 +1,46 @@
-Чтобы сравнить даты в Lua и выполнить определенное действие, если одна дата раньше другой, можно воспользоваться библиотекой `os`. Вот пример кода, который выполняет это:
-
-```lua
--- Функция для преобразования строки даты в таблицу времени
-function parse_date(date_str)
-    local pattern = "(%d+)-(%d+)-(%d+) (%d+):(%d+):(%d+)"
-    local year, month, day, hour, min, sec = date_str:match(pattern)
-    return os.time({
-        year = year,
-        month = month,
-        day = day,
-        hour = hour,
-        min = min,
-        sec = sec
-    })
+-- Функция для преобразования строки даты и времени в таблицу
+local function parseDateTime(dateTimeStr)
+    local year, month, day, hour, min, sec = dateTimeStr:match("(%d+)-(%d+)-(%d+) (%d+):(%d+):(%d+)")
+    return {
+        year = tonumber(year),
+        month = tonumber(month),
+        day = tonumber(day),
+        hour = tonumber(hour),
+        min = tonumber(min),
+        sec = tonumber(sec)
+    }
 end
 
--- Даты для сравнения
-local date1_str = "2024-07-03 17:30:31"
-local date2_str = "2024-07-03 17:20:31"
+-- Функция для сравнения двух таблиц даты и времени
+local function compareDateTimes(dt1, dt2)
+    if dt1.year ~= dt2.year then
+        return dt1.year < dt2.year
+    elseif dt1.month ~= dt2.month then
+        return dt1.month < dt2.month
+    elseif dt1.day ~= dt2.day then
+        return dt1.day < dt2.day
+    elseif dt1.hour ~= dt2.hour then
+        return dt1.hour < dt2.hour
+    elseif dt1.min ~= dt2.min then
+        return dt1.min < dt2.min
+    else
+        return dt1.sec < dt2.sec
+    end
+end
 
--- Преобразование строк дат в таблицы времени
-local date1 = parse_date(date1_str)
-local date2 = parse_date(date2_str)
+-- Даты и времена в формате строки
+local dateTimeStr1 = "2024-07-01 10:30:00"
+local dateTimeStr2 = "2024-07-01 15:45:00"
 
--- Сравнение дат
-if date1 > date2 then
-    print("Первая дата позже второй.")
+-- Преобразуем строки в таблицы
+local dateTime1 = parseDateTime(dateTimeStr1)
+local dateTime2 = parseDateTime(dateTimeStr2)
+
+-- Сравнение времени
+if compareDateTimes(dateTime1, dateTime2) then
+    print("dateTime1 меньше, чем dateTime2")
+elseif compareDateTimes(dateTime2, dateTime1) then
+    print("dateTime1 больше, чем dateTime2")
 else
-    print("Первая дата не позже второй.")
+    print("dateTime1 и dateTime2 равны")
 end
-```
-
-Этот скрипт преобразует строки дат в таблицы времени и затем сравнивает их. Если первая дата позже второй, он выведет соответствующее сообщение. Если первая дата раньше или равна второй, он выведет другое сообщение.
-
-Проверьте и используйте этот код в вашем проекте для сравнения дат.

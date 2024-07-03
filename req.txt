@@ -1,105 +1,36 @@
-Для того чтобы заголовок "Server Report" был на отдельной строке после заголовка компании, а также перед и после него были пустые строки, нужно добавить эти пустые строки и правильно настроить объединение ячеек.
+Чтобы сравнить даты в Lua и выполнить определенное действие, если одна дата раньше другой, можно воспользоваться библиотекой `os`. Вот пример кода, который выполняет это:
 
-Вот обновленный пример:
+```lua
+-- Функция для преобразования строки даты в таблицу времени
+function parse_date(date_str)
+    local pattern = "(%d+)-(%d+)-(%d+) (%d+):(%d+):(%d+)"
+    local year, month, day, hour, min, sec = date_str:match(pattern)
+    return os.time({
+        year = year,
+        month = month,
+        day = day,
+        hour = hour,
+        min = min,
+        sec = sec
+    })
+end
 
-### HTML:
+-- Даты для сравнения
+local date1_str = "2024-07-03 17:30:31"
+local date2_str = "2024-07-03 17:20:31"
 
-```html
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Export to Excel</title>
-</head>
-<body>
-    <table id="data-table" border="1">
-        <thead>
-            <tr>
-                <th colspan="2" style="text-align:center; font-size:20px;">Название компании</th>
-            </tr>
-            <tr></tr> <!-- Пустая строка перед "Server Report" -->
-            <tr>
-                <th colspan="2" style="text-align:center; font-size:18px;">Server Report</th>
-            </tr>
-            <tr></tr> <!-- Пустая строка после "Server Report" -->
-            <tr>
-                <th>Фильтр 1:</th>
-                <td>Значение 1</td>
-            </tr>
-            <tr>
-                <th>Фильтр 2:</th>
-                <td>Значение 2</td>
-            </tr>
-            <tr>
-                <th>Фильтр 3:</th>
-                <td>Значение 3</td>
-            </tr>
-            <tr>
-                <th>Server</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Server 1</td>
-                <td>Active</td>
-            </tr>
-            <tr>
-                <td>Server 2</td>
-                <td>Inactive</td>
-            </tr>
-            <!-- Add more rows as needed -->
-        </tbody>
-    </table>
-    <button onclick="exportToExcel()">Export to Excel</button>
+-- Преобразование строк дат в таблицы времени
+local date1 = parse_date(date1_str)
+local date2 = parse_date(date2_str)
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-    <script>
-        function exportToExcel() {
-            var wb = XLSX.utils.table_to_book(document.getElementById('data-table'), {sheet: "Sheet1"});
-            
-            // Применение стилей к заголовкам и фильтрам
-            var ws = wb.Sheets["Sheet1"];
-            var range = XLSX.utils.decode_range(ws['!ref']);
-            
-            // Стиль для заголовка компании
-            var companyCell = ws[XLSX.utils.encode_cell({r:0, c:0})];
-            companyCell.s = {
-                font: { bold: true, sz: 20 },
-                alignment: { horizontal: "center" }
-            };
-            ws['!merges'] = [{s: {r: 0, c: 0}, e: {r: 0, c: 1}}]; // Объединение ячеек для заголовка компании
-            
-            // Стиль для заголовка отчета "Server Report"
-            var reportCell = ws[XLSX.utils.encode_cell({r:2, c:0})];
-            reportCell.s = {
-                font: { bold: true, sz: 18 },
-                alignment: { horizontal: "center" }
-            };
-            ws[XLSX.utils.encode_cell({r: 2, c: 0})] = { v: 'Server Report', s: reportCell.s }; // Установка значения и стиля ячейки
-            ws['!merges'].push({s: {r: 2, c: 0}, e: {r: 2, c: 1}}); // Объединение ячеек для заголовка отчета
-            
-            // Стиль для фильтров
-            for (var i = 3; i < 6; ++i) {
-                var filterCell = ws[XLSX.utils.encode_cell({r: i, c: 0})];
-                filterCell.s = { font: { bold: true } };
-            }
-            
-            XLSX.writeFile(wb, 'report.xlsx');
-        }
-    </script>
-</body>
-</html>
+-- Сравнение дат
+if date1 > date2 then
+    print("Первая дата позже второй.")
+else
+    print("Первая дата не позже второй.")
+end
 ```
 
-### Объяснение:
+Этот скрипт преобразует строки дат в таблицы времени и затем сравнивает их. Если первая дата позже второй, он выведет соответствующее сообщение. Если первая дата раньше или равна второй, он выведет другое сообщение.
 
-1. **HTML**:
-   - Добавлены пустые строки перед и после строки с заголовком "Server Report".
-   - Объединены ячейки для заголовка компании и заголовка "Server Report".
-
-2. **JavaScript**:
-   - Применение стилей к ячейкам заголовка компании.
-   - Установка значения и стиля для ячейки с заголовком "Server Report" и объединение ячеек (ячейка `A3` и `B3`).
-   - Применение стилей к фильтрам.
-
-Этот код создаст Excel-файл с заголовком компании, заголовком отчета "Server Report" в отдельной строке после пустой строки, фильтрами и таблицей с данными.
+Проверьте и используйте этот код в вашем проекте для сравнения дат.

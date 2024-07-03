@@ -1,78 +1,73 @@
-Для шифрования паролей при передаче между системами можно использовать несколько подходов и методов. Один из наиболее распространенных и безопасных методов – это использование асимметричного шифрования с помощью алгоритмов, таких как RSA, или симметричного шифрования с использованием AES.
+Для создания Excel-файла с использованием HTML и добавления стилей, таких как заголовки и подзаголовки, можно использовать библиотеку `SheetJS` (xlsx) в JavaScript. Вот пример кода, который поможет вам начать:
 
-Вот пример того, как можно реализовать шифрование пароля с использованием библиотеки LuaCrypto, если вы используете Lua:
+1. **Подготовка HTML**:
+    - Создайте HTML-таблицу с данными, которые вы хотите экспортировать в Excel.
 
-### Пример с использованием RSA:
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Export to Excel</title>
+</head>
+<body>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th colspan="2">Server Report</th>
+            </tr>
+            <tr>
+                <th>Server</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Server 1</td>
+                <td>Active</td>
+            </tr>
+            <tr>
+                <td>Server 2</td>
+                <td>Inactive</td>
+            </tr>
+            <!-- Add more rows as needed -->
+        </tbody>
+    </table>
+    <button onclick="exportToExcel()">Export to Excel</button>
 
-1. **Установка LuaCrypto:**
-   Убедитесь, что у вас установлена библиотека LuaCrypto. Вы можете установить её с помощью LuaRocks:
-   ```
-   luarocks install luacrypto
-   ```
-
-2. **Генерация ключей RSA:**
-   Генерируйте пару ключей (открытый и закрытый ключ) с помощью утилиты OpenSSL:
-   ```
-   openssl genpkey -algorithm RSA -out private_key.pem -aes256
-   openssl rsa -pubout -in private_key.pem -out public_key.pem
-   ```
-
-3. **Использование ключей в Lua:**
-
-```lua
-local crypto = require("crypto")
-
--- Функция для чтения ключа из файла
-local function read_key(path)
-    local file = io.open(path, "rb")
-    local key = file:read("*all")
-    file:close()
-    return key
-end
-
--- Чтение открытого ключа
-local public_key = read_key("public_key.pem")
-
--- Пароль, который нужно зашифровать
-local password = "your_password"
-
--- Шифрование пароля с использованием открытого ключа
-local encrypted_password = crypto.public_encrypt(public_key, password)
-
-print("Зашифрованный пароль: " .. crypto.b64(encrypted_password))
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script>
+        function exportToExcel() {
+            var wb = XLSX.utils.table_to_book(document.getElementById('data-table'), {sheet: "Sheet1"});
+            
+            // Применение стилей к заголовкам
+            var ws = wb.Sheets["Sheet1"];
+            var range = XLSX.utils.decode_range(ws['!ref']);
+            
+            for(var C = range.s.c; C <= range.e.c; ++C) {
+                var cell = ws[XLSX.utils.encode_cell({r:1, c:C})]; // Second row (header)
+                if(cell) {
+                    cell.s = {
+                        font: {
+                            bold: true,
+                            color: { rgb: "FFFFFF" }
+                        },
+                        fill: {
+                            fgColor: { rgb: "4F81BD" }
+                        }
+                    };
+                }
+            }
+            
+            XLSX.writeFile(wb, 'report.xlsx');
+        }
+    </script>
+</body>
+</html>
 ```
 
-### Пример с использованием AES:
+2. **JavaScript**:
+    - Сначала загружается библиотека `SheetJS`.
+    - Затем, при нажатии кнопки "Export to Excel", таблица преобразуется в Excel.
+    - Добавлены стили для заголовков (шрифт жирный и цветной фон).
 
-1. **Установка библиотеки LuaCrypto:**
-   (см. шаг 1 выше)
-
-2. **Шифрование и расшифрование с использованием AES:**
-
-```lua
-local crypto = require("crypto")
-
--- Секретный ключ (должен быть согласован с другой системой)
-local key = "your_secret_key" -- Должен быть 16, 24 или 32 байта для AES
-
--- Инициализационный вектор (IV)
-local iv = "your_iv_12345678" -- Должен быть 16 байт
-
--- Пароль, который нужно зашифровать
-local password = "your_password"
-
--- Шифрование пароля
-local encrypted_password = crypto.encrypt("aes-256-cbc", password, key, iv)
-
--- Для передачи пароля в текстовом виде можно использовать base64
-local encrypted_password_base64 = crypto.b64(encrypted_password)
-
-print("Зашифрованный пароль: " .. encrypted_password_base64)
-
--- Расшифрование пароля
-local decrypted_password = crypto.decrypt("aes-256-cbc", crypto.unb64(encrypted_password_base64), key, iv)
-
-print("Расшифрованный пароль: " .. decrypted_password)
-```
-
-Эти примеры демонстрируют основные методы шифрования и дешифрования паролей. Вы можете адаптировать их для своей конкретной системы и требований безопасности.
+Этот пример создает простую HTML-таблицу и экспортирует её в Excel с заголовками, стилизованными синим фоном и белым текстом. Вы можете дополнительно настраивать стили, добавляя или изменяя свойства в объекте `cell.s`.

@@ -1,7 +1,7 @@
-Для создания Excel-файла с использованием HTML и добавления стилей, таких как заголовки и подзаголовки, можно использовать библиотеку `SheetJS` (xlsx) в JavaScript. Вот пример кода, который поможет вам начать:
+Чтобы добавить заголовок с названием компании, заголовок таблицы по центру и фильтры в Excel, вы можете модифицировать ваш HTML и JavaScript код следующим образом:
 
 1. **Подготовка HTML**:
-    - Создайте HTML-таблицу с данными, которые вы хотите экспортировать в Excel.
+    - Создайте HTML-таблицу и добавьте заголовок компании, заголовок отчета и фильтры в качестве строк таблицы.
 
 ```html
 <!DOCTYPE html>
@@ -10,10 +10,25 @@
     <title>Export to Excel</title>
 </head>
 <body>
-    <table id="data-table">
+    <table id="data-table" border="1">
         <thead>
             <tr>
-                <th colspan="2">Server Report</th>
+                <th colspan="2" style="text-align:center; font-size:20px;">Название компании</th>
+            </tr>
+            <tr>
+                <th colspan="2" style="text-align:center; font-size:18px;">Server Report</th>
+            </tr>
+            <tr>
+                <th>Фильтр 1:</th>
+                <td>Значение 1</td>
+            </tr>
+            <tr>
+                <th>Фильтр 2:</th>
+                <td>Значение 2</td>
+            </tr>
+            <tr>
+                <th>Фильтр 3:</th>
+                <td>Значение 3</td>
             </tr>
             <tr>
                 <th>Server</th>
@@ -39,12 +54,35 @@
         function exportToExcel() {
             var wb = XLSX.utils.table_to_book(document.getElementById('data-table'), {sheet: "Sheet1"});
             
-            // Применение стилей к заголовкам
+            // Применение стилей к заголовкам и фильтрам
             var ws = wb.Sheets["Sheet1"];
             var range = XLSX.utils.decode_range(ws['!ref']);
             
-            for(var C = range.s.c; C <= range.e.c; ++C) {
-                var cell = ws[XLSX.utils.encode_cell({r:1, c:C})]; // Second row (header)
+            // Стиль для заголовка компании
+            var companyCell = ws[XLSX.utils.encode_cell({r:0, c:0})];
+            companyCell.s = {
+                font: { bold: true, sz: 20 },
+                alignment: { horizontal: "center" }
+            };
+            ws['!merges'] = [{s: {r: 0, c: 0}, e: {r: 0, c: 1}}]; // Объединение ячеек для заголовка компании
+            
+            // Стиль для заголовка отчета
+            var reportCell = ws[XLSX.utils.encode_cell({r:1, c:0})];
+            reportCell.s = {
+                font: { bold: true, sz: 18 },
+                alignment: { horizontal: "center" }
+            };
+            ws['!merges'].push({s: {r: 1, c: 0}, e: {r: 1, c: 1}}); // Объединение ячеек для заголовка отчета
+            
+            // Стиль для фильтров
+            for (var i = 2; i < 5; ++i) {
+                var filterCell = ws[XLSX.utils.encode_cell({r: i, c: 0})];
+                filterCell.s = { font: { bold: true } };
+            }
+            
+            // Стиль для заголовков таблицы
+            for (var C = range.s.c; C <= range.e.c; ++C) {
+                var cell = ws[XLSX.utils.encode_cell({r:5, c:C})]; // Шестая строка (заголовки таблицы)
                 if(cell) {
                     cell.s = {
                         font: {
@@ -65,9 +103,16 @@
 </html>
 ```
 
-2. **JavaScript**:
-    - Сначала загружается библиотека `SheetJS`.
-    - Затем, при нажатии кнопки "Export to Excel", таблица преобразуется в Excel.
-    - Добавлены стили для заголовков (шрифт жирный и цветной фон).
+### Объяснение:
 
-Этот пример создает простую HTML-таблицу и экспортирует её в Excel с заголовками, стилизованными синим фоном и белым текстом. Вы можете дополнительно настраивать стили, добавляя или изменяя свойства в объекте `cell.s`.
+1. **HTML**:
+   - Созданы строки для названия компании и заголовка отчета с объединением ячеек для их центрирования.
+   - Добавлены строки для фильтров.
+
+2. **JavaScript**:
+   - Преобразование таблицы в книгу Excel (`XLSX.utils.table_to_book`).
+   - Применение стилей к ячейкам заголовка компании, заголовка отчета и фильтров.
+   - Объединение ячеек для заголовка компании и заголовка отчета.
+   - Применение стилей к заголовкам таблицы.
+
+Этот пример создаёт Excel-файл с заголовком компании, заголовком отчета и фильтрами, а также стилизованными заголовками таблицы.

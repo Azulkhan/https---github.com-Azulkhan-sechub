@@ -1,24 +1,78 @@
-Если вам нужно увеличить количество строк в результате запроса `SELECT` без вставки новых данных, вы можете использовать технику дублирования строк. Один из способов сделать это - воспользоваться функцией генерации серий и соединением с вашими данными.
+Для шифрования паролей при передаче между системами можно использовать несколько подходов и методов. Один из наиболее распространенных и безопасных методов – это использование асимметричного шифрования с помощью алгоритмов, таких как RSA, или симметричного шифрования с использованием AES.
 
-Вот пример запроса:
+Вот пример того, как можно реализовать шифрование пароля с использованием библиотеки LuaCrypto, если вы используете Lua:
 
-```sql
-WITH base_data AS (
-  SELECT * FROM your_table LIMIT 18
-),
-expanded_data AS (
-  SELECT 
-    base_data.*,
-    generate_series(1, 56) AS duplication_factor
-  FROM base_data
-)
-SELECT * FROM expanded_data
-LIMIT 1000;
+### Пример с использованием RSA:
+
+1. **Установка LuaCrypto:**
+   Убедитесь, что у вас установлена библиотека LuaCrypto. Вы можете установить её с помощью LuaRocks:
+   ```
+   luarocks install luacrypto
+   ```
+
+2. **Генерация ключей RSA:**
+   Генерируйте пару ключей (открытый и закрытый ключ) с помощью утилиты OpenSSL:
+   ```
+   openssl genpkey -algorithm RSA -out private_key.pem -aes256
+   openssl rsa -pubout -in private_key.pem -out public_key.pem
+   ```
+
+3. **Использование ключей в Lua:**
+
+```lua
+local crypto = require("crypto")
+
+-- Функция для чтения ключа из файла
+local function read_key(path)
+    local file = io.open(path, "rb")
+    local key = file:read("*all")
+    file:close()
+    return key
+end
+
+-- Чтение открытого ключа
+local public_key = read_key("public_key.pem")
+
+-- Пароль, который нужно зашифровать
+local password = "your_password"
+
+-- Шифрование пароля с использованием открытого ключа
+local encrypted_password = crypto.public_encrypt(public_key, password)
+
+print("Зашифрованный пароль: " .. crypto.b64(encrypted_password))
 ```
 
-Объяснение:
-1. CTE `base_data` выбирает 18 записей из вашей таблицы.
-2. В CTE `expanded_data` каждая запись из `base_data` дублируется 56 раз с использованием функции `generate_series`.
-3. Итоговый запрос выбирает первые 1000 записей из расширенного набора данных.
+### Пример с использованием AES:
 
-Замените `your_table` на название вашей таблицы. Этот подход позволяет вам получить 1000 строк в результате `SELECT` без вставки дополнительных данных в таблицу.
+1. **Установка библиотеки LuaCrypto:**
+   (см. шаг 1 выше)
+
+2. **Шифрование и расшифрование с использованием AES:**
+
+```lua
+local crypto = require("crypto")
+
+-- Секретный ключ (должен быть согласован с другой системой)
+local key = "your_secret_key" -- Должен быть 16, 24 или 32 байта для AES
+
+-- Инициализационный вектор (IV)
+local iv = "your_iv_12345678" -- Должен быть 16 байт
+
+-- Пароль, который нужно зашифровать
+local password = "your_password"
+
+-- Шифрование пароля
+local encrypted_password = crypto.encrypt("aes-256-cbc", password, key, iv)
+
+-- Для передачи пароля в текстовом виде можно использовать base64
+local encrypted_password_base64 = crypto.b64(encrypted_password)
+
+print("Зашифрованный пароль: " .. encrypted_password_base64)
+
+-- Расшифрование пароля
+local decrypted_password = crypto.decrypt("aes-256-cbc", crypto.unb64(encrypted_password_base64), key, iv)
+
+print("Расшифрованный пароль: " .. decrypted_password)
+```
+
+Эти примеры демонстрируют основные методы шифрования и дешифрования паролей. Вы можете адаптировать их для своей конкретной системы и требований безопасности.

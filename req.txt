@@ -1,46 +1,19 @@
--- Функция для преобразования строки даты и времени в таблицу
-local function parseDateTime(dateTimeStr)
-    local year, month, day, hour, min, sec = dateTimeStr:match("(%d+)-(%d+)-(%d+) (%d+):(%d+):(%d+)")
-    return {
-        year = tonumber(year),
-        month = tonumber(month),
-        day = tonumber(day),
-        hour = tonumber(hour),
-        min = tonumber(min),
-        sec = tonumber(sec)
-    }
-end
+Вот несколько анекдотов про программистов на Lua:
 
--- Функция для сравнения двух таблиц даты и времени
-local function compareDateTimes(dt1, dt2)
-    if dt1.year ~= dt2.year then
-        return dt1.year < dt2.year
-    elseif dt1.month ~= dt2.month then
-        return dt1.month < dt2.month
-    elseif dt1.day ~= dt2.day then
-        return dt1.day < dt2.day
-    elseif dt1.hour ~= dt2.hour then
-        return dt1.hour < dt2.hour
-    elseif dt1.min ~= dt2.min then
-        return dt1.min < dt2.min
-    else
-        return dt1.sec < dt2.sec
-    end
-end
+1. — Как Lua-программист ловит рыбу? 
+   — Он пишет функцию `catchFish()`, вызывает её несколько раз и проверяет результат.
 
--- Даты и времена в формате строки
-local dateTimeStr1 = "2024-07-01 10:30:00"
-local dateTimeStr2 = "2024-07-01 15:45:00"
+2. — Почему Lua-программист не боится числа 13?
+   — Потому что для него это просто очередной индекс массива.
 
--- Преобразуем строки в таблицы
-local dateTime1 = parseDateTime(dateTimeStr1)
-local dateTime2 = parseDateTime(dateTimeStr2)
+3. Lua-программист приходит в ресторан и говорит официанту:
+   — Дайте мне переменную блюда, пожалуйста.
+   Официант: 
+   — Какое именно блюдо?
+   Программист:
+   — Не важно, главное, чтобы его можно было изменить на ходу.
 
--- Сравнение времени
-if compareDateTimes(dateTime1, dateTime2) then
-    print("dateTime1 меньше, чем dateTime2")
-elseif compareDateTimes(dateTime2, dateTime1) then
-    print("dateTime1 больше, чем dateTime2")
-else
-    print("dateTime1 и dateTime2 равны")
-end
+4. Почему Lua-программисты всегда радостные?
+   — Потому что у них никогда не бывает ошибок типов!
+
+Надеюсь, они поднимут настроение!

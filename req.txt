@@ -1,77 +1,43 @@
-Here's a simple and clean CSS style for your tables that enhances readability and aesthetics:
+В Angular, директива `*ngIf` используется для условного отображения элементов в шаблоне. Выражение внутри `*ngIf` должно быть булевым (true или false). Если значение выражения истинное, элемент будет отображаться, если ложное — не будет.
 
-```css
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 20px 0;
-  font-size: 18px;
-  text-align: left;
-}
+В вашем случае выражение `*ngIf="queryOptions['query-code'].orderAsc"` означает, что элемент будет отображаться только тогда, когда свойство `orderAsc` объекта, находящегося в `queryOptions['query-code']`, имеет значение true.
 
-table th, table td {
-  padding: 12px;
-  border: 1px solid #ddd;
-}
+Давайте разберем по частям:
 
-table th {
-  background-color: #f2f2f2;
-  color: #333;
-}
+1. **`queryOptions`** — это объект, который содержит другие объекты или данные.
+2. **`['query-code']`** — это доступ к свойству объекта `queryOptions` с ключом `'query-code'`.
+3. **`orderAsc`** — это свойство объекта `queryOptions['query-code']`, которое содержит булево значение (true или false).
 
-table tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
+Таким образом, `*ngIf="queryOptions['query-code'].orderAsc"` будет отображать элемент в шаблоне только тогда, когда `queryOptions['query-code'].orderAsc` равно true.
 
-table tr:hover {
-  background-color: #f1f1f1;
-}
-
-table caption {
-  margin-top: 10px;
-  font-size: 22px;
-  font-weight: bold;
-}
-```
-
-### How to use
-1. Add the above CSS code to your stylesheet.
-2. Apply the styles to your HTML tables. For example:
+Пример использования в шаблоне:
 
 ```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
-  <title>Styled Table</title>
-</head>
-<body>
-  <table>
-    <caption>Sample Table</caption>
-    <thead>
-      <tr>
-        <th>Header 1</th>
-        <th>Header 2</th>
-        <th>Header 3</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Data 1</td>
-        <td>Data 2</td>
-        <td>Data 3</td>
-      </tr>
-      <tr>
-        <td>Data 4</td>
-        <td>Data 5</td>
-        <td>Data 6</td>
-      </tr>
-    </tbody>
-  </table>
-</body>
-</html>
+<div *ngIf="queryOptions['query-code'].orderAsc">
+  Этот блок отображается только тогда, когда orderAsc равно true.
+</div>
 ```
 
-This will give your tables a clean, professional look.
+Для полного понимания предположим, что у вас есть компонент с классом, который содержит объект `queryOptions`:
+
+```typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-query-example',
+  template: `
+    <div *ngIf="queryOptions['query-code'].orderAsc">
+      Этот блок отображается только тогда, когда orderAsc равно true.
+    </div>
+  `
+})
+export class QueryExampleComponent {
+  queryOptions = {
+    'query-code': {
+      orderAsc: true
+    }
+  };
+}
+```
+
+В этом примере элемент `<div>` будет отображаться, потому что `queryOptions['query-code'].orderAsc` равно true. Если вы измените значение `orderAsc` на false, элемент перестанет отображаться.

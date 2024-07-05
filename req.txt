@@ -1,70 +1,31 @@
-В Angular, `<ng-template>` используется для определения шаблонов, которые могут быть динамически отображены в других частях вашего приложения. Когда вы видите атрибут `pTemplate="summary"`, это указывает на использование библиотеки PrimeNG, которая предоставляет мощные компоненты для Angular.
+В данном случае `<ng-template pTemplate="summary">` является частью шаблона, используемого в Angular, а точнее в библиотеке PrimeNG, которая предоставляет компоненты UI для Angular.
 
-Давайте разберем пример использования этого кода в контексте PrimeNG:
+1. **`<ng-template>`**: Это директива Angular, которая используется для объявления шаблонов. Эти шаблоны могут быть использованы в других местах, например, в других компонентах или директивах.
 
-### Шаги
+2. **`pTemplate`**: Это атрибут, который используется в компонентах PrimeNG для определения именованных шаблонов. В данном случае `pTemplate="summary"` означает, что этот шаблон будет использоваться как шаблон для отображения сводной информации (summary).
 
-1. **Определение шаблона с `<ng-template>`:**
-   Здесь вы определяете шаблон с идентификатором `summary`. Этот шаблон может быть использован компонентом PrimeNG, например, таблицей, чтобы отобразить сводную информацию.
+3. **`summary`**: Это имя шаблона, которое определяет, где именно в компоненте будет использоваться данный шаблон. Разные компоненты PrimeNG могут иметь разные именованные шаблоны для различных целей.
+
+Пример использования в компоненте PrimeNG может выглядеть следующим образом:
 
 ```html
-<p-table [value]="cars">
+<p-table [value]="data">
   <ng-template pTemplate="header">
     <tr>
-      <th>Brand</th>
-      <th>Year</th>
-      <th>Color</th>
+      <th>Header 1</th>
+      <th>Header 2</th>
     </tr>
   </ng-template>
-  
-  <ng-template pTemplate="body" let-car>
+  <ng-template pTemplate="body" let-rowData>
     <tr>
-      <td>{{car.brand}}</td>
-      <td>{{car.year}}</td>
-      <td>{{car.color}}</td>
+      <td>{{rowData.col1}}</td>
+      <td>{{rowData.col2}}</td>
     </tr>
   </ng-template>
-  
   <ng-template pTemplate="summary">
-    <div class="p-clearfix">
-      <span class="p-float-left">Total Cars: {{cars.length}}</span>
-    </div>
+    <div>Summary content here</div>
   </ng-template>
 </p-table>
 ```
 
-2. **Использование шаблона в компоненте PrimeNG:**
-   В этом примере `<p-table>` — это компонент PrimeNG для таблицы. Шаблон `summary` используется для отображения итоговой информации внизу таблицы.
-
-### Описание
-
-- `<p-table [value]="cars">` — компонент PrimeNG, который отображает таблицу с данными из массива `cars`.
-- `<ng-template pTemplate="header">` — определяет шаблон для заголовка таблицы.
-- `<ng-template pTemplate="body" let-car>` — определяет шаблон для тела таблицы, где `let-car` позволяет использовать текущий элемент массива `cars`.
-- `<ng-template pTemplate="summary">` — определяет шаблон для сводной информации в таблице, в данном случае отображая общее количество автомобилей.
-
-### Важно
-
-- **PrimeNG**: Для работы с шаблонами `pTemplate` необходимо, чтобы в вашем проекте была установлена библиотека PrimeNG.
-- **Связывание данных**: Убедитесь, что массив `cars` определен в вашем компоненте TypeScript.
-
-### Пример TypeScript кода
-
-```typescript
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
-})
-export class AppComponent {
-  cars = [
-    { brand: 'Toyota', year: 2015, color: 'Red' },
-    { brand: 'Honda', year: 2016, color: 'Blue' },
-    { brand: 'Ford', year: 2017, color: 'Black' }
-  ];
-}
-```
-
-Этот пример демонстрирует базовую интеграцию шаблонов с компонентами PrimeNG, используя `<ng-template>`. Таким образом, вы можете динамически отображать различные части пользовательского интерфейса, такие как сводная информация, с помощью шаблонов Angular и компонентов PrimeNG.
+В этом примере `<ng-template pTemplate="summary">` используется для определения содержимого сводки, которая будет отображаться в компоненте таблицы PrimeNG.

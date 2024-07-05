@@ -1,45 +1,65 @@
-Для сравнения даты с полем в `WHERE` в Oracle SQL можно использовать оператор `=` и различные функции для работы с датами. Вот несколько примеров:
+Если ваши данные имеют формат даты и времени, и вы хотите сравнить только дату, игнорируя время, вы можете использовать несколько способов. Вот правильные способы сделать это в Oracle SQL:
 
-1. **Сравнение конкретной даты с полем**:
-   
-   ```sql
-   SELECT *
-   FROM your_table
-   WHERE your_date_column = TO_DATE('2024-07-05', 'YYYY-MM-DD');
-   ```
-
-2. **Сравнение с текущей датой**:
+1. **Использование `TRUNC` для обрезки времени и сравнения только даты**:
 
    ```sql
    SELECT *
    FROM your_table
-   WHERE your_date_column = SYSDATE;
+   WHERE TRUNC(your_date_column) = TO_DATE('2024-06-28', 'YYYY-MM-DD');
    ```
 
-3. **Сравнение с диапазоном дат**:
+2. **Использование `TO_CHAR` для преобразования даты в строку и сравнения только даты**:
 
    ```sql
    SELECT *
    FROM your_table
-   WHERE your_date_column BETWEEN TO_DATE('2024-01-01', 'YYYY-MM-DD') AND TO_DATE('2024-12-31', 'YYYY-MM-DD');
+   WHERE TO_CHAR(your_date_column, 'YYYY-MM-DD') = '2024-06-28';
    ```
 
-4. **Сравнение с датой и временем**:
+3. **Использование диапазона для сравнения только даты**:
 
    ```sql
    SELECT *
    FROM your_table
-   WHERE your_date_column = TO_TIMESTAMP('2024-07-05 12:00:00', 'YYYY-MM-DD HH24:MI:SS');
+   WHERE your_date_column >= TO_DATE('2024-06-28', 'YYYY-MM-DD')
+     AND your_date_column < TO_DATE('2024-06-29', 'YYYY-MM-DD');
    ```
 
-5. **Использование функций для работы с датами**:
-   
+Пример данных:
+
+```sql
+CREATE TABLE your_table (
+    your_date_column TIMESTAMP
+);
+
+INSERT INTO your_table (your_date_column) VALUES (TO_TIMESTAMP('2024-06-28 16:34:30.000', 'YYYY-MM-DD HH24:MI:SS.FF'));
+```
+
+Теперь давайте проверим каждый запрос:
+
+1. **Использование `TRUNC`**:
+
    ```sql
    SELECT *
    FROM your_table
-   WHERE TRUNC(your_date_column) = TO_DATE('2024-07-05', 'YYYY-MM-DD');
+   WHERE TRUNC(your_date_column) = TO_DATE('2024-06-28', 'YYYY-MM-DD');
    ```
 
-   В этом примере используется функция `TRUNC` для обрезки времени у даты, чтобы сравнение происходило только по дате.
+2. **Использование `TO_CHAR`**:
 
-Если у вас есть более конкретный пример или требования, пожалуйста, уточните, и я предоставлю более детальную информацию.
+   ```sql
+   SELECT *
+   FROM your_table
+   WHERE TO_CHAR(your_date_column, 'YYYY-MM-DD') = '2024-06-28';
+   ```
+
+3. **Использование диапазона**:
+
+   ```sql
+   SELECT *
+   FROM your_table
+   WHERE your_date_column >= TO_DATE('2024-06-28', 'YYYY-MM-DD')
+     AND your_date_column < TO_DATE('2024-06-29', 'YYYY-MM-DD');
+   ```
+
+Каждый из этих запросов должен успешно вернуть строки, соответствующие только дате `2024-06-28`, независимо от времени.

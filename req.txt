@@ -1,65 +1,41 @@
-Если ваши данные имеют формат даты и времени, и вы хотите сравнить только дату, игнорируя время, вы можете использовать несколько способов. Вот правильные способы сделать это в Oracle SQL:
+Чтобы отобразить сообщение "Данных нет" в случае, если массив `queryRes` пустой, и чтобы `ngFor` работал, когда массив не пуст, вы можете использовать директиву Angular `*ngIf` вместе с `*ngFor`.
 
-1. **Использование `TRUNC` для обрезки времени и сравнения только даты**:
+Вот пример, как это можно сделать:
 
-   ```sql
-   SELECT *
-   FROM your_table
-   WHERE TRUNC(your_date_column) = TO_DATE('2024-06-28', 'YYYY-MM-DD');
-   ```
-
-2. **Использование `TO_CHAR` для преобразования даты в строку и сравнения только даты**:
-
-   ```sql
-   SELECT *
-   FROM your_table
-   WHERE TO_CHAR(your_date_column, 'YYYY-MM-DD') = '2024-06-28';
-   ```
-
-3. **Использование диапазона для сравнения только даты**:
-
-   ```sql
-   SELECT *
-   FROM your_table
-   WHERE your_date_column >= TO_DATE('2024-06-28', 'YYYY-MM-DD')
-     AND your_date_column < TO_DATE('2024-06-29', 'YYYY-MM-DD');
-   ```
-
-Пример данных:
-
-```sql
-CREATE TABLE your_table (
-    your_date_column TIMESTAMP
-);
-
-INSERT INTO your_table (your_date_column) VALUES (TO_TIMESTAMP('2024-06-28 16:34:30.000', 'YYYY-MM-DD HH24:MI:SS.FF'));
+```html
+<table>
+  <tr *ngIf="queryRes.length === 0">
+    <td colspan="number_of_columns">Данных нет</td>
+  </tr>
+  <tr *ngFor="let row of queryRes">
+    <!-- Строки вашей таблицы с данными -->
+    <td>{{ row.field1 }}</td>
+    <td>{{ row.field2 }}</td>
+    <!-- Другие поля -->
+  </tr>
+</table>
 ```
 
-Теперь давайте проверим каждый запрос:
+В этом примере, если массив `queryRes` пустой (т.е. `queryRes.length === 0`), будет отображена строка с сообщением "Данных нет". Если массив не пустой, строки с данными будут отображены с помощью `ngFor`.
 
-1. **Использование `TRUNC`**:
+Если вы хотите иметь более точный контроль и избежать отображения пустой строки в таблице, можно использовать контейнеры, такие как `<ng-container>`:
 
-   ```sql
-   SELECT *
-   FROM your_table
-   WHERE TRUNC(your_date_column) = TO_DATE('2024-06-28', 'YYYY-MM-DD');
-   ```
+```html
+<table>
+  <ng-container *ngIf="queryRes.length > 0; else noData">
+    <tr *ngFor="let row of queryRes">
+      <!-- Строки вашей таблицы с данными -->
+      <td>{{ row.field1 }}</td>
+      <td>{{ row.field2 }}</td>
+      <!-- Другие поля -->
+    </tr>
+  </ng-container>
+  <ng-template #noData>
+    <tr>
+      <td colspan="number_of_columns">Данных нет</td>
+    </tr>
+  </ng-template>
+</table>
+```
 
-2. **Использование `TO_CHAR`**:
-
-   ```sql
-   SELECT *
-   FROM your_table
-   WHERE TO_CHAR(your_date_column, 'YYYY-MM-DD') = '2024-06-28';
-   ```
-
-3. **Использование диапазона**:
-
-   ```sql
-   SELECT *
-   FROM your_table
-   WHERE your_date_column >= TO_DATE('2024-06-28', 'YYYY-MM-DD')
-     AND your_date_column < TO_DATE('2024-06-29', 'YYYY-MM-DD');
-   ```
-
-Каждый из этих запросов должен успешно вернуть строки, соответствующие только дате `2024-06-28`, независимо от времени.
+В этом примере, если `queryRes` пустой, будет использован шаблон `noData`, который отображает сообщение "Данных нет". Если `queryRes` не пустой, `ngFor` будет отображать строки с данными.

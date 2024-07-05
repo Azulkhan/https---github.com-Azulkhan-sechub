@@ -1,19 +1,71 @@
-эЕсли `Mydatas` изначально пустое, можно добавить проверку на наличие элементов в массиве перед тем, как использовать `slice`. Это позволит избежать ошибок, когда массив пустой.
+Для реализации пагинации в Angular вы можете использовать разные подходы, включая написание собственного решения или использование существующих библиотек, таких как `ngx-pagination`. Вот пример реализации простого решения для пагинации:
 
-Пример:
+1. **В компоненте TypeScript:**
 
-```html
-<ng-container *ngIf="fields['Mydatas'] && fields['Mydatas'].length > 3">
-  <ng-container *ngFor="let field of fields['Mydatas'].slice(0, fields['Mydatas'].length - 3); let index = index">
-    <!-- Ваш код для отображения каждого field -->
-  </ng-container>
-</ng-container>
+```typescript
+import { Component } from '@angular/core';
 
-<ng-container *ngIf="fields['Mydatas'] && fields['Mydatas'].length >= 3">
-  <ng-container *ngFor="let field of fields['Mydatas'].slice(-3); let index = index">
-    <!-- Ваш код для отображения каждого field -->
-  </ng-container>
-</ng-container>
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  fields = {
+    'Mydatas': [] // Ваши данные
+  };
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
+
+  get paginatedFields() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.fields['Mydatas'].slice(startIndex, endIndex);
+  }
+
+  totalPages() {
+    return Math.ceil(this.fields['Mydatas'].length / this.itemsPerPage);
+  }
+
+  changePage(page: number) {
+    this.currentPage = page;
+  }
+}
 ```
 
-Эти проверки гарантируют, что код внутри `*ngFor` будет выполняться только в том случае, если массив `Mydatas` существует и содержит достаточно элементов.
+2. **В шаблоне HTML:**
+
+```html
+<div *ngIf="fields['Mydatas'] && fields['Mydatas'].length">
+  <ng-container *ngFor="let field of paginatedFields; let index = index">
+    <!-- Ваш код для отображения каждого field -->
+  </ng-container>
+
+  <div class="pagination">
+    <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+    <button *ngFor="let page of [].constructor(totalPages()); let pageIndex = index"
+            (click)="changePage(pageIndex + 1)"
+            [disabled]="currentPage === (pageIndex + 1)">
+      {{ pageIndex + 1 }}
+    </button>
+    <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages()">Next</button>
+  </div>
+</div>
+```
+
+3. **CSS (необязательно, для стилей пагинации):**
+
+```css
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  margin: 0 5px;
+  padding: 5px 10px;
+}
+```
+
+Этот пример создает простую систему пагинации. Функция `paginatedFields` возвращает текущий набор данных на основе текущей страницы и количества элементов на странице. Кнопки пагинации позволяют пользователю переходить между страницами.

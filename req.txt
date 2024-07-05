@@ -1,25 +1,19 @@
-Для того чтобы исключить последние три значения при итерации через массив в Angular, можно изменить условие в директиве `*ngFor`. Используйте метод `slice` для создания нового массива, исключив последние три элемента.
+эЕсли `Mydatas` изначально пустое, можно добавить проверку на наличие элементов в массиве перед тем, как использовать `slice`. Это позволит избежать ошибок, когда массив пустой.
 
 Пример:
 
 ```html
-<ng-container *ngFor="let field of fields['Mydatas'].slice(0, fields['Mydatas'].length - 3); let index = index">
-  <!-- Ваш код для отображения каждого field -->
+<ng-container *ngIf="fields['Mydatas'] && fields['Mydatas'].length > 3">
+  <ng-container *ngFor="let field of fields['Mydatas'].slice(0, fields['Mydatas'].length - 3); let index = index">
+    <!-- Ваш код для отображения каждого field -->
+  </ng-container>
+</ng-container>
+
+<ng-container *ngIf="fields['Mydatas'] && fields['Mydatas'].length >= 3">
+  <ng-container *ngFor="let field of fields['Mydatas'].slice(-3); let index = index">
+    <!-- Ваш код для отображения каждого field -->
+  </ng-container>
 </ng-container>
 ```
 
-Этот подход создает подмассив, который начинается с начала массива и заканчивается тремя элементами раньше, чем конец оригинального массива.
-
-
-
-Чтобы взять только последние три значения из массива в Angular, также можно использовать метод `slice`.
-
-Пример:
-
-```html
-<ng-container *ngFor="let field of fields['Mydatas'].slice(-3); let index = index">
-  <!-- Ваш код для отображения каждого field -->
-</ng-container>
-```
-
-Метод `slice(-3)` создаст подмассив, который содержит только последние три элемента оригинального массива.
+Эти проверки гарантируют, что код внутри `*ngFor` будет выполняться только в том случае, если массив `Mydatas` существует и содержит достаточно элементов.

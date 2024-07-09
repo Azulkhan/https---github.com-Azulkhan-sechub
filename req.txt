@@ -1,69 +1,55 @@
-В Angular для создания пагинации обычно используют сторонние библиотеки, такие как ngx-pagination, или реализуют её вручную. Вот пример, как можно использовать библиотеку ngx-pagination для добавления пагинации в ваше Angular приложение:
+Если у вас уже настроена таблица и на других страницах уже работает пагинация с использованием `ngx-pagination`, то интеграция пагинации в вашу таблицу не должна быть сложной. Давайте рассмотрим, как это сделать.
 
-1. **Установите ngx-pagination**:
+Предположим, у вас есть таблица в шаблоне компонента (`table.component.html`) и массив данных в классе компонента (`table.component.ts`).
 
-   В командной строке выполните следующую команду:
-   ```bash
-   npm install ngx-pagination --save
+1. **Шаблон компонента (table.component.html)**:
+
+   ```html
+   <table>
+     <thead>
+       <tr>
+         <th>Column 1</th>
+         <th>Column 2</th>
+         <!-- другие колонки -->
+       </tr>
+     </thead>
+     <tbody>
+       <tr *ngFor="let item of items | paginate: { itemsPerPage: 10, currentPage: p }">
+         <td>{{ item.column1 }}</td>
+         <td>{{ item.column2 }}</td>
+         <!-- другие данные -->
+       </tr>
+     </tbody>
+   </table>
+
+   <pagination-controls (pageChange)="p = $event"></pagination-controls>
    ```
 
-2. **Импортируйте NgxPaginationModule в ваш модуль**:
-
-   Откройте файл модуля (например, `app.module.ts`) и добавьте импорт:
-   ```typescript
-   import { NgxPaginationModule } from 'ngx-pagination';
-
-   @NgModule({
-     declarations: [
-       // ваши компоненты
-     ],
-     imports: [
-       // другие модули
-       NgxPaginationModule
-     ],
-     providers: [],
-     bootstrap: [AppComponent]
-   })
-   export class AppModule { }
-   ```
-
-3. **Используйте ngx-pagination в вашем компоненте**:
-
-   В компоненте, где вы хотите использовать пагинацию, настройте данные и логику. Например, предположим, что у вас есть компонент `items.component.ts`:
+2. **Класс компонента (table.component.ts)**:
 
    ```typescript
-   import { Component } from '@angular/core';
+   import { Component, OnInit } from '@angular/core';
 
    @Component({
-     selector: 'app-items',
-     templateUrl: './items.component.html',
-     styleUrls: ['./items.component.css']
+     selector: 'app-table',
+     templateUrl: './table.component.html',
+     styleUrls: ['./table.component.css']
    })
-   export class ItemsComponent {
-     items = []; // массив ваших данных
-     p: number = 1; // текущая страница
-     
-     constructor() {
-       // инициализация данных
-       for (let i = 1; i <= 100; i++) {
-         this.items.push(`Item ${i}`);
-       }
+   export class TableComponent implements OnInit {
+     items: any[] = [];
+     p: number = 1;
+
+     ngOnInit() {
+       // Инициализация данных
+       this.items = [
+         { column1: 'Data 1', column2: 'Data 2' },
+         { column1: 'Data 3', column2: 'Data 4' },
+         // другие данные
+       ];
      }
    }
    ```
 
-4. **Добавьте пагинацию в шаблон**:
+В этом примере `items` — это массив данных для вашей таблицы. `p` — это переменная, которая хранит текущую страницу. Используя пайп `paginate`, вы можете указать, сколько элементов должно отображаться на одной странице с помощью параметра `itemsPerPage`.
 
-   В файле шаблона вашего компонента (например, `items.component.html`), добавьте следующий код:
-
-   ```html
-   <ul>
-     <li *ngFor="let item of items | paginate: { itemsPerPage: 10, currentPage: p }">{{ item }}</li>
-   </ul>
-   
-   <pagination-controls (pageChange)="p = $event"></pagination-controls>
-   ```
-
-   В этом примере `itemsPerPage` определяет количество элементов на одной странице, а `currentPage` указывает текущую страницу.
-
-Вот и всё! Теперь у вас должна работать пагинация в вашем Angular приложении. Вы можете настроить параметры пагинации, такие как количество элементов на странице и текущую страницу, в соответствии с вашими требованиями.
+Если на других страницах у вас уже используется `ngx-pagination`, то этот код должен быть вам знаком и легко адаптируем. Основная идея состоит в том, чтобы обернуть ваш `*ngFor` директивой `paginate` и добавить компонент `pagination-controls` для управления пагинацией.

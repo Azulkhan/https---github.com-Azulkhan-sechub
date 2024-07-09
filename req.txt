@@ -1,29 +1,69 @@
-В `p-table` из PrimeNG атрибут `[value]` используется для передачи данных, которые вы хотите отобразить в таблице. Вместо `data` вам нужно передать переменную из вашего компонента Angular, которая содержит массив объектов, которые вы хотите отобразить в таблице.
+В Angular для создания пагинации обычно используют сторонние библиотеки, такие как ngx-pagination, или реализуют её вручную. Вот пример, как можно использовать библиотеку ngx-pagination для добавления пагинации в ваше Angular приложение:
 
-Например, если у вас есть компонент Angular с массивом данных `tableData`, вы можете использовать его так:
+1. **Установите ngx-pagination**:
 
-```html
-<p-table [value]="tableData">
-  <!-- Здесь идут шаблоны заголовка, тела и подвала -->
-</p-table>
-```
+   В командной строке выполните следующую команду:
+   ```bash
+   npm install ngx-pagination --save
+   ```
 
-В вашем компоненте TypeScript (`app.component.ts`) вы должны иметь что-то подобное:
+2. **Импортируйте NgxPaginationModule в ваш модуль**:
 
-```typescript
-import { Component } from '@angular/core';
+   Откройте файл модуля (например, `app.module.ts`) и добавьте импорт:
+   ```typescript
+   import { NgxPaginationModule } from 'ngx-pagination';
 
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html'
-})
-export class AppComponent {
-  tableData = [
-    { id: 1, name: 'Item 1', price: 100 },
-    { id: 2, name: 'Item 2', price: 150 },
-    { id: 3, name: 'Item 3', price: 200 }
-  ];
-}
-```
+   @NgModule({
+     declarations: [
+       // ваши компоненты
+     ],
+     imports: [
+       // другие модули
+       NgxPaginationModule
+     ],
+     providers: [],
+     bootstrap: [AppComponent]
+   })
+   export class AppModule { }
+   ```
 
-Здесь `tableData` является массивом объектов, каждый из которых представляет одну строку данных в таблице. Вы можете использовать любое имя для вашей переменной, важно лишь, чтобы она содержала корректные данные для отображения в `p-table`.
+3. **Используйте ngx-pagination в вашем компоненте**:
+
+   В компоненте, где вы хотите использовать пагинацию, настройте данные и логику. Например, предположим, что у вас есть компонент `items.component.ts`:
+
+   ```typescript
+   import { Component } from '@angular/core';
+
+   @Component({
+     selector: 'app-items',
+     templateUrl: './items.component.html',
+     styleUrls: ['./items.component.css']
+   })
+   export class ItemsComponent {
+     items = []; // массив ваших данных
+     p: number = 1; // текущая страница
+     
+     constructor() {
+       // инициализация данных
+       for (let i = 1; i <= 100; i++) {
+         this.items.push(`Item ${i}`);
+       }
+     }
+   }
+   ```
+
+4. **Добавьте пагинацию в шаблон**:
+
+   В файле шаблона вашего компонента (например, `items.component.html`), добавьте следующий код:
+
+   ```html
+   <ul>
+     <li *ngFor="let item of items | paginate: { itemsPerPage: 10, currentPage: p }">{{ item }}</li>
+   </ul>
+   
+   <pagination-controls (pageChange)="p = $event"></pagination-controls>
+   ```
+
+   В этом примере `itemsPerPage` определяет количество элементов на одной странице, а `currentPage` указывает текущую страницу.
+
+Вот и всё! Теперь у вас должна работать пагинация в вашем Angular приложении. Вы можете настроить параметры пагинации, такие как количество элементов на странице и текущую страницу, в соответствии с вашими требованиями.

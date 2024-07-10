@@ -1,55 +1,86 @@
-Если у вас уже настроена таблица и на других страницах уже работает пагинация с использованием `ngx-pagination`, то интеграция пагинации в вашу таблицу не должна быть сложной. Давайте рассмотрим, как это сделать.
+Для переписывания таблицы на p-table (из библиотеки PrimeNG) в Angular, следуйте этим шагам:
 
-Предположим, у вас есть таблица в шаблоне компонента (`table.component.html`) и массив данных в классе компонента (`table.component.ts`).
+Установите PrimeNG и PrimeIcons:
 
-1. **Шаблон компонента (table.component.html)**:
+bash
+Копировать код
+npm install primeng primeicons
+Импортируйте необходимые модули в ваш Angular модуль:
 
-   ```html
-   <table>
-     <thead>
-       <tr>
-         <th>Column 1</th>
-         <th>Column 2</th>
-         <!-- другие колонки -->
-       </tr>
-     </thead>
-     <tbody>
-       <tr *ngFor="let item of items | paginate: { itemsPerPage: 10, currentPage: p }">
-         <td>{{ item.column1 }}</td>
-         <td>{{ item.column2 }}</td>
-         <!-- другие данные -->
-       </tr>
-     </tbody>
-   </table>
+В app.module.ts импортируйте TableModule и любой другой необходимый модуль:
 
-   <pagination-controls (pageChange)="p = $event"></pagination-controls>
-   ```
+typescript
+Копировать код
+import { TableModule } from 'primeng/table';
 
-2. **Класс компонента (table.component.ts)**:
+@NgModule({
+  declarations: [
+    // ваши компоненты
+  ],
+  imports: [
+    // другие модули
+    TableModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+Обновите ваш компонент для использования p-table:
 
-   ```typescript
-   import { Component, OnInit } from '@angular/core';
+Замените ваш HTML код для таблицы на p-table. Например:
 
-   @Component({
-     selector: 'app-table',
-     templateUrl: './table.component.html',
-     styleUrls: ['./table.component.css']
-   })
-   export class TableComponent implements OnInit {
-     items: any[] = [];
-     p: number = 1;
+До (используя стандартный HTML table):
 
-     ngOnInit() {
-       // Инициализация данных
-       this.items = [
-         { column1: 'Data 1', column2: 'Data 2' },
-         { column1: 'Data 3', column2: 'Data 4' },
-         // другие данные
-       ];
-     }
-   }
-   ```
+html
+Копировать код
+<table>
+  <thead>
+    <tr>
+      <th>Имя</th>
+      <th>Возраст</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of items">
+      <td>{{ item.name }}</td>
+      <td>{{ item.age }}</td>
+    </tr>
+  </tbody>
+</table>
+После (используя PrimeNG p-table):
 
-В этом примере `items` — это массив данных для вашей таблицы. `p` — это переменная, которая хранит текущую страницу. Используя пайп `paginate`, вы можете указать, сколько элементов должно отображаться на одной странице с помощью параметра `itemsPerPage`.
+html
+Копировать код
+<p-table [value]="items">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Имя</th>
+      <th>Возраст</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-item>
+    <tr>
+      <td>{{ item.name }}</td>
+      <td>{{ item.age }}</td>
+    </tr>
+  </ng-template>
+</p-table>
+Настройте стили:
 
-Если на других страницах у вас уже используется `ngx-pagination`, то этот код должен быть вам знаком и легко адаптируем. Основная идея состоит в том, чтобы обернуть ваш `*ngFor` директивой `paginate` и добавить компонент `pagination-controls` для управления пагинацией.
+Убедитесь, что вы добавили стили PrimeNG в ваш проект. Включите их в ваш angular.json:
+
+json
+Копировать код
+"styles": [
+  "node_modules/primeng/resources/themes/saga-blue/theme.css",
+  "node_modules/primeng/resources/primeng.min.css",
+  "node_modules/primeicons/primeicons.css",
+  "src/styles.css"
+]
+Теперь ваша таблица будет использовать компоненты PrimeNG p-table, предоставляя дополнительные возможности и стилизацию.
+
+
+
+
+
+

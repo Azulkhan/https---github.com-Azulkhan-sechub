@@ -1,85 +1,26 @@
-Для того чтобы ваш компонент пагинации работал корректно, вам нужно создать Angular класс, который будет управлять состоянием пагинации и обработкой событий. Вот пример такого класса:
+В Go шаблонах (Go templates) используется цикл range для перебора элементов коллекции, такой как массив или карта (map). Если у вас есть коллекция items и вы хотите получить только одно значение, можно воспользоваться условием или задать конкретный ключ для получения нужного элемента. Например:
 
-```typescript
-import { Component } from '@angular/core';
+1. Если вы хотите отобразить одно значение, которое соответствует определенному условию:
+go
+Копировать код
+{{ range $item_key, $item_value := .items }}
+  {{ if eq $item_key "desiredKey" }}
+    {{ $item_value }}
+  {{ end }}
+{{ end }}
+2. Если вы хотите отобразить элемент с конкретным индексом (например, первый элемент):
+go
+Копировать код
+{{ range $index, $element := .items }}
+  {{ if eq $index 0 }}
+    {{ $element }}
+  {{ end }}
+{{ end }}
+3. Если вам нужно получить конкретное значение по ключу:
+Если у вас есть карта (map), можно обратиться к конкретному ключу напрямую без использования цикла range:
 
-@Component({
-  selector: 'app-pagination-demo',
-  templateUrl: './pagination-demo.component.html',
-  styleUrls: ['./pagination-demo.component.css']
-})
-export class PaginationDemoComponent {
-  // Общее количество элементов
-  allCount: number = 100; // Пример значения, может быть получено из API
-
-  // Опции для запроса, включающие текущую страницу и количество элементов на странице
-  query_options = {
-    page: 1,
-    perpage: 10
-  };
-
-  // Варианты значений для элементов на странице
-  perpage_vars = [10, 20, 50];
-
-  // Обработка события изменения страницы
-  changePage(event: any) {
-    this.query_options.page = event;
-    this.loadData(); // Метод для загрузки данных
-  }
-
-  // Обработка события изменения количества элементов на странице
-  changePerPage(event: any) {
-    this.query_options.perpage = event;
-    this.query_options.page = 1; // Сбрасываем на первую страницу при изменении количества элементов на странице
-    this.loadData(); // Метод для загрузки данных
-  }
-
-  // Метод для загрузки данных
-  loadData() {
-    // Ваша логика для загрузки данных, возможно, с использованием сервиса и API
-    console.log(`Загружаем данные для страницы ${this.query_options.page} с ${this.query_options.perpage} элементами на странице`);
-  }
-}
-```
-
-В шаблоне (`pagination-demo.component.html`) вы можете использовать ваш компонент пагинации следующим образом:
-
-```html
-<pagination
-  [perpage-vars]="perpage_vars"
-  [row-count]="allCount"
-  [page]="query_options.page"
-  [perpage]="query_options.perpage"
-  [show-gotopage]="false"
-  [show_perpage]="true"
-  (pageCghanged)="changePage($event)"
-  (perPageChanged)="changePerPage($event)"
-  [siza]="'lg'">
-</pagination>
-```
-
-Убедитесь, что вы импортировали и зарегистрировали компонент пагинации в вашем модуле:
-
-```typescript
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { AppComponent } from './app.component';
-import { PaginationDemoComponent } from './pagination-demo/pagination-demo.component';
-import { PaginationComponent } from './pagination/pagination.component'; // Ваш компонент пагинации
-
-@NgModule({
-  declarations: [
-    AppComponent,
-    PaginationDemoComponent,
-    PaginationComponent // Добавьте сюда ваш компонент пагинации
-  ],
-  imports: [
-    BrowserModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
-export class AppModule { }
-```
-
-Этот пример должен дать вам базовую структуру для реализации пагинации в вашем Angular приложении. Вы можете адаптировать его в зависимости от специфики вашего проекта.
+go
+Копировать код
+{{ $desiredValue := index .items "desiredKey" }}
+{{ $desiredValue }}
+Эти примеры показывают, как можно извлечь одно значение из коллекции items в Go шаблонах. В зависимости от того, как организованы ваши данные и какое значение вам нужно получить, можно выбрать подходящий способ.

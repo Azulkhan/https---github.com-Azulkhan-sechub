@@ -1,30 +1,85 @@
-Ваш тег `<pagination>` в Angular представляет собой компонент для управления пагинацией (разбивкой данных на страницы). Давайте разберем каждый атрибут и поймем, как он работает:
+Для того чтобы ваш компонент пагинации работал корректно, вам нужно создать Angular класс, который будет управлять состоянием пагинации и обработкой событий. Вот пример такого класса:
 
-1. **`[perpage-vars]="perpage_vars"`**:
-   - Передает в компонент массив возможных значений для количества элементов на странице. Например, `[10, 20, 50]`, чтобы пользователь мог выбрать, сколько элементов отображать на одной странице.
+```typescript
+import { Component } from '@angular/core';
 
-2. **`[row-count]="table?.allCount"`**:
-   - Передает общее количество элементов, которые нужно разбить на страницы. Здесь используется безопасная навигация (`?.`), чтобы избежать ошибок, если `table` не определен.
+@Component({
+  selector: 'app-pagination-demo',
+  templateUrl: './pagination-demo.component.html',
+  styleUrls: ['./pagination-demo.component.css']
+})
+export class PaginationDemoComponent {
+  // Общее количество элементов
+  allCount: number = 100; // Пример значения, может быть получено из API
 
-3. **`[page]="query_options.page"`**:
-   - Передает текущую страницу, на которой находится пользователь. Это значение используется для определения, какие элементы отображать на текущей странице.
+  // Опции для запроса, включающие текущую страницу и количество элементов на странице
+  query_options = {
+    page: 1,
+    perpage: 10
+  };
 
-4. **`[perpage]="query_options.perpage"`**:
-   - Передает текущее количество элементов, отображаемых на одной странице. Это значение может изменяться пользователем через интерфейс.
+  // Варианты значений для элементов на странице
+  perpage_vars = [10, 20, 50];
 
-5. **`[show-gotopage]="false"`**:
-   - Определяет, показывать ли в интерфейсе элемент для перехода к определенной странице (здесь установлено значение `false`, то есть не показывать).
+  // Обработка события изменения страницы
+  changePage(event: any) {
+    this.query_options.page = event;
+    this.loadData(); // Метод для загрузки данных
+  }
 
-6. **`[show_perpage]="true"`**:
-   - Определяет, показывать ли в интерфейсе элемент для выбора количества элементов на странице (здесь установлено значение `true`, то есть показывать).
+  // Обработка события изменения количества элементов на странице
+  changePerPage(event: any) {
+    this.query_options.perpage = event;
+    this.query_options.page = 1; // Сбрасываем на первую страницу при изменении количества элементов на странице
+    this.loadData(); // Метод для загрузки данных
+  }
 
-7. **`(pageCghanged)="changePage($event)"`**:
-   - Событие, которое вызывается при изменении текущей страницы. Функция `changePage($event)` обрабатывает это событие и обновляет состояние компонента или приложения.
+  // Метод для загрузки данных
+  loadData() {
+    // Ваша логика для загрузки данных, возможно, с использованием сервиса и API
+    console.log(`Загружаем данные для страницы ${this.query_options.page} с ${this.query_options.perpage} элементами на странице`);
+  }
+}
+```
 
-8. **`(perPageChanged)="changePerPage($event)"`**:
-   - Событие, которое вызывается при изменении количества элементов на странице. Функция `changePerPage($event)` обрабатывает это событие и обновляет состояние компонента или приложения.
+В шаблоне (`pagination-demo.component.html`) вы можете использовать ваш компонент пагинации следующим образом:
 
-9. **`[siza]="lg"`**:
-   - Параметр, который может задавать размер компонента (в данном случае значение `lg` может означать "large" - большой).
+```html
+<pagination
+  [perpage-vars]="perpage_vars"
+  [row-count]="allCount"
+  [page]="query_options.page"
+  [perpage]="query_options.perpage"
+  [show-gotopage]="false"
+  [show_perpage]="true"
+  (pageCghanged)="changePage($event)"
+  (perPageChanged)="changePerPage($event)"
+  [siza]="'lg'">
+</pagination>
+```
 
-Таким образом, этот компонент пагинации взаимодействует с вашим приложением, позволяя пользователям переключаться между страницами данных и выбирать количество элементов, отображаемых на каждой странице. События `pageCghanged` и `perPageChanged` помогают синхронизировать состояние компонента с состоянием вашего приложения.
+Убедитесь, что вы импортировали и зарегистрировали компонент пагинации в вашем модуле:
+
+```typescript
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppComponent } from './app.component';
+import { PaginationDemoComponent } from './pagination-demo/pagination-demo.component';
+import { PaginationComponent } from './pagination/pagination.component'; // Ваш компонент пагинации
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    PaginationDemoComponent,
+    PaginationComponent // Добавьте сюда ваш компонент пагинации
+  ],
+  imports: [
+    BrowserModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+Этот пример должен дать вам базовую структуру для реализации пагинации в вашем Angular приложении. Вы можете адаптировать его в зависимости от специфики вашего проекта.

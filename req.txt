@@ -1,18 +1,7 @@
-<table style="width: 100%; border-collapse: collapse;">
-  <thead style="background-color: lightgrey;">
-    <tr>
-      <th style="border: 1px solid black; padding: 8px; text-align: left;">Заголовок 1</th>
-      <th style="border: 1px solid black; padding: 8px; text-align: left;">Заголовок 2</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="border: 1px solid black; padding: 8px; text-align: left;">Ячейка 1</td>
-      <td style="border: 1px solid black; padding: 8px; text-align: left;">Ячейка 2</td>
-    </tr>
-    <tr>
-      <td style="border: 1px solid black; padding: 8px; text-align: left;">Ячейка 3</td>
-      <td style="border: 1px solid black; padding: 8px; text-align: left;">Ячейка 4</td>
-    </tr>
-  </tbody>
-</table>
+Для добавления апострофа в начале значения переменной `sap_barcode` в шаблоне, можно использовать функцию `printf` для форматирования строки. Например:
+
+```lua
+{{ printf "'%s'" (index $item_value "sap_barcode") }}
+```
+
+Этот код добавит апостроф перед значением переменной `sap_barcode`.

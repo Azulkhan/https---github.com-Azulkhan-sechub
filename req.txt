@@ -1,21 +1,18 @@
-<table border="1">
-  <tr style="background-color: lightgrey;">
-    <td style="background-color: grey; color: white;">Ячейка 1</td>
-    <td>Ячейка 2</td>
-  </tr>
-  <tr style="background-color: lightgrey;">
-    <td>Ячейка 3</td>
-    <td>Ячейка 4</td>
-  </tr>
-</table>
-
-<table border="1">
-  <tr>
-    <td>Ячейка 1</td>
-    <td>Ячейка 2</td>
-  </tr>
-  <tr>
-    <td>Ячейка 3</td>
-    <td>Ячейка 4</td>
-  </tr>
+<table style="width: 100%; border-collapse: collapse;">
+  <thead style="background-color: lightgrey;">
+    <tr>
+      <th style="border: 1px solid black; padding: 8px; text-align: left;">Заголовок 1</th>
+      <th style="border: 1px solid black; padding: 8px; text-align: left;">Заголовок 2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="border: 1px solid black; padding: 8px; text-align: left;">Ячейка 1</td>
+      <td style="border: 1px solid black; padding: 8px; text-align: left;">Ячейка 2</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black; padding: 8px; text-align: left;">Ячейка 3</td>
+      <td style="border: 1px solid black; padding: 8px; text-align: left;">Ячейка 4</td>
+    </tr>
+  </tbody>
 </table>

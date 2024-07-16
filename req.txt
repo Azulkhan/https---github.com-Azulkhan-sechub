@@ -1,32 +1,69 @@
-В контексте Angular и TypeScript использование `this.` перед переменной указывает на то, что переменная или объект являются свойством текущего экземпляра класса.
+В Angular, самая простая функция может быть написана внутри класса компонента. Например, давайте создадим компонент и добавим в него простую функцию.
 
-Когда вы видите `this.query_options`, это означает, что `query_options` является свойством объекта, который представляет экземпляр класса. Использование `this.` помогает явно указать, что вы работаете с переменной, принадлежащей текущему объекту (или классу), а не с локальной переменной или глобальной переменной.
+### Создание компонента
 
-Пример класса в TypeScript с использованием `this.`:
+1. Сначала создадим компонент, если у вас его еще нет. Используем Angular CLI:
+   ```bash
+   ng generate component my-simple-component
+   ```
+
+### Добавление простой функции в компонент
+
+2. Откройте файл компонента `my-simple-component.component.ts` и добавьте туда простую функцию.
 
 ```typescript
-class MyComponent {
-  query_options: any;
+import { Component } from '@angular/core';
 
-  constructor() {
-    // Инициализация свойства объекта query_options
-    this.query_options = {
-      flt: {}
-    };
-  }
-
-  updateQueryOptions(item: { alias: string, value: any }) {
-    // Используем this. чтобы обратиться к свойству объекта query_options
-    this.query_options.flt[item.alias] = item.value;
+@Component({
+  selector: 'app-my-simple-component',
+  templateUrl: './my-simple-component.component.html',
+  styleUrls: ['./my-simple-component.component.css']
+})
+export class MySimpleComponent {
+  
+  // Пример простой функции
+  mySimpleFunction(): void {
+    console.log('Hello, Angular!');
   }
 }
-
-// Создание экземпляра класса
-const component = new MyComponent();
-component.updateQueryOptions({ alias: 'name', value: 'John' });
-
-console.log(component.query_options);
-// Output: { flt: { name: 'John' } }
 ```
 
-В этом примере `query_options` является свойством класса `MyComponent`, и `this.query_options` используется для обращения к этому свойству внутри методов класса.
+### Использование функции в шаблоне компонента
+
+3. Чтобы вызвать эту функцию из шаблона, обновите файл шаблона `my-simple-component.component.html`:
+
+```html
+<button (click)="mySimpleFunction()">Click me</button>
+```
+
+### Полный пример
+
+#### `my-simple-component.component.ts`
+```typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-my-simple-component',
+  templateUrl: './my-simple-component.component.html',
+  styleUrls: ['./my-simple-component.component.css']
+})
+export class MySimpleComponent {
+  
+  // Пример простой функции
+  mySimpleFunction(): void {
+    console.log('Hello, Angular!');
+  }
+}
+```
+
+#### `my-simple-component.component.html`
+```html
+<button (click)="mySimpleFunction()">Click me</button>
+```
+
+### Пояснения
+
+- `mySimpleFunction(): void` – это простая функция, которая не принимает параметров и не возвращает значения (тип `void`). Она просто выводит сообщение в консоль.
+- `(click)="mySimpleFunction()"` – это синтаксис Angular для привязки события клика на кнопку к функции `mySimpleFunction`.
+
+Когда вы нажмете на кнопку, функция `mySimpleFunction` будет вызвана, и в консоль выведется сообщение "Hello, Angular!".

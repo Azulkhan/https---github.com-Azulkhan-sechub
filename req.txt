@@ -20,3 +20,37 @@ console.log(this.query_options);
 ```
 
 Таким образом, если `item.alias` равно `'name'`, а `item.value` равно `'John'`, то строка `this.query_options.flt[item.alias] = item.value;` создаст или обновит свойство `name` в объекте `flt`, присвоив ему значение `'John'`.
+
+
+В контексте Angular и TypeScript использование `this.` перед переменной указывает на то, что переменная или объект являются свойством текущего экземпляра класса.
+
+Когда вы видите `this.query_options`, это означает, что `query_options` является свойством объекта, который представляет экземпляр класса. Использование `this.` помогает явно указать, что вы работаете с переменной, принадлежащей текущему объекту (или классу), а не с локальной переменной или глобальной переменной.
+
+Пример класса в TypeScript с использованием `this.`:
+
+```typescript
+class MyComponent {
+  query_options: any;
+
+  constructor() {
+    // Инициализация свойства объекта query_options
+    this.query_options = {
+      flt: {}
+    };
+  }
+
+  updateQueryOptions(item: { alias: string, value: any }) {
+    // Используем this. чтобы обратиться к свойству объекта query_options
+    this.query_options.flt[item.alias] = item.value;
+  }
+}
+
+// Создание экземпляра класса
+const component = new MyComponent();
+component.updateQueryOptions({ alias: 'name', value: 'John' });
+
+console.log(component.query_options);
+// Output: { flt: { name: 'John' } }
+```
+
+В этом примере `query_options` является свойством класса `MyComponent`, и `this.query_options` используется для обращения к этому свойству внутри методов класса.

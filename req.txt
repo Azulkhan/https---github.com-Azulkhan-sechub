@@ -1,69 +1,14 @@
-В Angular, самая простая функция может быть написана внутри класса компонента. Например, давайте создадим компонент и добавим в него простую функцию.
+Для преобразования числа в строку с нужным форматом в PostgreSQL, можно воспользоваться функцией `to_char`. Пример запроса для преобразования числа `128975` в строку `128 975,00` будет следующим:
 
-### Создание компонента
-
-1. Сначала создадим компонент, если у вас его еще нет. Используем Angular CLI:
-   ```bash
-   ng generate component my-simple-component
-   ```
-
-### Добавление простой функции в компонент
-
-2. Откройте файл компонента `my-simple-component.component.ts` и добавьте туда простую функцию.
-
-```typescript
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-my-simple-component',
-  templateUrl: './my-simple-component.component.html',
-  styleUrls: ['./my-simple-component.component.css']
-})
-export class MySimpleComponent {
-  
-  // Пример простой функции
-  mySimpleFunction(): void {
-    console.log('Hello, Angular!');
-  }
-}
+```sql
+SELECT to_char(128975, '999 999,00');
 ```
 
-### Использование функции в шаблоне компонента
+Этот запрос преобразует число `128975` в строку `128 975,00`. Если вы хотите применять это преобразование к данным в таблице, например, в поле `my_field` таблицы `my_table`, то запрос будет выглядеть так:
 
-3. Чтобы вызвать эту функцию из шаблона, обновите файл шаблона `my-simple-component.component.html`:
-
-```html
-<button (click)="mySimpleFunction()">Click me</button>
+```sql
+SELECT to_char(my_field, '999 999,00') AS formatted_field
+FROM my_table;
 ```
 
-### Полный пример
-
-#### `my-simple-component.component.ts`
-```typescript
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-my-simple-component',
-  templateUrl: './my-simple-component.component.html',
-  styleUrls: ['./my-simple-component.component.css']
-})
-export class MySimpleComponent {
-  
-  // Пример простой функции
-  mySimpleFunction(): void {
-    console.log('Hello, Angular!');
-  }
-}
-```
-
-#### `my-simple-component.component.html`
-```html
-<button (click)="mySimpleFunction()">Click me</button>
-```
-
-### Пояснения
-
-- `mySimpleFunction(): void` – это простая функция, которая не принимает параметров и не возвращает значения (тип `void`). Она просто выводит сообщение в консоль.
-- `(click)="mySimpleFunction()"` – это синтаксис Angular для привязки события клика на кнопку к функции `mySimpleFunction`.
-
-Когда вы нажмете на кнопку, функция `mySimpleFunction` будет вызвана, и в консоль выведется сообщение "Hello, Angular!".
+Этот запрос вернет значение поля `my_field` в требуемом формате для каждой строки таблицы `my_table`.

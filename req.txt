@@ -1,45 +1,57 @@
-В Angular код `this.dbQueryService.getQuery(option).subscribe((resp) => { ... })` используется для выполнения асинхронного запроса к сервису и обработки ответа. Давайте разберем его подробнее:
+Чтобы проверить, можно ли выполнять HTTP-запросы из базы данных PostgreSQL, можно использовать расширение `pg_http`. Это расширение позволяет выполнять HTTP-запросы непосредственно из SQL-запросов в PostgreSQL. Вот как это сделать:
 
-1. **`this.dbQueryService.getQuery(option)`**:
-   - `this.dbQueryService` - это экземпляр сервиса, который обычно инжектируется в компонент через конструктор.
-   - `getQuery(option)` - метод сервиса, который выполняет запрос к базе данных или другому источнику данных. Он возвращает объект `Observable`, который представляет собой поток данных.
+### Шаг 1: Установить расширение `pg_http`
 
-2. **`.subscribe((resp) => { ... })`**:
-   - Метод `subscribe` используется для подписки на `Observable`, возвращаемый `getQuery(option)`.
-   - Внутри `subscribe` передается функция обратного вызова, которая выполняется, когда Observable эмитирует данные (в данном случае, когда получен ответ `resp`).
+1. Убедитесь, что у вас установлен PostgreSQL. Если нет, установите его.
+2. Скачайте и установите расширение `pg_http` из [GitHub репозитория](https://github.com/pramsey/pgsql-http).
 
-Пример кода может выглядеть так:
+Для установки через командную строку:
 
-```typescript
-import { Component, OnInit } from '@angular/core';
-import { DbQueryService } from './db-query.service';
-
-@Component({
-  selector: 'app-example',
-  templateUrl: './example.component.html',
-  styleUrls: ['./example.component.css']
-})
-export class ExampleComponent implements OnInit {
-
-  constructor(private dbQueryService: DbQueryService) {}
-
-  ngOnInit(): void {
-    const option = { /* параметры запроса */ };
-    this.dbQueryService.getQuery(option).subscribe((resp) => {
-      // Обработка ответа
-      console.log(resp);
-      // Можно сохранить ответ в переменную компонента для отображения в шаблоне
-    }, (error) => {
-      // Обработка ошибки
-      console.error('Ошибка запроса:', error);
-    });
-  }
-}
+```sh
+git clone https://github.com/pramsey/pgsql-http.git
+cd pgsql-http
+make
+make install
 ```
 
-В этом примере:
-- Сервис `DbQueryService` инжектируется в компонент через конструктор.
-- В методе `ngOnInit` компонента вызывается `getQuery` с параметром `option`.
-- Внутри `subscribe` обрабатывается успешный ответ (выводится в консоль) или ошибка (обрабатывается и выводится в консоль).
+### Шаг 2: Создать расширение в базе данных
 
-Это позволяет компоненту асинхронно получать данные и обновлять состояние или отображение в шаблоне по мере поступления данных.
+Подключитесь к вашей базе данных и создайте расширение:
+
+```sql
+CREATE EXTENSION http;
+```
+
+### Шаг 3: Выполнить HTTP-запрос
+
+Теперь вы можете выполнять HTTP-запросы. Вот пример запроса `GET`:
+
+```sql
+SELECT content
+FROM http_get('http://httpbin.org/get');
+```
+
+Или запрос `POST`:
+
+```sql
+SELECT content
+FROM http_post('http://httpbin.org/post', 'key=value');
+```
+
+### Пример использования
+
+1. Подключитесь к вашей базе данных с помощью `psql` или любого другого клиента для PostgreSQL.
+2. Создайте расширение:
+
+   ```sql
+   CREATE EXTENSION http;
+   ```
+
+3. Выполните тестовый запрос:
+
+   ```sql
+   SELECT content
+   FROM http_get('https://api.github.com');
+   ```
+
+Если запрос выполнится успешно и вернёт данные, значит, у вас есть возможность выполнять HTTP-запросы из вашей базы данных PostgreSQL.

@@ -1,23 +1,21 @@
-Давайте я приведу полный пример реализации пагинации для таблицы в Angular с использованием пакета `ngx-pagination`. В этом примере мы будем иметь таблицу данных, которую мы будем пагинировать и добавим элементы управления для перехода на предыдущую, следующую страницы, а также перехода на конкретные страницы.
+Для реализации пагинации в Angular можно использовать компонент `p-table` из библиотеки PrimeNG. Вот пример, как можно это сделать:
 
-### Шаг 1: Установка `ngx-pagination`
-
-Установите `ngx-pagination` в вашем проекте:
+1. Установите PrimeNG и необходимые зависимости:
 
 ```bash
-npm install ngx-pagination --save
+npm install primeng --save
+npm install primeicons --save
+npm install @angular/cdk --save
 ```
 
-### Шаг 2: Импорт модуля пагинации
-
-Импортируйте `NgxPaginationModule` в ваш модуль приложения (например, `app.module.ts`):
+2. Импортируйте необходимые модули в ваш модуль приложения (`app.module.ts`):
 
 ```typescript
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { NgxPaginationModule } from 'ngx-pagination'; // Импортируем NgxPaginationModule
-
 import { AppComponent } from './app.component';
+import { TableModule } from 'primeng/table';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -25,7 +23,8 @@ import { AppComponent } from './app.component';
   ],
   imports: [
     BrowserModule,
-    NgxPaginationModule // Добавляем NgxPaginationModule в список импортов
+    BrowserAnimationsModule,
+    TableModule
   ],
   providers: [],
   bootstrap: [AppComponent]
@@ -33,111 +32,68 @@ import { AppComponent } from './app.component';
 export class AppModule { }
 ```
 
-### Шаг 3: Создание компонента с таблицей и пагинацией
-
-Создайте компонент (`table.component.ts`), который будет содержать вашу таблицу и управление пагинацией:
+3. Создайте компонент и настройте его для отображения таблицы с пагинацией (`app.component.ts` и `app.component.html`):
 
 ```typescript
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+
+interface Product {
+  id?: string;
+  name?: string;
+  price?: number;
+  category?: string;
+  quantity?: number;
+  inventoryStatus?: string;
+  rating?: number;
+}
 
 @Component({
-  selector: 'app-table',
-  templateUrl: './table.component.html',
-  styleUrls: ['./table.component.css']
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
 })
-export class TableComponent {
-  // Данные для таблицы (замените на свои данные)
-  data: any[] = [];
-  // Параметры пагинации
-  currentPage: number = 1;
-  itemsPerPage: number = 10; // Количество элементов на странице
+export class AppComponent implements OnInit {
+  products: Product[] = [];
+  totalRecords: number = 0;
+  loading: boolean = true;
 
-  constructor() {
-    // Здесь может быть ваша логика загрузки данных для таблицы
-    this.loadData();
+  ngOnInit() {
+    this.loading = false;
+    this.products = this.loadProducts();
+    this.totalRecords = this.products.length;
   }
 
-  // Метод загрузки данных (замените на вашу логику загрузки данных)
-  loadData() {
-    // Пример загрузки данных (замените на вашу логику)
-    this.data = [];
-    for (let i = 1; i <= 100; i++) {
-      this.data.push({ id: i, name: `Item ${i}` });
-    }
-  }
-
-  // Обработчик изменения страницы
-  onPageChange(event: any) {
-    this.currentPage = event;
-    // Дополнительная логика, которая должна быть выполнена при изменении страницы
+  loadProducts(): Product[] {
+    // Загрузите или создайте данные для таблицы
+    return [
+      { id: '1000', name: 'Product1', price: 100, category: 'Category1', quantity: 10, inventoryStatus: 'INSTOCK', rating: 5 },
+      { id: '1001', name: 'Product2', price: 200, category: 'Category2', quantity: 20, inventoryStatus: 'OUTOFSTOCK', rating: 4 },
+      // Добавьте больше данных по мере необходимости
+    ];
   }
 }
 ```
-
-### Шаг 4: Шаблон компонента с таблицей и пагинацией
-
-Шаблон компонента (`table.component.html`), где будет расположена ваша таблица и элементы управления пагинацией:
 
 ```html
-<div>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let item of data | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }">
-        <td>{{ item.id }}</td>
-        <td>{{ item.name }}</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <div class="pagination-controls">
-    <pagination-controls (pageChange)="onPageChange($event)"
-                         previousLabel="Previous"
-                         nextLabel="Next"
-                         directionLinks="true"
-                         autoHide="false">
-    </pagination-controls>
-  </div>
-</div>
+<!-- app.component.html -->
+<p-table [value]="products" [paginator]="true" [rows]="10" [totalRecords]="totalRecords" [loading]="loading">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Name</th>
+      <th>Price</th>
+      <th>Category</th>
+      <th>Quantity</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-product>
+    <tr>
+      <td>{{ product.name }}</td>
+      <td>{{ product.price }}</td>
+      <td>{{ product.category }}</td>
+      <td>{{ product.quantity }}</td>
+    </tr>
+  </ng-template>
+</p-table>
 ```
 
-### Шаг 5: CSS стили (необязательно)
-
-Добавьте стили для вашей таблицы и пагинации (`table.component.css`):
-
-```css
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-
-.table th, .table td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: left;
-}
-
-.pagination-controls {
-  text-align: center;
-  margin-top: 20px;
-}
-```
-
-### Шаг 6: Использование компонента таблицы в вашем приложении
-
-Используйте ваш компонент таблицы (`app-table`) в вашем приложении, например, в `app.component.html`:
-
-```html
-<div>
-  <h1>Table with Pagination Example</h1>
-  <app-table></app-table>
-</div>
-```
-
-Это основной пример реализации пагинации для таблицы в Angular с использованием `ngx-pagination`. Вы можете настроить количество элементов на странице (`itemsPerPage`), добавить дополнительные элементы управления (например, кнопки "Первая страница", "Последняя страница") и т.д., в зависимости от вашего дизайна и функциональных требований.
+Этот пример показывает, как создать таблицу с пагинацией в Angular, используя компонент `p-table` из библиотеки PrimeNG. Таблица будет отображать по 10 записей на странице и поддерживать навигацию по страницам.

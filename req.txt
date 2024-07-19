@@ -31,3 +31,148 @@
 - **Поле в первой записи:** В колонке "Название" поле будет "Apple"
 
 Таким образом, колонка является более широким понятием, описывающим структуру и тип данных в таблице, тогда как поле — это конкретное значение в данной структуре.
+
+
+Давайте я приведу полный пример реализации пагинации для таблицы в Angular с использованием пакета `ngx-pagination`. В этом примере мы будем иметь таблицу данных, которую мы будем пагинировать и добавим элементы управления для перехода на предыдущую, следующую страницы, а также перехода на конкретные страницы.
+
+### Шаг 1: Установка `ngx-pagination`
+
+Установите `ngx-pagination` в вашем проекте:
+
+```bash
+npm install ngx-pagination --save
+```
+
+### Шаг 2: Импорт модуля пагинации
+
+Импортируйте `NgxPaginationModule` в ваш модуль приложения (например, `app.module.ts`):
+
+```typescript
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgxPaginationModule } from 'ngx-pagination'; // Импортируем NgxPaginationModule
+
+import { AppComponent } from './app.component';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    NgxPaginationModule // Добавляем NgxPaginationModule в список импортов
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+### Шаг 3: Создание компонента с таблицей и пагинацией
+
+Создайте компонент (`table.component.ts`), который будет содержать вашу таблицу и управление пагинацией:
+
+```typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-table',
+  templateUrl: './table.component.html',
+  styleUrls: ['./table.component.css']
+})
+export class TableComponent {
+  // Данные для таблицы (замените на свои данные)
+  data: any[] = [];
+  // Параметры пагинации
+  currentPage: number = 1;
+  itemsPerPage: number = 10; // Количество элементов на странице
+
+  constructor() {
+    // Здесь может быть ваша логика загрузки данных для таблицы
+    this.loadData();
+  }
+
+  // Метод загрузки данных (замените на вашу логику загрузки данных)
+  loadData() {
+    // Пример загрузки данных (замените на вашу логику)
+    this.data = [];
+    for (let i = 1; i <= 100; i++) {
+      this.data.push({ id: i, name: `Item ${i}` });
+    }
+  }
+
+  // Обработчик изменения страницы
+  onPageChange(event: any) {
+    this.currentPage = event;
+    // Дополнительная логика, которая должна быть выполнена при изменении страницы
+  }
+}
+```
+
+### Шаг 4: Шаблон компонента с таблицей и пагинацией
+
+Шаблон компонента (`table.component.html`), где будет расположена ваша таблица и элементы управления пагинацией:
+
+```html
+<div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of data | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }">
+        <td>{{ item.id }}</td>
+        <td>{{ item.name }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pagination-controls">
+    <pagination-controls (pageChange)="onPageChange($event)"
+                         previousLabel="Previous"
+                         nextLabel="Next"
+                         directionLinks="true"
+                         autoHide="false">
+    </pagination-controls>
+  </div>
+</div>
+```
+
+### Шаг 5: CSS стили (необязательно)
+
+Добавьте стили для вашей таблицы и пагинации (`table.component.css`):
+
+```css
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.table th, .table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.pagination-controls {
+  text-align: center;
+  margin-top: 20px;
+}
+```
+
+### Шаг 6: Использование компонента таблицы в вашем приложении
+
+Используйте ваш компонент таблицы (`app-table`) в вашем приложении, например, в `app.component.html`:
+
+```html
+<div>
+  <h1>Table with Pagination Example</h1>
+  <app-table></app-table>
+</div>
+```
+
+Это основной пример реализации пагинации для таблицы в Angular с использованием `ngx-pagination`. Вы можете настроить количество элементов на странице (`itemsPerPage`), добавить дополнительные элементы управления (например, кнопки "Первая страница", "Последняя страница") и т.д., в зависимости от вашего дизайна и функциональных требований.

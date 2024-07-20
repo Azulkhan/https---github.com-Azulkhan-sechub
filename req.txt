@@ -1,82 +1,112 @@
-Внутри компонента `<p-table>`, использование `<ng-container *ngFor="let field of fields; index as field_index">` предполагает, что вы проходите через массив `fields` и создаете динамические элементы на основе каждого элемента массива. Чтобы понять, что через это заполняются названия полей, нам нужно взглянуть на структуру данных в массиве `fields` и на то, как эти данные используются в шаблоне.
+Чтобы добавить пагинацию к вашей таблице в Angular, вы можете использовать встроенные возможности Angular и PrimeNG для упрощения работы. Ниже приведен пример реализации:
 
-### Шаги для анализа
+Установка PrimeNG и PrimeIcons:
+bash
+Копировать код
+npm install primeng primeicons
+Импорт модулей PrimeNG в app.module.ts:
+typescript
+Копировать код
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppComponent } from './app.component';
+import { TableModule } from 'primeng/table';
+import { PaginatorModule } from 'primeng/paginator';
+import { FormsModule } from '@angular/forms';
 
-1. **Посмотрите на определение массива `fields` в компоненте TypeScript**:
-   - Определите, как выглядит массив `fields` и какие данные он содержит.
+@NgModule({
+  declarations: [AppComponent],
+  imports: [
+    BrowserModule,
+    TableModule,
+    PaginatorModule,
+    FormsModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+Изменение вашего компонента для использования пагинации:
+typescript
+Копировать код
+import { Component, OnInit } from '@angular/core';
+import { DbQueryService } from './db-query.service'; // Убедитесь, что путь к вашему сервису правильный
 
-2. **Анализируйте шаблон HTML**:
-   - Поймите, как данные из `fields` используются внутри `<ng-container>`.
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent implements OnInit {
+  query_report$mob_inv_os_unused: any[] = [];
+  fields: any = {};
+  query_options: any = {
+    'report$mob_inv_os_unused': {
+      flt: {},
+      flteq: {},
+      func22: {},
+      orderAsc: 1,
+      orderBy: '',
+      first: 0,
+      rows: 10
+    }
+  };
 
-### Пример
+  constructor(private dbQueryService: DbQueryService) { }
 
-Допустим, у вас есть массив `fields` в вашем компоненте TypeScript, определенный следующим образом:
+  ngOnInit() {
+    this.loadData();
+  }
 
-```typescript
-export class YourComponent {
-  fields = [
-    { name: 'ID', field: 'id' },
-    { name: 'Name', field: 'name' },
-    { name: 'Age', field: 'age' }
-  ];
+  loadData() {
+    let option = this.query_options['report$mob_inv_os_unused'];
+    option.preparam1 = this.f['param$74'].value ? this.f['param$74'].value : '';
+    option.preparam2 = this.f['param$75'].value ? this.f['param$75'].value : '';
+    option.preparam3 = this.f['param$81'].value ? this.f['param$81'].value : '';
+    this.dbQueryService.getQuery(option).subscribe((resp) => {
+      if (resp && resp.items) {
+        this.query_report$mob_inv_os_unused = resp.items;
+        if (!this.fields['report$mob_inv_os_unused']) {
+          this.getFields('report$mob_inv_os_unused');
+          console.log("tst: " + this.query_report$mob_inv_os_unused);
+        }
+      } else {
+        this.query_report$mob_inv_os_unused = [];
+      }
+    });
+  }
+
+  paginate(event) {
+    this.query_options['report$mob_inv_os_unused'].first = event.first;
+    this.query_options['report$mob_inv_os_unused'].rows = event.rows;
+    this.loadData();
+  }
+
+  // Другие методы вашего компонента...
 }
-```
+Изменение вашего HTML шаблона для добавления пагинации:
+html
+Копировать код
+<table class="table table-striped" style="padding: 12px; border: 1px solid #ddd;">
+  <thead>
+    <!-- Ваши заголовки колонок -->
+  </thead>
+  <tbody>
+    <tr *ngIf="query_report$mob_inv_os_unused.length === 0">
+      <td colspan="21" style="text-align: center;">
+        <span>Данных нет</span>
+      </td>
+    </tr>
+    <tr *ngFor="let row of query_report$mob_inv_os_unused">
+      <!-- Ваши данные -->
+    </tr>
+  </tbody>
+</table>
 
-В шаблоне HTML вы можете использовать `<ng-container *ngFor="let field of fields; index as field_index">` для динамического создания колонок таблицы:
-
-```html
-<p-table [value]="data">
-  <ng-container *ngFor="let field of fields; index as field_index">
-    <p-column field="{{field.field}}" header="{{field.name}}">
-      <!-- Здесь можно добавить дополнительный контент для каждой колонки -->
-    </p-column>
-  </ng-container>
-</p-table>
-```
-
-### Понимание заполнения названий полей
-
-- **Массив `fields`**: Каждый объект в массиве `fields` содержит два свойства: `name` и `field`.
-  - `name`: Название, которое будет отображаться в заголовке столбца.
-  - `field`: Поле данных, которое будет использоваться для привязки данных в таблице.
-
-- **Шаблон `<ng-container>`**: 
-  - Проходит по каждому элементу в массиве `fields`.
-  - Создает `<p-column>` для каждого элемента.
-  - Использует свойства `field.name` и `field.field` для настройки каждого столбца.
-
-В данном примере, если массив `fields` содержит объекты с `name` и `field`, то `name` используется для заголовка столбца (`header`), а `field` используется для привязки данных (`field`).
-
-### Пример с данными
-
-Предположим, у вас есть данные, которые вы хотите отобразить в таблице:
-
-```typescript
-data = [
-  { id: 1, name: 'John', age: 25 },
-  { id: 2, name: 'Jane', age: 30 },
-  { id: 3, name: 'Doe', age: 22 }
-];
-```
-
-### Итоговый шаблон
-
-Теперь ваш шаблон будет выглядеть так:
-
-```html
-<p-table [value]="data">
-  <ng-container *ngFor="let field of fields; index as field_index">
-    <p-column field="{{field.field}}" header="{{field.name}}">
-      <!-- Дополнительный контент для каждой колонки, если нужно -->
-    </p-column>
-  </ng-container>
-</p-table>
-```
-
-### Объяснение
-
-- **`<p-table [value]="data">`**: Основной компонент таблицы, который получает данные для отображения.
-- **`<ng-container *ngFor="let field of fields; index as field_index">`**: Директива `*ngFor` проходит по массиву `fields` и создает динамические столбцы.
-- **`<p-column field="{{field.field}}" header="{{field.name}}">`**: Создает столбцы с заголовками и привязкой данных на основе свойств `field` и `name` каждого объекта в массиве `fields`.
-
-Таким образом, массив `fields` определяет, какие столбцы будут в таблице, и какие заголовки у этих столбцов.
+<p-paginator
+  [rows]="query_options['report$mob_inv_os_unused'].rows"
+  [totalRecords]="query_report$mob_inv_os_unused.length"
+  (onPageChange)="paginate($event)"
+  [rowsPerPageOptions]="[10, 20, 30, 50, 100]">
+</p-paginator>
+Этот код добавляет компонент PrimeNG p-paginator под вашей таблицей, который обрабатывает события изменения страницы и обновляет данные таблицы соответственно. Вы можете настроить массив rowsPerPageOptions в соответствии с вашими предпочтениями.

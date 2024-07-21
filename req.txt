@@ -1,112 +1,118 @@
-Чтобы добавить пагинацию к вашей таблице в Angular, вы можете использовать встроенные возможности Angular и PrimeNG для упрощения работы. Ниже приведен пример реализации:
+To add pagination to your existing HTML template, you'll need to integrate a pagination component and update your TypeScript class to handle pagination logic. Here's a step-by-step guide to adding pagination:
 
-Установка PrimeNG и PrimeIcons:
-bash
-Копировать код
-npm install primeng primeicons
-Импорт модулей PrimeNG в app.module.ts:
+1. Update TypeScript Class
+Extend your class to manage pagination by adding methods for handling page changes and updating the data to be displayed based on the current page. Here's how you can modify your TypeScript class:
+
 typescript
 Копировать код
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { AppComponent } from './app.component';
-import { TableModule } from 'primeng/table';
-import { PaginatorModule } from 'primeng/paginator';
-import { FormsModule } from '@angular/forms';
+export class GenClass extends vm.constructor {
+    // Existing properties
+    page = 1;  // Current page
+    perpage = 15;  // Number of items per page
+    totalItems = 0; // Total number of items
 
-@NgModule({
-  declarations: [AppComponent],
-  imports: [
-    BrowserModule,
-    TableModule,
-    PaginatorModule,
-    FormsModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
-export class AppModule { }
-Изменение вашего компонента для использования пагинации:
-typescript
-Копировать код
-import { Component, OnInit } from '@angular/core';
-import { DbQueryService } from './db-query.service'; // Убедитесь, что путь к вашему сервису правильный
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
-})
-export class AppComponent implements OnInit {
-  query_report$mob_inv_os_unused: any[] = [];
-  fields: any = {};
-  query_options: any = {
-    'report$mob_inv_os_unused': {
-      flt: {},
-      flteq: {},
-      func22: {},
-      orderAsc: 1,
-      orderBy: '',
-      first: 0,
-      rows: 10
+    // Method to handle page change
+    changePage(page: number) {
+        this.page = page;
+        this.bind();
     }
-  };
 
-  constructor(private dbQueryService: DbQueryService) { }
+    // Update bind method to handle pagination
+    bind() {
+        let option = this.query_options['report$mob_inv_os_shortage'];
+        option.preparam1 = this.f['param$74'].value ? this.f['param$74'].value : '';
+        option.preparam2 = this.f['param$75'].value ? this.f['param$75'].value : '';
+        option.preparam3 = this.f['param$81'].value ? this.f['param$81'].value : '';
+        option.page = this.page;  // Pass current page
+        option.perpage = this.perpage;  // Pass number of items per page
 
-  ngOnInit() {
-    this.loadData();
-  }
-
-  loadData() {
-    let option = this.query_options['report$mob_inv_os_unused'];
-    option.preparam1 = this.f['param$74'].value ? this.f['param$74'].value : '';
-    option.preparam2 = this.f['param$75'].value ? this.f['param$75'].value : '';
-    option.preparam3 = this.f['param$81'].value ? this.f['param$81'].value : '';
-    this.dbQueryService.getQuery(option).subscribe((resp) => {
-      if (resp && resp.items) {
-        this.query_report$mob_inv_os_unused = resp.items;
-        if (!this.fields['report$mob_inv_os_unused']) {
-          this.getFields('report$mob_inv_os_unused');
-          console.log("tst: " + this.query_report$mob_inv_os_unused);
-        }
-      } else {
-        this.query_report$mob_inv_os_unused = [];
-      }
-    });
-  }
-
-  paginate(event) {
-    this.query_options['report$mob_inv_os_unused'].first = event.first;
-    this.query_options['report$mob_inv_os_unused'].rows = event.rows;
-    this.loadData();
-  }
-
-  // Другие методы вашего компонента...
+        this.dbQueryService.getQuery(option).subscribe((resp) => {
+            if (resp && resp.items) {
+                this.query_report$mob_inv_os_shortage = resp.items;
+                this.totalItems = resp.totalItems || 0; // Update total items count
+                if (!this.fields['report$mob_inv_os_shortage']) {
+                    this.getFields('report$mob_inv_os_shortage');
+                }
+            } else {
+                this.query_report$mob_inv_os_shortage = [];
+                this.totalItems = 0;
+            }
+        });
+    }
 }
-Изменение вашего HTML шаблона для добавления пагинации:
+2. Update HTML Template
+Integrate pagination controls into your HTML template. You can use a basic pagination layout or a pagination component from a library like PrimeNG.
+
+Here's how you can update your HTML template with basic pagination controls:
+
 html
 Копировать код
-<table class="table table-striped" style="padding: 12px; border: 1px solid #ddd;">
-  <thead>
-    <!-- Ваши заголовки колонок -->
-  </thead>
-  <tbody>
-    <tr *ngIf="query_report$mob_inv_os_unused.length === 0">
-      <td colspan="21" style="text-align: center;">
-        <span>Данных нет</span>
-      </td>
-    </tr>
-    <tr *ngFor="let row of query_report$mob_inv_os_unused">
-      <!-- Ваши данные -->
-    </tr>
-  </tbody>
-</table>
+<div class="p-card">
+    <!-- Existing content -->
 
-<p-paginator
-  [rows]="query_options['report$mob_inv_os_unused'].rows"
-  [totalRecords]="query_report$mob_inv_os_unused.length"
-  (onPageChange)="paginate($event)"
-  [rowsPerPageOptions]="[10, 20, 30, 50, 100]">
-</p-paginator>
-Этот код добавляет компонент PrimeNG p-paginator под вашей таблицей, который обрабатывает события изменения страницы и обновляет данные таблицы соответственно. Вы можете настроить массив rowsPerPageOptions в соответствии с вашими предпочтениями.
+    <div class="card-body">
+        <!-- Existing form and table -->
+
+        <div class="table-responsive mt-3">
+            <span *ngIf="fields['report$mob_inv_os_shortage'] && fields['report$mob_inv_os_shortage'].length > 0" class="ms-2 text-secondary" translate="Количество записей:"> <span class="text-dark" [innerHtml]="query_report$mob_inv_os_shortage.length-1"></span></span>
+            <table class="table table-striped" style="padding: 12px;border: 1px solid #ddd;">
+                <thead>
+                    <!-- Existing table header -->
+                </thead>
+                <tbody>
+                    <!-- Existing table body -->
+                </tbody>
+                <tfoot>
+                    <!-- Existing table footer -->
+                </tfoot>
+            </table>
+
+            <!-- Pagination Controls -->
+            <div class="pagination">
+                <button (click)="changePage(1)" [disabled]="page === 1">First</button>
+                <button (click)="changePage(page - 1)" [disabled]="page === 1">Previous</button>
+                <span>Page {{page}} of {{ Math.ceil(totalItems / perpage) }}</span>
+                <button (click)="changePage(page + 1)" [disabled]="page >= Math.ceil(totalItems / perpage)">Next</button>
+                <button (click)="changePage(Math.ceil(totalItems / perpage))" [disabled]="page >= Math.ceil(totalItems / perpage)">Last</button>
+            </div>
+        </div>
+    </div>
+</div>
+3. Add CSS for Pagination
+Include CSS to style the pagination controls. Here's a basic style that you can use:
+
+html
+Копировать код
+<style>
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .pagination button {
+        margin: 0 5px;
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        background-color: #f2f2f2;
+        cursor: pointer;
+    }
+    .pagination button:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+    .pagination span {
+        align-self: center;
+        margin: 0 10px;
+    }
+</style>
+Summary
+TypeScript Class: Update to manage the current page and handle page changes.
+HTML Template: Add pagination controls and update the table to reflect the current page's data.
+CSS: Style the pagination controls for better presentation.
+Feel free to adjust the pagination controls and styling according to your preferences or requirements.
+
+
+
+
+
+

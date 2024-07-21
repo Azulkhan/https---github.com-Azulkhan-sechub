@@ -1,119 +1,141 @@
-Да, этот подход можно адаптировать для Angular. Вместо прямого использования JavaScript для манипуляций с DOM, вы можете использовать Angular-синтаксис и привязку данных для управления пагинацией. Вот пример, как это можно сделать в Angular.
+Чтобы улучшить внешний вид вашего компонента пагинации и добавить функциональность для скрытия и отображения элементов, можно использовать CSS для стилизации и Angular для управления динамическим содержимым. Вот шаги по улучшению:
 
-Пример кода для Angular
-HTML
+1. HTML-шаблон
+Изменим HTML-шаблон, чтобы добавить классы для стилизации и динамического отображения номеров страниц:
+
 html
 Копировать код
 <div class="pagination">
-    <span class="material-icons-round" (click)="goToFirstPage()" title="Первая страница">first_page</span>
-    <span class="material-icons" (click)="goToPreviousPage()" title="Предыдущая страница">navigate_before</span>
-
-    <div class="page-numbers">
-        <span *ngFor="let page of pages" 
-              [class.active]="page === currentPage"
-              (click)="selectPage(page)">
-            {{ page }}
-        </span>
+    <span class="material-icons-round" id="first-page" title="Первая страница" (click)="first_page()">first_page</span>
+    <span class="material-icons" id="previous-page" title="Предыдущая страница" (click)="before_page()">navigate_before</span>
+    
+    <div id="page-numbers" class="page-numbers">
+        <ng-container *ngFor="let page of pageNumbers">
+            <span 
+                class="page-number" 
+                [class.active]="page === currentPage"
+                (click)="goToPage(page)"
+                [class.hidden]="page < startPage || page > endPage"
+            >
+                {{ page }}
+            </span>
+        </ng-container>
     </div>
-
-    <span class="material-icons" (click)="goToNextPage()" title="Следующая страница">navigate_next</span>
-    <span class="material-icons-outlined" (click)="goToLastPage()" title="Последняя страница">last_page</span>
+    
+    <span class="material-icons" id="next-page" title="Следующая страница" (click)="next_page()">navigate_next</span>
+    <span class="material-icons-outlined" id="last-page" title="Последняя страница" (click)="last_page()">last_page</span>
 </div>
-CSS
+2. CSS для стилизации
+Добавим стили, чтобы улучшить внешний вид пагинации и обеспечить визуальные эффекты:
+
 css
 Копировать код
+/* Основной контейнер пагинации */
 .pagination {
     display: flex;
     align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
+/* Стили для кнопок навигации */
 .material-icons, .material-icons-round, .material-icons-outlined {
     cursor: pointer;
-    margin: 0 5px;
+    font-size: 24px;
+    transition: color 0.3s ease;
 }
 
+.material-icons:hover, .material-icons-round:hover, .material-icons-outlined:hover {
+    color: #007bff; /* Измените цвет при наведении, если нужно */
+}
+
+/* Стили для номеров страниц */
 .page-numbers {
     display: flex;
+    gap: 5px;
 }
 
-.page-numbers span {
+/* Стили для каждого номера страницы */
+.page-number {
     cursor: pointer;
-    margin: 0 3px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: #f1f1f1;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.page-numbers span.active {
-    font-weight: bold;
+.page-number.active {
+    background-color: #007bff;
+    color: #fff;
 }
-TypeScript (Component)
+
+.page-number:hover {
+    background-color: #ddd; /* Измените цвет при наведении, если нужно */
+}
+
+/* Стили для скрытия номеров страниц вне текущего диапазона */
+.page-number.hidden {
+    display: none;
+}
+3. Логика в Angular-компоненте
+Добавьте логику для управления состоянием пагинации и динамическим отображением страниц:
+
 typescript
 Копировать код
-import { Component, OnInit } from '@angular/core';
-
-@Component({
-  selector: 'app-pagination',
-  templateUrl: './pagination.component.html',
-  styleUrls: ['./pagination.component.css']
-})
-export class PaginationComponent implements OnInit {
-  totalPages = 10; // Общее количество страниц
-  currentPage = 1; // Номер текущей страницы
-  pages: number[] = [];
+export class YourComponent implements OnInit {
+  totalPages: number = 0;  // Общее количество страниц
+  currentPage: number = 1; // Текущая страница
+  pageNumbers: number[] = []; // Список номеров страниц
+  startPage: number = 1; // Начальная страница для отображения
+  endPage: number = 5;   // Конечная страница для отображения
 
   ngOnInit() {
-    this.updatePagination();
+    this.calculatePageNumbers();
   }
 
-  updatePagination() {
-    this.pages = [];
-    let startPage = Math.max(1, this.currentPage - 2);
-    let endPage = Math.min(this.totalPages, this.currentPage + 2);
+  calculatePageNumbers() {
+    this.pageNumbers = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
 
-    if (this.currentPage <= 3) {
-      endPage = Math.min(this.totalPages, 5);
-    }
-    if (this.currentPage >= this.totalPages - 2) {
-      startPage = Math.max(1, this.totalPages - 4);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      this.pages.push(i);
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePageNumbers();
+      // Ваш код для загрузки данных для текущей страницы
     }
   }
 
-  goToFirstPage() {
-    this.currentPage = 1;
-    this.updatePagination();
+  updatePageNumbers() {
+    const totalPages = this.pageNumbers.length;
+    this.startPage = Math.max(1, this.currentPage - 2);
+    this.endPage = Math.min(totalPages, this.currentPage + 2);
   }
 
-  goToPreviousPage() {
+  first_page() {
+    this.goToPage(1);
+  }
+
+  before_page() {
     if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePagination();
+      this.goToPage(this.currentPage - 1);
     }
   }
 
-  goToNextPage() {
+  next_page() {
     if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePagination();
+      this.goToPage(this.currentPage + 1);
     }
   }
 
-  goToLastPage() {
-    this.currentPage = this.totalPages;
-    this.updatePagination();
-  }
-
-  selectPage(page: number) {
-    this.currentPage = page;
-    this.updatePagination();
+  last_page() {
+    this.goToPage(this.totalPages);
   }
 }
-Описание
-HTML: Используется Angular-синтаксис для привязки событий и динамического отображения страниц. *ngFor используется для итерации по массиву страниц и отображения их на экране.
+4. Объяснение
+HTML-шаблон: Мы добавили Angular директивы для динамического отображения номеров страниц и используем классы для управления активным состоянием и видимостью страниц.
 
-CSS: Определяет стили для пагинации и активной страницы.
+CSS: Стили обеспечивают плавные переходы и визуальные эффекты для кнопок и номеров страниц.
 
-TypeScript (Component): Логика для управления пагинацией. Метод updatePagination обновляет массив страниц в зависимости от текущей страницы, а методы goToFirstPage, goToPreviousPage, goToNextPage, goToLastPage и selectPage изменяют текущую страницу и обновляют отображение.
+TypeScript: Логика в компоненте управляет текущей страницей и обновляет видимость номеров страниц в зависимости от текущей страницы.
 
-Этот подход интегрирован с Angular и использует возможности фреймворка для управления состоянием и взаимодействия с DOM.
+Этот подход обеспечит функциональную и визуально приятную пагинацию для вашего приложения. Вы можете настроить стили и логику в зависимости от ваших конкретных требований.

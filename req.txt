@@ -1,18 +1,23 @@
-Для создания такого функционала, где при выборе страницы отображается динамический диапазон страниц, вам понадобится сочетание HTML, CSS и JavaScript. Вот пример, как это можно реализовать:
+Да, этот подход можно адаптировать для Angular. Вместо прямого использования JavaScript для манипуляций с DOM, вы можете использовать Angular-синтаксис и привязку данных для управления пагинацией. Вот пример, как это можно сделать в Angular.
 
+Пример кода для Angular
 HTML
 html
 Копировать код
 <div class="pagination">
-    <span class="material-icons-round" id="first-page" title="Первая страница">first_page</span>
-    <span class="material-icons" id="previous-page" title="Предыдущая страница">navigate_before</span>
-    
-    <div id="page-numbers" class="page-numbers">
-        <!-- Page numbers will be dynamically inserted here -->
+    <span class="material-icons-round" (click)="goToFirstPage()" title="Первая страница">first_page</span>
+    <span class="material-icons" (click)="goToPreviousPage()" title="Предыдущая страница">navigate_before</span>
+
+    <div class="page-numbers">
+        <span *ngFor="let page of pages" 
+              [class.active]="page === currentPage"
+              (click)="selectPage(page)">
+            {{ page }}
+        </span>
     </div>
 
-    <span class="material-icons" id="next-page" title="Следующая страница">navigate_next</span>
-    <span class="material-icons-outlined" id="last-page" title="Последняя страница">last_page</span>
+    <span class="material-icons" (click)="goToNextPage()" title="Следующая страница">navigate_next</span>
+    <span class="material-icons-outlined" (click)="goToLastPage()" title="Последняя страница">last_page</span>
 </div>
 CSS
 css
@@ -39,80 +44,76 @@ css
 .page-numbers span.active {
     font-weight: bold;
 }
-JavaScript
-javascript
+TypeScript (Component)
+typescript
 Копировать код
-const totalPages = 10; // Total number of pages
-let currentPage = 1; // Current page number
+import { Component, OnInit } from '@angular/core';
 
-const pageNumbersContainer = document.getElementById('page-numbers');
-const firstPageButton = document.getElementById('first-page');
-const previousPageButton = document.getElementById('previous-page');
-const nextPageButton = document.getElementById('next-page');
-const lastPageButton = document.getElementById('last-page');
+@Component({
+  selector: 'app-pagination',
+  templateUrl: './pagination.component.html',
+  styleUrls: ['./pagination.component.css']
+})
+export class PaginationComponent implements OnInit {
+  totalPages = 10; // Общее количество страниц
+  currentPage = 1; // Номер текущей страницы
+  pages: number[] = [];
 
-function updatePagination() {
-    pageNumbersContainer.innerHTML = '';
+  ngOnInit() {
+    this.updatePagination();
+  }
 
-    // Determine range of pages to show
-    let startPage = Math.max(1, currentPage - 2);
-    let endPage = Math.min(totalPages, currentPage + 2);
+  updatePagination() {
+    this.pages = [];
+    let startPage = Math.max(1, this.currentPage - 2);
+    let endPage = Math.min(this.totalPages, this.currentPage + 2);
 
-    // Adjust range if it’s near the edges
-    if (currentPage <= 3) {
-        endPage = Math.min(totalPages, 5);
+    if (this.currentPage <= 3) {
+      endPage = Math.min(this.totalPages, 5);
     }
-    if (currentPage >= totalPages - 2) {
-        startPage = Math.max(1, totalPages - 4);
+    if (this.currentPage >= this.totalPages - 2) {
+      startPage = Math.max(1, this.totalPages - 4);
     }
 
     for (let i = startPage; i <= endPage; i++) {
-        const span = document.createElement('span');
-        span.textContent = i;
-        if (i === currentPage) {
-            span.classList.add('active');
-        }
-        span.addEventListener('click', () => {
-            currentPage = i;
-            updatePagination();
-        });
-        pageNumbersContainer.appendChild(span);
+      this.pages.push(i);
     }
-    
-    firstPageButton.style.visibility = currentPage === 1 ? 'hidden' : 'visible';
-    previousPageButton.style.visibility = currentPage === 1 ? 'hidden' : 'visible';
-    nextPageButton.style.visibility = currentPage === totalPages ? 'hidden' : 'visible';
-    lastPageButton.style.visibility = currentPage === totalPages ? 'hidden' : 'visible';
+  }
+
+  goToFirstPage() {
+    this.currentPage = 1;
+    this.updatePagination();
+  }
+
+  goToPreviousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
+
+  goToNextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+
+  goToLastPage() {
+    this.currentPage = this.totalPages;
+    this.updatePagination();
+  }
+
+  selectPage(page: number) {
+    this.currentPage = page;
+    this.updatePagination();
+  }
 }
-
-firstPageButton.addEventListener('click', () => {
-    currentPage = 1;
-    updatePagination();
-});
-
-previousPageButton.addEventListener('click', () => {
-    if (currentPage > 1) {
-        currentPage--;
-        updatePagination();
-    }
-});
-
-nextPageButton.addEventListener('click', () => {
-    if (currentPage < totalPages) {
-        currentPage++;
-        updatePagination();
-    }
-});
-
-lastPageButton.addEventListener('click', () => {
-    currentPage = totalPages;
-    updatePagination();
-});
-
-// Initial call to set up pagination
-updatePagination();
 Описание
-HTML: Создаем контейнер с иконками и область для отображения номеров страниц.
-CSS: Определяем стиль для иконок и номеров страниц.
-JavaScript: Обрабатываем логику для отображения номеров страниц, управления видимостью кнопок и обновления текущей страницы.
-Вы можете адаптировать этот код под свои нужды, изменяя количество страниц или стиль.
+HTML: Используется Angular-синтаксис для привязки событий и динамического отображения страниц. *ngFor используется для итерации по массиву страниц и отображения их на экране.
+
+CSS: Определяет стили для пагинации и активной страницы.
+
+TypeScript (Component): Логика для управления пагинацией. Метод updatePagination обновляет массив страниц в зависимости от текущей страницы, а методы goToFirstPage, goToPreviousPage, goToNextPage, goToLastPage и selectPage изменяют текущую страницу и обновляют отображение.
+
+Этот подход интегрирован с Angular и использует возможности фреймворка для управления состоянием и взаимодействия с DOM.

@@ -1,67 +1,44 @@
-To create a responsive and visually appealing pagination component where the per-page options change the number of items displayed and also change their appearance when selected, you can use the following approach. This combines HTML with Angular functionality, including styling changes.
+Для того чтобы выделить выбранное количество элементов на странице, можно использовать Angular привязку классов ([class.class-name]) или условия (ngClass) в сочетании с CSS-стилями. Вот пример, как это можно сделать:
 
-First, let's create the HTML structure with appropriate Angular bindings and event handlers. We'll also include some CSS for styling.
-
-HTML
+HTML:
 html
 Копировать код
-<div class="container-fluid">
-    <label>На странице:
-        <span class="badge badge-success">{{query_report$mob_inv_os_toprint.length - 1}}</span>
-        <translate>Of</translate>
-        <span class="badge badge-primary">{{row.row_num}}</span>
+<div>
+    <label>Результат:
+        <span>{{query_report$mob_inv_os_toprint.length - 1}}</span>
+        <translate>от</translate>
+        <span>{{row.row_num}}</span>
     </label>
     <label>На странице:
-        <span ng-click="setPerPage(10)" ng-class="{'badge badge-success': perPage === 10, 'badge badge-primary': perPage !== 10}">10</span>
-        <span ng-click="setPerPage(25)" ng-class="{'badge badge-success': perPage === 25, 'badge badge-primary': perPage !== 25}">25</span>
-        <span ng-click="setPerPage(50)" ng-class="{'badge badge-success': perPage === 50, 'badge badge-primary': perPage !== 50}">50</span>
+        <span [class.active]="perPage === 10" (click)="setPerPage(10)">10</span>
+        <span [class.active]="perPage === 25" (click)="setPerPage(25)">25</span>
+        <span [class.active]="perPage === 50" (click)="setPerPage(50)">50</span>
     </label> 
     <br>
 </div>
-CSS
+TypeScript (Component):
+typescript
+Копировать код
+export class YourComponent {
+    perPage: number = 10; // Установите начальное значение
+
+    setPerPage(value: number) {
+        this.perPage = value;
+        // Другие действия, необходимые при изменении количества элементов на странице
+    }
+}
+CSS:
 css
 Копировать код
-.badge {
-    padding: 10px;
-    margin: 5px;
-    cursor: pointer;
-    border-radius: 5px;
+.active {
+    font-weight: bold;
+    color: blue; /* Можно изменить цвет текста */
+    background-color: lightgrey; /* Можно добавить фон */
+    border-radius: 5px; /* Пример закругленных углов */
+    padding: 5px; /* Пример внутреннего отступа */
 }
-
-.badge-success {
-    background-color: green;
-    color: white;
-}
-
-.badge-primary {
-    background-color: blue;
-    color: white;
-}
-
-.badge:hover {
-    background-color: lightgray;
-}
-AngularJS Controller
-In your AngularJS controller, you should define the setPerPage function to update the perPage variable and reinitialize the data with the new per-page value.
-
-javascript
-Копировать код
-$scope.perPage = 10; // Default perPage value
-
-$scope.setPerPage = function(perPage) {
-    $scope.perPage = perPage;
-    $scope.init({currentPage: 1, perPage: perPage});
-};
-Explanation
-HTML:
-
-The ng-click directive is used to call the setPerPage function when a badge is clicked.
-The ng-class directive dynamically applies the badge-success class to the selected per-page option and badge-primary to the unselected ones.
-CSS:
-
-The .badge, .badge-success, and .badge-primary classes define the styles for the badges.
-.badge:hover adds a hover effect to improve the visual appeal.
-AngularJS Controller:
-
-The setPerPage function updates the perPage variable and calls the init function with the new per-page value.
-By following this approach, the pagination component will have a clear visual indication of the selected option and will update the number of items displayed per page dynamically when a badge is clicked.
+Объяснение:
+HTML: Добавлена директива [class.active], которая добавляет класс active элементу span, если текущее значение perPage совпадает с числом в span.
+TypeScript: Добавлена переменная perPage для хранения текущего количества элементов на странице и метод setPerPage, который обновляет это значение.
+CSS: Добавлен стиль для класса active, который выделяет выбранный элемент.
+Этот подход позволяет динамически изменять стиль выбранного количества элементов на странице и делает пользовательский интерфейс более понятным и удобным.

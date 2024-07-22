@@ -1,4 +1,4 @@
-Для того чтобы выделить выбранное количество элементов на странице, можно использовать Angular привязку классов ([class.class-name]) или условия (ngClass) в сочетании с CSS-стилями. Вот пример, как это можно сделать:
+Чтобы стили кнопок выглядели современно и привлекательно, можно использовать следующие CSS-стили. Они обеспечат хорошее визуальное представление и взаимодействие с пользователем, включая стили для выделенного состояния и стандартного вида.
 
 HTML:
 html
@@ -10,35 +10,55 @@ html
         <span>{{row.row_num}}</span>
     </label>
     <label>На странице:
-        <span [class.active]="perPage === 10" (click)="setPerPage(10)">10</span>
-        <span [class.active]="perPage === 25" (click)="setPerPage(25)">25</span>
-        <span [class.active]="perPage === 50" (click)="setPerPage(50)">50</span>
+        <span [class]="{'button': true, 'active': perPage === 10}" (click)="setPerPage(10)">10</span>
+        <span [class]="{'button': true, 'active': perPage === 25}" (click)="setPerPage(25)">25</span>
+        <span [class]="{'button': true, 'active': perPage === 50}" (click)="setPerPage(50)">50</span>
     </label> 
     <br>
 </div>
-TypeScript (Component):
-typescript
-Копировать код
-export class YourComponent {
-    perPage: number = 10; // Установите начальное значение
-
-    setPerPage(value: number) {
-        this.perPage = value;
-        // Другие действия, необходимые при изменении количества элементов на странице
-    }
-}
 CSS:
 css
 Копировать код
-.active {
-    font-weight: bold;
-    color: blue; /* Можно изменить цвет текста */
-    background-color: lightgrey; /* Можно добавить фон */
-    border-radius: 5px; /* Пример закругленных углов */
-    padding: 5px; /* Пример внутреннего отступа */
+/* Стили для кнопок */
+.button {
+    display: inline-block;
+    padding: 8px 12px;
+    margin-right: 10px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+    color: #333;
+    text-align: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.button:hover {
+    background-color: #e0e0e0;
+    border-color: #ccc;
+}
+
+.button.active {
+    background-color: #007bff; /* Цвет фона для активного состояния */
+    color: white; /* Цвет текста для активного состояния */
+    border-color: #0056b3; /* Цвет границы для активного состояния */
+    font-weight: bold; /* Жирный текст для активного состояния */
+}
+
+.button:focus {
+    outline: none; /* Убираем стандартный контур при фокусе */
+}
+
+.button:active {
+    background-color: #0056b3; /* Цвет фона при нажатии */
+    border-color: #004080; /* Цвет границы при нажатии */
 }
 Объяснение:
-HTML: Добавлена директива [class.active], которая добавляет класс active элементу span, если текущее значение perPage совпадает с числом в span.
-TypeScript: Добавлена переменная perPage для хранения текущего количества элементов на странице и метод setPerPage, который обновляет это значение.
-CSS: Добавлен стиль для класса active, который выделяет выбранный элемент.
-Этот подход позволяет динамически изменять стиль выбранного количества элементов на странице и делает пользовательский интерфейс более понятным и удобным.
+HTML: Применение классов button и active к span элементам. Класс active применяется, когда соответствующее значение perPage совпадает.
+CSS:
+.button: Стиль для кнопок, включает внутренние отступы, границу, закругление углов и базовые цвета.
+.button:hover: Изменение фона и границы при наведении курсора.
+.button.active: Специфичный стиль для активного состояния кнопок, включая изменение цвета фона и текста.
+.button:focus и .button:active: Стиль для состояния фокуса и нажатия кнопки, чтобы обеспечить хороший пользовательский опыт.
+Эти стили помогут сделать кнопки более заметными и приятными для взаимодействия, а также улучшат визуальную и функциональную сторону вашего интерфейса.

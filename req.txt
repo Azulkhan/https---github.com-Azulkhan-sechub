@@ -1,141 +1,67 @@
-Чтобы улучшить внешний вид вашего компонента пагинации и добавить функциональность для скрытия и отображения элементов, можно использовать CSS для стилизации и Angular для управления динамическим содержимым. Вот шаги по улучшению:
+To create a responsive and visually appealing pagination component where the per-page options change the number of items displayed and also change their appearance when selected, you can use the following approach. This combines HTML with Angular functionality, including styling changes.
 
-1. HTML-шаблон
-Изменим HTML-шаблон, чтобы добавить классы для стилизации и динамического отображения номеров страниц:
+First, let's create the HTML structure with appropriate Angular bindings and event handlers. We'll also include some CSS for styling.
 
+HTML
 html
 Копировать код
-<div class="pagination">
-    <span class="material-icons-round" id="first-page" title="Первая страница" (click)="first_page()">first_page</span>
-    <span class="material-icons" id="previous-page" title="Предыдущая страница" (click)="before_page()">navigate_before</span>
-    
-    <div id="page-numbers" class="page-numbers">
-        <ng-container *ngFor="let page of pageNumbers">
-            <span 
-                class="page-number" 
-                [class.active]="page === currentPage"
-                (click)="goToPage(page)"
-                [class.hidden]="page < startPage || page > endPage"
-            >
-                {{ page }}
-            </span>
-        </ng-container>
-    </div>
-    
-    <span class="material-icons" id="next-page" title="Следующая страница" (click)="next_page()">navigate_next</span>
-    <span class="material-icons-outlined" id="last-page" title="Последняя страница" (click)="last_page()">last_page</span>
+<div class="container-fluid">
+    <label>На странице:
+        <span class="badge badge-success">{{query_report$mob_inv_os_toprint.length - 1}}</span>
+        <translate>Of</translate>
+        <span class="badge badge-primary">{{row.row_num}}</span>
+    </label>
+    <label>На странице:
+        <span ng-click="setPerPage(10)" ng-class="{'badge badge-success': perPage === 10, 'badge badge-primary': perPage !== 10}">10</span>
+        <span ng-click="setPerPage(25)" ng-class="{'badge badge-success': perPage === 25, 'badge badge-primary': perPage !== 25}">25</span>
+        <span ng-click="setPerPage(50)" ng-class="{'badge badge-success': perPage === 50, 'badge badge-primary': perPage !== 50}">50</span>
+    </label> 
+    <br>
 </div>
-2. CSS для стилизации
-Добавим стили, чтобы улучшить внешний вид пагинации и обеспечить визуальные эффекты:
-
+CSS
 css
 Копировать код
-/* Основной контейнер пагинации */
-.pagination {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-/* Стили для кнопок навигации */
-.material-icons, .material-icons-round, .material-icons-outlined {
+.badge {
+    padding: 10px;
+    margin: 5px;
     cursor: pointer;
-    font-size: 24px;
-    transition: color 0.3s ease;
-}
-
-.material-icons:hover, .material-icons-round:hover, .material-icons-outlined:hover {
-    color: #007bff; /* Измените цвет при наведении, если нужно */
-}
-
-/* Стили для номеров страниц */
-.page-numbers {
-    display: flex;
-    gap: 5px;
-}
-
-/* Стили для каждого номера страницы */
-.page-number {
-    cursor: pointer;
-    padding: 5px 10px;
     border-radius: 5px;
-    background-color: #f1f1f1;
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.page-number.active {
-    background-color: #007bff;
-    color: #fff;
+.badge-success {
+    background-color: green;
+    color: white;
 }
 
-.page-number:hover {
-    background-color: #ddd; /* Измените цвет при наведении, если нужно */
+.badge-primary {
+    background-color: blue;
+    color: white;
 }
 
-/* Стили для скрытия номеров страниц вне текущего диапазона */
-.page-number.hidden {
-    display: none;
+.badge:hover {
+    background-color: lightgray;
 }
-3. Логика в Angular-компоненте
-Добавьте логику для управления состоянием пагинации и динамическим отображением страниц:
+AngularJS Controller
+In your AngularJS controller, you should define the setPerPage function to update the perPage variable and reinitialize the data with the new per-page value.
 
-typescript
+javascript
 Копировать код
-export class YourComponent implements OnInit {
-  totalPages: number = 0;  // Общее количество страниц
-  currentPage: number = 1; // Текущая страница
-  pageNumbers: number[] = []; // Список номеров страниц
-  startPage: number = 1; // Начальная страница для отображения
-  endPage: number = 5;   // Конечная страница для отображения
+$scope.perPage = 10; // Default perPage value
 
-  ngOnInit() {
-    this.calculatePageNumbers();
-  }
+$scope.setPerPage = function(perPage) {
+    $scope.perPage = perPage;
+    $scope.init({currentPage: 1, perPage: perPage});
+};
+Explanation
+HTML:
 
-  calculatePageNumbers() {
-    this.pageNumbers = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
+The ng-click directive is used to call the setPerPage function when a badge is clicked.
+The ng-class directive dynamically applies the badge-success class to the selected per-page option and badge-primary to the unselected ones.
+CSS:
 
-  goToPage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.updatePageNumbers();
-      // Ваш код для загрузки данных для текущей страницы
-    }
-  }
+The .badge, .badge-success, and .badge-primary classes define the styles for the badges.
+.badge:hover adds a hover effect to improve the visual appeal.
+AngularJS Controller:
 
-  updatePageNumbers() {
-    const totalPages = this.pageNumbers.length;
-    this.startPage = Math.max(1, this.currentPage - 2);
-    this.endPage = Math.min(totalPages, this.currentPage + 2);
-  }
-
-  first_page() {
-    this.goToPage(1);
-  }
-
-  before_page() {
-    if (this.currentPage > 1) {
-      this.goToPage(this.currentPage - 1);
-    }
-  }
-
-  next_page() {
-    if (this.currentPage < this.totalPages) {
-      this.goToPage(this.currentPage + 1);
-    }
-  }
-
-  last_page() {
-    this.goToPage(this.totalPages);
-  }
-}
-4. Объяснение
-HTML-шаблон: Мы добавили Angular директивы для динамического отображения номеров страниц и используем классы для управления активным состоянием и видимостью страниц.
-
-CSS: Стили обеспечивают плавные переходы и визуальные эффекты для кнопок и номеров страниц.
-
-TypeScript: Логика в компоненте управляет текущей страницей и обновляет видимость номеров страниц в зависимости от текущей страницы.
-
-Этот подход обеспечит функциональную и визуально приятную пагинацию для вашего приложения. Вы можете настроить стили и логику в зависимости от ваших конкретных требований.
+The setPerPage function updates the perPage variable and calls the init function with the new per-page value.
+By following this approach, the pagination component will have a clear visual indication of the selected option and will update the number of items displayed per page dynamically when a badge is clicked.

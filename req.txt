@@ -1,38 +1,60 @@
-Чтобы сделать строку "итого" в PostgreSQL, можно использовать объединение основного запроса с запросом, который вычисляет итоговые значения. Вот пример, как это можно сделать:
+Для того чтобы получить данные с подсчетом записей или суммами с определенными условиями в PostgreSQL, можно использовать оператор `CASE` в сочетании с агрегатными функциями такими как `COUNT` или `SUM`. Приведу общий пример запроса, который может помочь вам в решении вашей задачи:
 
 ```sql
-WITH main_query AS (
-    SELECT 
-        column1,
-        column2,
-        SUM(column3) AS total
-    FROM 
-        your_table
-    WHERE 
-        %filter%
-    GROUP BY 
-        column1, column2
-)
-SELECT 
-    column1,
-    column2,
-    total
-FROM 
-    main_query
-
-UNION ALL
-
-SELECT 
-    'Итого' AS column1,
-    NULL AS column2,
-    SUM(total) AS total
-FROM 
-    main_query
-
-ORDER BY 
-    column1, column2;
+SELECT
+    'Наименование 1' AS name,
+    COUNT(*) FILTER (WHERE условие1) AS count1,
+    SUM(column_name) FILTER (WHERE условие2) AS sum1,
+    'Наименование 2' AS name,
+    COUNT(*) FILTER (WHERE условие3) AS count2,
+    SUM(column_name) FILTER (WHERE условие4) AS sum2,
+    -- Добавьте больше строк по аналогии
+FROM
+    table_name
+GROUP BY
+    name;
 ```
 
-В этом примере используется Common Table Expression (CTE) для основного запроса (`main_query`). Затем основной запрос объединяется с запросом, который вычисляет итоговые значения и добавляет строку "Итого". Если вам нужно использовать динамическое упорядочение, вы можете добавить его в основной запрос и запрос итогов.
+Если у вас 11 строк с различными наименованиями и условиями, это можно сделать так:
 
-Этот подход позволяет добавить строку "Итого" в результат вашего запроса без значительных изменений в структуре основного запроса.
+```sql
+SELECT
+    'Наименование 1' AS name,
+    COUNT(*) FILTER (WHERE условие1) AS count1,
+    SUM(column_name) FILTER (WHERE условие1) AS sum1
+FROM
+    table_name
+UNION ALL
+SELECT
+    'Наименование 2' AS name,
+    COUNT(*) FILTER (WHERE условие2) AS count2,
+    SUM(column_name) FILTER (WHERE условие2) AS sum2
+FROM
+    table_name
+UNION ALL
+-- Добавьте больше строк по аналогии
+;
+```
+
+Пример использования, если вам нужно получить сумму продаж по разным категориям товаров:
+
+```sql
+SELECT
+    'Категория 1' AS category,
+    COUNT(*) FILTER (WHERE category = 'Категория 1') AS count_category1,
+    SUM(sales) FILTER (WHERE category = 'Категория 1') AS sum_sales_category1
+FROM
+    sales_table
+UNION ALL
+SELECT
+    'Категория 2' AS category,
+    COUNT(*) FILTER (WHERE category = 'Категория 2') AS count_category2,
+    SUM(sales) FILTER (WHERE category = 'Категория 2') AS sum_sales_category2
+FROM
+    sales_table
+UNION ALL
+-- Добавьте больше строк по аналогии
+;
+```
+
+Этот запрос будет возвращать строки с наименованиями и соответствующими подсчетами или суммами по заданным условиям. Убедитесь, что условия и имена столбцов соответствуют вашей схеме данных.

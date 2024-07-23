@@ -1,42 +1,38 @@
-В Angular можно создать выпадающий список и управлять его значением с помощью ngModel. Вот пример, как это можно сделать:
+Чтобы сделать строку "итого" в PostgreSQL, можно использовать объединение основного запроса с запросом, который вычисляет итоговые значения. Вот пример, как это можно сделать:
 
-HTML: Создайте выпадающий список с помощью <select> и ngModel для связывания значения.
-html
-Копировать код
-<select [(ngModel)]="perpage" (ngModelChange)="onPerPageChange($event)">
-  <option *ngFor="let option of options" [value]="option">{{ option }}</option>
-  <option value="b">b</option>
-</select>
-TypeScript: Определите переменные и методы в вашем компоненте.
-typescript
-Копировать код
-import { Component } from '@angular/core';
+```sql
+WITH main_query AS (
+    SELECT 
+        column1,
+        column2,
+        SUM(column3) AS total
+    FROM 
+        your_table
+    WHERE 
+        %filter%
+    GROUP BY 
+        column1, column2
+)
+SELECT 
+    column1,
+    column2,
+    total
+FROM 
+    main_query
 
-@Component({
-  selector: 'app-my-component',
-  templateUrl: './my-component.component.html',
-  styleUrls: ['./my-component.component.css']
-})
-export class MyComponent {
-  perpage: number | string = 15;  // Значение по умолчанию
-  const_perpage: number = 15;  // Константа по умолчанию
-  options: number[] = [15, 30, 45, 60, 75, 90];  // Опции для выпадающего списка
+UNION ALL
 
-  constructor() {
-    // Инициализация или другие действия при создании компонента
-  }
+SELECT 
+    'Итого' AS column1,
+    NULL AS column2,
+    SUM(total) AS total
+FROM 
+    main_query
 
-  onPerPageChange(value: number | string) {
-    // Логика при изменении значения
-    if (value === 'b') {
-      this.perpage = this.const_perpage;  // Возврат к значению по умолчанию
-    } else {
-      this.perpage = Number(value);  // Присваиваем выбранное значение
-    }
-  }
-}
-Объяснение:
+ORDER BY 
+    column1, column2;
+```
 
-В HTML-шаблоне создается выпадающий список с опциями и связывается с переменной perpage с помощью ngModel.
-При изменении значения в списке вызывается метод onPerPageChange, который обновляет значение переменной perpage. Если выбрано значение "b", оно сбрасывает значение на const_perpage.
-Таким образом, при изменении значения в выпадающем списке переменная perpage будет обновляться, и при выборе "b" возвращаться к значению по умолчанию.
+В этом примере используется Common Table Expression (CTE) для основного запроса (`main_query`). Затем основной запрос объединяется с запросом, который вычисляет итоговые значения и добавляет строку "Итого". Если вам нужно использовать динамическое упорядочение, вы можете добавить его в основной запрос и запрос итогов.
+
+Этот подход позволяет добавить строку "Итого" в результат вашего запроса без значительных изменений в структуре основного запроса.

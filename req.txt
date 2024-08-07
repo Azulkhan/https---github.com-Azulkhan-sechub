@@ -1,31 +1,12 @@
-Для того чтобы сохранить формат числа `0,00` в ячейке таблицы, вы можете использовать функцию JavaScript для форматирования чисел. Если ваш шаблонизатор поддерживает встраивание JavaScript, вы можете использовать что-то вроде следующего:
-
-```html
-<td>{{ inrex($item_value, "is_rg").toFixed(2) }}</td>
-```
-
-Функция `toFixed(2)` форматирует число до двух знаков после запятой, что даст вам значение `0,00` вместо `0`.
-
-Если ваш шаблонизатор не поддерживает встроенный JavaScript, вы можете форматировать значение непосредственно в JavaScript при заполнении таблицы:
-
-```html
-<td>{{ formatNumber(inrex($item_value, "is_rg")) }}</td>
-```
-
-А функция `formatNumber` будет выглядеть так:
-
-```javascript
-function formatNumber(value) {
-  return value.toFixed(2);
-}
-```
-
-Убедитесь, что `value` — это число. Если это строка, возможно, потребуется предварительно преобразовать её в число:
-
-```javascript
-function formatNumber(value) {
-  return parseFloat(value).toFixed(2);
-}
-```
-
-Этот подход гарантирует, что значение `0,00` будет отображаться правильно в ячейке таблицы.
+SELECT 
+    m.user_id
+FROM 
+    mob_inv_tasks_users m
+JOIN 
+    users u ON m.user_id = u.id
+JOIN 
+    auth_tokens a ON m.user_id = a.user_id
+WHERE 
+    u.dep_id = 1
+    AND a.update_at IS NOT NULL
+    AND a.sys$uuid = 'auth_token'

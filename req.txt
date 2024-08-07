@@ -1,0 +1,26 @@
+Вам нужно создать запрос, который объединяет три таблицы для фильтрации данных по `dep_id`, `user_id` и условиям в `auth_tokens`. Вот пример запроса, который это делает:
+
+```sql
+SELECT 
+    m.user_id
+FROM 
+    mob_inv_tasks_users m
+JOIN 
+    users u ON m.user_id = u.id
+JOIN 
+    auth_tokens a ON m.user_id = a.user_id
+WHERE 
+    u.dep_id = 1
+    AND a.update_at IS NOT NULL
+    AND a.sys$uuid = 'auth_token'
+```
+
+Этот запрос выполняет следующие действия:
+
+1. **JOIN** соединяет таблицы `mob_inv_tasks_users`, `users` и `auth_tokens` по `user_id`.
+2. **WHERE** фильтрует результаты по:
+   - `dep_id = 1` из таблицы `users`,
+   - условию `update_at IS NOT NULL` из таблицы `auth_tokens`,
+   - и условию `sys$uuid = 'auth_token'` из таблицы `auth_tokens`.
+
+Если у вас есть конкретное значение для `auth_token`, замените `'auth_token'` на нужное значение. Этот запрос должен вернуть `user_id` из таблицы `mob_inv_tasks_users`, которые удовлетворяют всем указанным условиям.

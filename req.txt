@@ -1,31 +1,44 @@
-Конечно! Вот простой пример HTML-документа, где текст содержит отступы:
+В Lua можно использовать два вложенных цикла `for`, где во втором цикле данные сохраняются в зависимости от значения из первого цикла с учетом связи через `id`. Вот пример реализации:
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text with Indents</title>
-    <style>
-        .indented-text {
-            text-indent: 2em; /* отступ для первой строки абзаца */
-            margin-bottom: 1em; /* отступ снизу после каждого абзаца */
-        }
-    </style>
-</head>
-<body>
-    <p class="indented-text">
-        This is the first paragraph of text. The first line has an indent, and there is a margin at the bottom to separate it from the next paragraph.
-    </p>
-    <p class="indented-text">
-        Here is the second paragraph with the same styling. Each paragraph starts with an indented line and is separated from the previous one by some space.
-    </p>
-    <p class="indented-text">
-        Finally, this is the third paragraph. The consistent indent and spacing help make the text easier to read and visually appealing.
-    </p>
-</body>
-</html>
+```lua
+-- Пример данных
+local first_list = {
+    {id = 1, name = "Первый"},
+    {id = 2, name = "Второй"}
+}
+
+local second_list = {
+    {id = 1, value = "Данные для первого"},
+    {id = 1, value = "Еще данные для первого"},
+    {id = 2, value = "Данные для второго"}
+}
+
+-- Результат
+local result = {}
+
+-- Цикл по первому списку
+for i, item1 in ipairs(first_list) do
+    -- Создаем новый список для каждого элемента из первого списка
+    result[item1.id] = {}
+    
+    -- Цикл по второму списку
+    for j, item2 in ipairs(second_list) do
+        -- Если id совпадает, добавляем элемент из второго списка в результат
+        if item1.id == item2.id then
+            table.insert(result[item1.id], item2.value)
+        end
+    end
+end
+
+-- Выводим результат
+for id, values in pairs(result) do
+    print("ID:", id)
+    for k, value in ipairs(values) do
+        print("  Значение:", value)
+    end
+end
 ```
 
-В этом примере текст в каждом абзаце начинается с отступа, а сами абзацы отделены друг от друга. Если нужно изменить величину отступа или расстояние между абзацами, можно изменить значения `text-indent` и `margin-bottom` в CSS.
+Этот скрипт создает результат, где данные из второго списка сохраняются для каждого элемента из первого списка, основываясь на связи через `id`.
+
+Если что-то нужно изменить или добавить, дайте знать!

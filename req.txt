@@ -1,31 +1,24 @@
-Чтобы сделать такой запрос в PostgreSQL, вы можете использовать подзапрос с условием `CASE` или оператор `COALESCE`. Вот пример:
-
-### Пример с использованием `CASE`
-```sql
-SELECT
-    CASE 
-        WHEN EXISTS (
-            SELECT 1 FROM your_table WHERE your_column = 'your_value'
-        )
-        THEN 'your_value'
-        ELSE NULL
-    END AS result;
-```
-
-### Пример с использованием `COALESCE`
-Если вы хотите получить значение из таблицы или `NULL`, если оно не найдено, можно использовать `COALESCE` в сочетании с подзапросом:
+Чтобы создать таблицу для логирования уведомлений в PostgreSQL, которая будет фиксировать, кто и какое уведомление получил, можно использовать следующий SQL-запрос:
 
 ```sql
-SELECT
-    COALESCE(
-        (SELECT your_column FROM your_table WHERE your_column = 'your_value' LIMIT 1),
-        NULL
-    ) AS result;
+CREATE TABLE notification_log (
+    id SERIAL PRIMARY KEY,                   -- Уникальный идентификатор записи
+    recipient_id INTEGER NOT NULL,           -- Идентификатор получателя уведомления
+    notification_type VARCHAR(255) NOT NULL, -- Тип уведомления (например, email, SMS)
+    message TEXT NOT NULL,                   -- Сообщение уведомления
+    received_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- Время получения уведомления
+    status VARCHAR(50) DEFAULT 'sent',       -- Статус уведомления (например, sent, failed, etc.)
+    response TEXT                            -- Ответ или комментарий (если применимо)
+);
 ```
 
-### Пояснение
-- `your_table` — это имя вашей таблицы.
-- `your_column` — это колонка, в которой вы ищете значение.
-- `'your_value'` — это значение, которое вы ищете.
+### Пояснения:
+1. **`id SERIAL PRIMARY KEY`**: Автоматически увеличивающийся уникальный идентификатор для каждой записи.
+2. **`recipient_id INTEGER NOT NULL`**: Идентификатор пользователя или системы, получившего уведомление.
+3. **`notification_type VARCHAR(255)`**: Тип уведомления, например, `email`, `SMS` и т.д.
+4. **`message TEXT`**: Текст уведомления.
+5. **`received_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP`**: Время получения уведомления, по умолчанию текущее время.
+6. **`status VARCHAR(50) DEFAULT 'sent'`**: Статус уведомления, например, `sent` (отправлено) или `failed` (не удалось отправить).
+7. **`response TEXT`**: Поле для хранения ответа или комментария (например, если уведомление не доставлено или доставлено с ошибкой).
 
-Первый вариант (`CASE`) проверяет, существует ли запись с указанным значением, и возвращает либо значение, либо `NULL`. Второй вариант (`COALESCE`) пытается вернуть значение из базы данных, а если его нет, возвращает `NULL`.
+Эта структура таблицы позволит вам хранить данные о каждом уведомлении, кто его получил, какой тип уведомления был использован, а также статус и время доставки.

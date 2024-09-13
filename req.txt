@@ -1,6 +1,6 @@
-Если вам нужно просто прикрепить файл к REST-запросу и отправить его по почте, то для работы с файлами в REST сервисе (например, через API для отправки почты) вам нужно подготовить файл в правильном формате, например, как часть multipart/form-data.
+Если у вас есть Word-документ, который нужно отправить через REST API, то процесс отправки практически тот же, что и для других типов файлов. Вы просто указываете правильный MIME-тип для Word-файла и его путь. Для Word-документов MIME-тип обычно такой: `application/vnd.openxmlformats-officedocument.wordprocessingml.document`.
 
-Вот базовый пример Lua-кода для отправки REST-запроса с прикрепленным файлом:
+Пример кода для отправки Word-документа:
 
 ```lua
 local http = require("socket.http")
@@ -10,18 +10,23 @@ local mime = require("mime")
 -- Массив с файлами
 files = {}
 
--- Пример добавления файла в массив (без чтения, просто описание)
-table.insert(files, {name = "test.txt", path = "/path/to/test.txt", type = "text/plain"})
+-- Пример добавления Word-файла в массив (без чтения, просто описание)
+table.insert(files, {name = "document.docx", path = "/path/to/document.docx", type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"})
 
 -- Функция для отправки файла по почте
 function sendFileViaEmail(files)
     local boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"  -- произвольная граница для multipart данных
 
+    -- Открываем файл для чтения
+    local file = io.open(files[1].path, "rb")
+    local file_content = file:read("*all")
+    file:close()
+
     -- Создаем тело запроса
     local body = "--" .. boundary .. "\r\n"
     body = body .. 'Content-Disposition: form-data; name="file"; filename="' .. files[1].name .. '"\r\n'
     body = body .. "Content-Type: " .. files[1].type .. "\r\n\r\n"
-    body = body .. mime.b64("path/to/" .. files[1].path) .. "\r\n" -- кодируем файл в base64
+    body = body .. file_content .. "\r\n"
 
     body = body .. "--" .. boundary .. "--\r\n"
 
@@ -34,7 +39,7 @@ function sendFileViaEmail(files)
     -- Отправляем запрос
     local response_body = {}
     local res, code, response_headers = http.request{
-        url = "https://api.emailservice.com/send",
+        url = "https://api.emailservice.com/send", -- заменить на реальный URL почтового сервиса
         method = "POST",
         headers = headers,
         source = ltn12.source.string(body),
@@ -53,6 +58,10 @@ end
 sendFileViaEmail(files)
 ```
 
-Этот пример показывает отправку файла через REST-запрос с использованием multipart/form-data. Конечно, API для почтовой отправки может отличаться в зависимости от вашей системы (например, DAMU CRM), поэтому нужно будет адаптировать его под конкретный формат данных.
+### Пояснения:
+1. **MIME-тип для Word-документов**: `application/vnd.openxmlformats-officedocument.wordprocessingml.document`.
+2. **Чтение Word-документа**: Мы открываем файл в бинарном режиме (`rb`), чтобы правильно прочитать его содержимое.
+3. **Тело запроса**: Формируется в соответствии с форматом `multipart/form-data`, где каждая часть имеет разделитель `boundary`. Этот формат часто используется для отправки файлов через REST API.
+4. **Отправка через HTTP**: Мы используем библиотеку `socket.http` для отправки POST-запроса с прикрепленным файлом.
 
-Убедитесь, что API почтового сервиса поддерживает отправку файлов как части REST-запроса.
+Этот пример можно адаптировать для любого API, поддерживающего отправку файлов через POST-запрос. Если ваш DAMU CRM имеет встроенный API для отправки писем, убедитесь, что вы правильно указываете URL и параметры в соответствии с документацией платформы.

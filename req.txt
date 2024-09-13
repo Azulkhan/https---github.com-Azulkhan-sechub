@@ -1,67 +1,36 @@
-Если у вас есть Word-документ, который нужно отправить через REST API, то процесс отправки практически тот же, что и для других типов файлов. Вы просто указываете правильный MIME-тип для Word-файла и его путь. Для Word-документов MIME-тип обычно такой: `application/vnd.openxmlformats-officedocument.wordprocessingml.document`.
+Для вычисления шестого рабочего дня от заданной даты в PostgreSQL, можно использовать цикл для перебора дней и пропускать выходные (субботу и воскресенье). 
 
-Пример кода для отправки Word-документа:
+Вот пример запроса на PostgreSQL:
 
-```lua
-local http = require("socket.http")
-local ltn12 = require("ltn12")
-local mime = require("mime")
+```sql
+WITH RECURSIVE workdays AS (
+    -- Начальная дата
+    SELECT
+        date '2024-09-13' AS day,
+        CASE
+            WHEN EXTRACT(ISODOW FROM date '2024-09-13') < 6 THEN 1 -- Если день не выходной
+            ELSE 0 -- Если выходной
+        END AS workday_count
+    UNION ALL
+    -- Следующие дни
+    SELECT
+        day + INTERVAL '1 day',
+        workday_count + CASE
+            WHEN EXTRACT(ISODOW FROM day + INTERVAL '1 day') < 6 THEN 1 -- Увеличиваем счетчик, если не выходной
+            ELSE 0
+        END
+    FROM workdays
+    WHERE workday_count < 6 -- Ищем до 6-го рабочего дня
+)
 
--- Массив с файлами
-files = {}
-
--- Пример добавления Word-файла в массив (без чтения, просто описание)
-table.insert(files, {name = "document.docx", path = "/path/to/document.docx", type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"})
-
--- Функция для отправки файла по почте
-function sendFileViaEmail(files)
-    local boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"  -- произвольная граница для multipart данных
-
-    -- Открываем файл для чтения
-    local file = io.open(files[1].path, "rb")
-    local file_content = file:read("*all")
-    file:close()
-
-    -- Создаем тело запроса
-    local body = "--" .. boundary .. "\r\n"
-    body = body .. 'Content-Disposition: form-data; name="file"; filename="' .. files[1].name .. '"\r\n'
-    body = body .. "Content-Type: " .. files[1].type .. "\r\n\r\n"
-    body = body .. file_content .. "\r\n"
-
-    body = body .. "--" .. boundary .. "--\r\n"
-
-    -- Заголовки запроса
-    local headers = {
-        ["Content-Type"] = "multipart/form-data; boundary=" .. boundary,
-        ["Content-Length"] = #body
-    }
-
-    -- Отправляем запрос
-    local response_body = {}
-    local res, code, response_headers = http.request{
-        url = "https://api.emailservice.com/send", -- заменить на реальный URL почтового сервиса
-        method = "POST",
-        headers = headers,
-        source = ltn12.source.string(body),
-        sink = ltn12.sink.table(response_body)
-    }
-
-    -- Проверка результата
-    if code == 200 then
-        print("Файл успешно отправлен по почте")
-    else
-        print("Ошибка при отправке почты: " .. code)
-    end
-end
-
--- Вызываем функцию
-sendFileViaEmail(files)
+SELECT day
+FROM workdays
+WHERE workday_count = 6;  -- Возвращаем 6-й рабочий день
 ```
 
 ### Пояснения:
-1. **MIME-тип для Word-документов**: `application/vnd.openxmlformats-officedocument.wordprocessingml.document`.
-2. **Чтение Word-документа**: Мы открываем файл в бинарном режиме (`rb`), чтобы правильно прочитать его содержимое.
-3. **Тело запроса**: Формируется в соответствии с форматом `multipart/form-data`, где каждая часть имеет разделитель `boundary`. Этот формат часто используется для отправки файлов через REST API.
-4. **Отправка через HTTP**: Мы используем библиотеку `socket.http` для отправки POST-запроса с прикрепленным файлом.
+1. **WITH RECURSIVE**: создает рекурсивный запрос, который последовательно прибавляет по одному дню к стартовой дате.
+2. **EXTRACT(ISODOW FROM day)**: возвращает день недели в формате ISO (1 = понедельник, 7 = воскресенье). Мы используем это, чтобы определить, является ли день выходным.
+3. **workday_count**: увеличивается на 1 только если день — рабочий (с понедельника по пятницу).
 
-Этот пример можно адаптировать для любого API, поддерживающего отправку файлов через POST-запрос. Если ваш DAMU CRM имеет встроенный API для отправки писем, убедитесь, что вы правильно указываете URL и параметры в соответствии с документацией платформы.
+Этот запрос вернёт шестой рабочий день от указанной даты, пропуская выходные.

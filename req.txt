@@ -1,36 +1,10 @@
-Для вычисления шестого рабочего дня от заданной даты в PostgreSQL, можно использовать цикл для перебора дней и пропускать выходные (субботу и воскресенье). 
-
-Вот пример запроса на PostgreSQL:
-
-```sql
-WITH RECURSIVE workdays AS (
-    -- Начальная дата
-    SELECT
-        date '2024-09-13' AS day,
-        CASE
-            WHEN EXTRACT(ISODOW FROM date '2024-09-13') < 6 THEN 1 -- Если день не выходной
-            ELSE 0 -- Если выходной
-        END AS workday_count
-    UNION ALL
-    -- Следующие дни
-    SELECT
-        day + INTERVAL '1 day',
-        workday_count + CASE
-            WHEN EXTRACT(ISODOW FROM day + INTERVAL '1 day') < 6 THEN 1 -- Увеличиваем счетчик, если не выходной
-            ELSE 0
-        END
-    FROM workdays
-    WHERE workday_count < 6 -- Ищем до 6-го рабочего дня
-)
-
-SELECT day
-FROM workdays
-WHERE workday_count = 6;  -- Возвращаем 6-й рабочий день
-```
-
-### Пояснения:
-1. **WITH RECURSIVE**: создает рекурсивный запрос, который последовательно прибавляет по одному дню к стартовой дате.
-2. **EXTRACT(ISODOW FROM day)**: возвращает день недели в формате ISO (1 = понедельник, 7 = воскресенье). Мы используем это, чтобы определить, является ли день выходным.
-3. **workday_count**: увеличивается на 1 только если день — рабочий (с понедельника по пятницу).
-
-Этот запрос вернёт шестой рабочий день от указанной даты, пропуская выходные.
+SELECT
+    my_date,
+    CASE
+        WHEN EXTRACT(DOW FROM my_date) = 6 THEN 'Суббота'
+        WHEN EXTRACT(DOW FROM my_date) = 0 THEN 'Воскресенье'
+        ELSE 'Рабочий день'
+    END AS day_type
+FROM (
+    SELECT date '2024-09-13' AS my_date -- Замените дату на вашу
+) AS date_check;

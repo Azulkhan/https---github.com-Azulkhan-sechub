@@ -1,64 +1,66 @@
-Для отображения PDF-презентации на HTML-странице есть несколько подходов:
+Чтобы отобразить PDF на странице в Angular, можно использовать тег `<iframe>` или библиотеку, такую как `pdf-viewer`. Вот два подхода:
 
-1. **Использование встроенного PDF-просмотра с `<iframe>`:**
-   Это самый простой способ. Вы можете вставить PDF-файл на страницу с помощью тега `<iframe>`:
-   ```html
-   <iframe src="your-presentation.pdf" width="100%" height="600px"></iframe>
-   ```
-   Этот метод встроит PDF-документ в вашу страницу, и браузер покажет его с помощью встроенного PDF-просмотра.
+### 1. Использование тега `<iframe>`:
+Это самый простой способ отобразить PDF файл:
 
-2. **Использование тега `<embed>`:**
-   Подобно `<iframe>`, вы также можете использовать тег `<embed>`:
-   ```html
-   <embed src="your-presentation.pdf" type="application/pdf" width="100%" height="600px">
-   ```
+```html
+<iframe [src]="pdfUrl | safe: 'resourceUrl'" width="100%" height="600px"></iframe>
+```
 
-3. **Использование библиотеки PDF.js:**
-   PDF.js — это мощная библиотека, которая позволяет отображать PDF-файлы непосредственно на веб-странице, не полагаясь на встроенные механизмы браузера. Это более контролируемый и кастомизируемый способ.
+В TypeScript-коде:
 
-   1. Сначала добавьте PDF.js в проект:
-      ```html
-      <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
-      ```
+```typescript
+pdfUrl: string = 'assets/sample.pdf';
+```
 
-   2. Затем создайте HTML-элемент, куда будет рендериться PDF:
-      ```html
-      <canvas id="pdfCanvas"></canvas>
-      ```
+Тут `safe` — это кастомный pipe для безопасной работы с URL. Его можно создать следующим образом:
 
-   3. И используйте следующий скрипт для отображения PDF-файла:
-      ```javascript
-      var url = 'your-presentation.pdf';
+```typescript
+import { Pipe, PipeTransform } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
-      var loadingTask = pdfjsLib.getDocument(url);
-      loadingTask.promise.then(function(pdf) {
-          // Получаем первую страницу
-          pdf.getPage(1).then(function(page) {
-              var scale = 1.5;
-              var viewport = page.getViewport({ scale: scale });
+@Pipe({ name: 'safe' })
+export class SafePipe implements PipeTransform {
+  constructor(private sanitizer: DomSanitizer) {}
 
-              // Подготовка элемента canvas
-              var canvas = document.getElementById('pdfCanvas');
-              var context = canvas.getContext('2d');
-              canvas.height = viewport.height;
-              canvas.width = viewport.width;
+  transform(url: string, type: string): SafeResourceUrl {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+}
+```
 
-              // Рендер страницы на canvas
-              var renderContext = {
-                  canvasContext: context,
-                  viewport: viewport
-              };
-              page.render(renderContext);
-          });
-      });
-      ```
+### 2. Использование библиотеки `ng2-pdf-viewer`:
 
-Этот метод даёт больше возможностей для кастомизации и контроля за отображением страниц PDF.
+1. Установите библиотеку:
 
-4. **Использование сторонних сервисов:**
-   Вы можете использовать сторонние сервисы, такие как Google Docs Viewer, для встраивания PDF:
-   ```html
-   <iframe src="https://docs.google.com/gview?url=your-presentation.pdf&embedded=true" width="100%" height="600px"></iframe>
-   ```
+```bash
+npm install ng2-pdf-viewer
+```
 
-Выбор метода зависит от ваших требований: если вам нужен простой способ, подойдет `<iframe>` или `<embed>`. Если вам нужна полная кастомизация, лучше использовать PDF.js.
+2. Импортируйте `PdfViewerModule` в ваш модуль:
+
+```typescript
+import { PdfViewerModule } from 'ng2-pdf-viewer';
+
+@NgModule({
+  imports: [
+    PdfViewerModule
+    // другие модули
+  ],
+})
+export class AppModule {}
+```
+
+3. В компоненте используйте:
+
+```html
+<pdf-viewer [src]="pdfUrl" [render-text]="true" style="display: block;"></pdf-viewer>
+```
+
+И в TypeScript:
+
+```typescript
+pdfUrl: string = 'assets/sample.pdf';
+```
+
+Этот способ позволяет вам отображать PDF без необходимости использования внешних плагинов, а также предлагает дополнительные функции, такие как масштабирование, навигация по страницам и т.д.

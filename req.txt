@@ -1,116 +1,49 @@
-В Angular есть несколько способов отображения PDF-документов на странице. Вот несколько популярных методов:
+Для отображения презентации PowerPoint (файлы `.pptx`) на HTML-странице, у вас есть несколько вариантов:
 
-### 1. **Использование встроенного HTML `<embed>` или `<iframe>`:**
+### 1. **Конвертация в PDF и встраивание**
+   - Конвертируйте PPTX в PDF, а затем используйте элемент `<iframe>` для отображения PDF файла.
+   ```html
+   <iframe src="path/to/yourfile.pdf" width="100%" height="600px"></iframe>
+   ```
 
-Это самый простой способ. Можно встроить PDF в страницу с помощью тега `<embed>` или `<iframe>`.
+### 2. **Использование сторонних сервисов**
+   Вы можете использовать сторонние сервисы для встраивания презентаций, например:
+   
+   - **Google Slides**:
+     1. Загрузите презентацию в Google Slides.
+     2. Выберите "Файл" → "Опубликовать в интернете" → "Встраивание".
+     3. Скопируйте и вставьте предоставленный код.
+     ```html
+     <iframe src="https://docs.google.com/presentation/d/YOUR_FILE_ID/embed" frameborder="0" width="100%" height="600px"></iframe>
+     ```
 
-Пример с использованием тега `<embed>`:
+   - **SlideShare**: Если вы загружаете презентацию на SlideShare, вы можете получить код для встраивания презентации на ваш сайт.
 
-```html
-<embed src="path/to/your/file.pdf" width="100%" height="600px" type="application/pdf">
-```
+### 3. **Использование JavaScript-библиотеки**
+   Вы можете использовать JavaScript-библиотеки, такие как **PptxGenJS** или **Reveal.js**, которые позволяют создавать и отображать слайды прямо в браузере.
 
-Пример с использованием тега `<iframe>`:
+   Например, `PptxGenJS` позволяет создавать презентации с помощью JavaScript:
+   ```html
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.7.1/pptxgen.min.js"></script>
+   <script>
+     var pptx = new PptxGenJS();
+     var slide = pptx.addSlide();
+     slide.addText('Hello World!', { x:1, y:1, fontSize:18 });
+     pptx.writeFile('SamplePresentation.pptx');
+   </script>
+   ```
 
-```html
-<iframe src="path/to/your/file.pdf" width="100%" height="600px"></iframe>
-```
+### 4. **Конвертация в изображения**
+   Вы можете конвертировать каждый слайд PPTX в изображение (PNG или JPG) и отобразить их как набор `<img>` на HTML-странице:
+   ```html
+   <img src="path/to/slide1.png" alt="Slide 1">
+   <img src="path/to/slide2.png" alt="Slide 2">
+   ```
 
-### 2. **Использование библиотеки `ng2-pdf-viewer`:**
+### 5. **Office Web Viewer**
+   Используйте Office Web Viewer для встраивания презентации:
+   ```html
+   <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=URL_Вашей_Презентации" width="100%" height="600px"></iframe>
+   ```
 
-`ng2-pdf-viewer` — это Angular-библиотека, которая позволяет отображать PDF-файлы на странице и поддерживает функции вроде масштабирования, поворота и т.д.
-
-#### Установка:
-
-1. Установите библиотеку:
-
-```bash
-npm install ng2-pdf-viewer
-```
-
-2. Импортируйте её в ваш модуль:
-
-```typescript
-import { PdfViewerModule } from 'ng2-pdf-viewer';
-
-@NgModule({
-  declarations: [...],
-  imports: [
-    PdfViewerModule,
-    ...
-  ],
-  ...
-})
-export class AppModule { }
-```
-
-3. Используйте компонент `pdf-viewer` в шаблоне:
-
-```html
-<pdf-viewer [src]="pdfSrc" 
-            [render-text]="true"
-            style="display: block;"
-            [original-size]="true">
-</pdf-viewer>
-```
-
-4. В вашем компоненте укажите путь к PDF:
-
-```typescript
-export class YourComponent {
-  pdfSrc = "path/to/your/file.pdf";
-}
-```
-
-### 3. **Использование библиотеки PDF.js:**
-
-PDF.js — это популярная библиотека для рендеринга PDF в HTML5. Её можно интегрировать в Angular проект.
-
-#### Установка:
-
-1. Установите библиотеки PDF.js:
-
-```bash
-npm install pdfjs-dist
-```
-
-2. Импортируйте PDF.js в компонент и используйте его для рендеринга PDF.
-
-```typescript
-import * as pdfjsLib from 'pdfjs-dist';
-import { Component, OnInit } from '@angular/core';
-
-@Component({
-  selector: 'app-pdf-viewer',
-  template: `<canvas id="pdf-canvas"></canvas>`,
-})
-export class PdfViewerComponent implements OnInit {
-  ngOnInit(): void {
-    const url = 'path/to/your/file.pdf';
-    const canvas: any = document.getElementById('pdf-canvas');
-    const context = canvas.getContext('2d');
-
-    pdfjsLib.getDocument(url).promise.then((pdf) => {
-      pdf.getPage(1).then((page) => {
-        const viewport = page.getViewport({ scale: 1 });
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-
-        const renderContext = {
-          canvasContext: context,
-          viewport: viewport,
-        };
-        page.render(renderContext);
-      });
-    });
-  }
-}
-```
-
-Этот код загружает и рендерит PDF-документ на `canvas`.
-
-### Заключение:
-
-- Для простого отображения PDF можно использовать теги `<embed>` или `<iframe>`.
-- Для более продвинутого управления PDF (масштабирование, поворот и т.д.) можно использовать библиотеку `ng2-pdf-viewer`.
-- Если нужен полный контроль над процессом рендеринга PDF, можно использовать библиотеку PDF.js.
+Вам нужно будет выбрать подходящий метод в зависимости от вашего проекта.

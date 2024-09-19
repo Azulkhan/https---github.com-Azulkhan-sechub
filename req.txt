@@ -1,3 +1,6 @@
+Если основной цвет вашего сайта синий, можно адаптировать стили так, чтобы зелёные элементы гармонировали с синим. Вот обновлённый HTML с учётом синего цвета для лучшего сочетания:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,14 +10,14 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f8f0;
+            background-color: #f0f8ff; /* Светло-голубой фон для гармонии с синим */
             color: #333;
             margin: 0;
             padding: 20px;
         }
 
         header {
-            background-color: #2e8b57;
+            background-color: #1e90ff; /* Основной синий цвет */
             color: white;
             padding: 20px;
             text-align: center;
@@ -31,7 +34,7 @@
         }
 
         nav a {
-            color: #2e8b57;
+            color: #2e8b57; /* Зелёный акцент для ссылок */
             text-decoration: none;
             margin: 0 15px;
             font-size: 1.2em;
@@ -46,7 +49,7 @@
         }
 
         section h2 {
-            color: #2e8b57;
+            color: #2e8b57; /* Заголовки в зелёном */
         }
 
         section p {
@@ -58,14 +61,14 @@
             margin-top: 50px;
             text-align: center;
             padding: 10px;
-            background-color: #2e8b57;
+            background-color: #1e90ff; /* Синий для футера */
             color: white;
         }
 
         .btn {
             display: inline-block;
             padding: 10px 20px;
-            background-color: #2e8b57;
+            background-color: #2e8b57; /* Зелёные кнопки */
             color: white;
             text-decoration: none;
             border-radius: 5px;
@@ -118,3 +121,11 @@
 
 </body>
 </html>
+```
+
+### Изменения:
+- Основной фон изменён на светло-голубой (`#f0f8ff`), который хорошо сочетается с синим.
+- Заголовки, ссылки и кнопки остались зелёными для акцентов.
+- Синий цвет используется в шапке и футере сайта, чтобы гармонировать с основным дизайном. 
+
+Теперь зелёный и синий цвета будут смотреться гармонично.

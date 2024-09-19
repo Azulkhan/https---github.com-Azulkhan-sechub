@@ -10,13 +10,12 @@
             background-color: #ffffff;
             color: #333;
             margin: 0;
-            padding: 0;
+            padding: 20px;
         }
         .container {
             width: 100%;
             max-width: 1000px;
             margin: 0 auto;
-            padding: 20px;
         }
         .header {
             background-color: #007f39;
@@ -37,6 +36,24 @@
             max-width: 100%;
             height: auto;
         }
+        .section {
+            margin-top: 40px;
+        }
+        .section h1 {
+            color: #008f4c;
+            font-size: 24px;
+        }
+        .section p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .highlight {
+            color: red;
+        }
+        .bold-text {
+            font-weight: bold;
+            color: #008f4c;
+        }
         .footer {
             text-align: left;
             font-size: 14px;
@@ -52,15 +69,27 @@
 <body>
 
 <div class="container">
+    <!-- Первый слайд -->
     <div class="header">
         <h1>Проект «Инвентаризация имущества Банка с использованием мобильного приложения»</h1>
     </div>
 
     <div class="content">
         <p>Сентябрь 2024 г.<br>Исполнитель: Хван О.В.</p>
-        <img src="image.png" alt="Иллюстрация проекта">
+        <img src="image1.png" alt="Иллюстрация проекта">
     </div>
 
+    <!-- Второй слайд -->
+    <div class="section">
+        <h1>Что такое инвентаризация?</h1>
+        <p>Это процесс проверки фактического наличия и состояния имущества с данными бухгалтерского учета.</p>
+        <p>Инвентаризации подлежит все имущество независимо от его местонахождения, а также не принадлежащее Банку, но числящееся в бухгалтерском учете (находящееся на ответственном хранении, арендованное согласно договору), <span class="highlight">а также имущество, не учтенное по каким-либо причинам (излишки).</span></p>
+        <p class="bold-text">Инвентаризация является обязательным ежегодным процессом, который закреплен на законодательном уровне и также правилами инвентаризации банка.</p>
+
+        <img src="image2.png" alt="Иллюстрация процесса инвентаризации" style="max-width: 100%; height: auto;">
+    </div>
+
+    <!-- Футер -->
     <div class="footer">
         <a href="https://halykbank.kz">halykbank.kz</a>
         <a href="https://facebook.com/halykbank">facebook.com/halykbank</a>

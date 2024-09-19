@@ -1,131 +1,97 @@
-Если основной цвет вашего сайта синий, можно адаптировать стили так, чтобы зелёные элементы гармонировали с синим. Вот обновлённый HTML с учётом синего цвета для лучшего сочетания:
-
-```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="kk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instruction Page</title>
+    <title>Магистратура 2022-2023</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f8ff; /* Светло-голубой фон для гармонии с синим */
-            color: #333;
-            margin: 0;
-            padding: 20px;
+            margin: 20px;
         }
-
-        header {
-            background-color: #1e90ff; /* Основной синий цвет */
-            color: white;
-            padding: 20px;
-            text-align: center;
+        h1, h2 {
+            color: #003399;
         }
-
-        h1 {
-            margin: 0;
-            font-size: 2.5em;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
-
-        nav {
-            margin-top: 20px;
-            text-align: center;
+        table, th, td {
+            border: 1px solid black;
         }
-
-        nav a {
-            color: #2e8b57; /* Зелёный акцент для ссылок */
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 1.2em;
+        th, td {
+            padding: 8px;
+            text-align: left;
         }
-
-        nav a:hover {
-            text-decoration: underline;
-        }
-
-        section {
-            margin-top: 40px;
-        }
-
-        section h2 {
-            color: #2e8b57; /* Заголовки в зелёном */
-        }
-
-        section p {
-            font-size: 1.1em;
-            line-height: 1.6;
-        }
-
-        footer {
-            margin-top: 50px;
-            text-align: center;
-            padding: 10px;
-            background-color: #1e90ff; /* Синий для футера */
-            color: white;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #2e8b57; /* Зелёные кнопки */
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 1em;
-            margin-top: 20px;
-        }
-
-        .btn:hover {
-            background-color: #256b44;
+        th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>Company Instruction Manual</h1>
-</header>
+    <h1>2022-2023 оқу жылына арналған Магистратура гранты иегерлерінің тізімі</h1>
 
-<nav>
-    <a href="#introduction">Introduction</a>
-    <a href="#steps">Steps</a>
-    <a href="#conclusion">Conclusion</a>
-</nav>
+    <h2>M001 - Педагогика және психология</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>ТЖК</th>
+                <th>Тегі, Аты, Әкесінің аты</th>
+                <th>Балдар жиынтығы</th>
+                <th>ЖОО</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>00148333</td>
+                <td>КАСЕНОВА ЖИБЕК КАКЕНОВНА</td>
+                <td>55</td>
+                <td>035</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>00118428</td>
+                <td>ОРАЗАЛЫ АҢСАР НҰРБОЛАТҰЛЫ</td>
+                <td>55</td>
+                <td>007</td>
+            </tr>
+        </tbody>
+    </table>
 
-<section id="introduction">
-    <h2>Introduction</h2>
-    <p>Welcome to the instruction manual for our company's procedures. In this guide, you will find step-by-step instructions on how to complete various tasks effectively and efficiently.</p>
-</section>
+    <h2>M011 - Физика педагогтерін даярлау</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>ТЖК</th>
+                <th>Тегі, Аты, Әкесінің аты</th>
+                <th>Балдар жиынтығы</th>
+                <th>ЖОО</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>00122438</td>
+                <td>МАЖИТОВА АЙДАНА ТАЛГАТКЫЗЫ</td>
+                <td>55</td>
+                <td>027</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>00127684</td>
+                <td>ЖҰБАНЫШОВ АҚЖАЙДАР ШЫНБЕРГЕНҰЛЫ</td>
+                <td>50</td>
+                <td>003</td>
+            </tr>
+        </tbody>
+    </table>
 
-<section id="steps">
-    <h2>Steps</h2>
-    <p>Here are the steps you need to follow to achieve your goal:</p>
-    <ul>
-        <li>Step 1: Begin by gathering all necessary resources.</li>
-        <li>Step 2: Follow the guidelines provided in the company manual.</li>
-        <li>Step 3: Ensure compliance with all safety protocols.</li>
-        <li>Step 4: Report any issues to your supervisor immediately.</li>
-    </ul>
-</section>
-
-<section id="conclusion">
-    <h2>Conclusion</h2>
-    <p>Thank you for following this instruction manual. If you have any questions or need further assistance, feel free to reach out to the support team.</p>
-    <a href="#" class="btn">Contact Support</a>
-</section>
-
-<footer>
-    <p>&copy; 2024 Company Name. All rights reserved.</p>
-</footer>
-
+    <!-- Add more sections for other specializations -->
+    
 </body>
 </html>
-```
-
-### Изменения:
-- Основной фон изменён на светло-голубой (`#f0f8ff`), который хорошо сочетается с синим.
-- Заголовки, ссылки и кнопки остались зелёными для акцентов.
-- Синий цвет используется в шапке и футере сайта, чтобы гармонировать с основным дизайном. 
-
-Теперь зелёный и синий цвета будут смотреться гармонично.

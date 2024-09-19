@@ -1,49 +1,120 @@
-Для отображения презентации PowerPoint (файлы `.pptx`) на HTML-странице, у вас есть несколько вариантов:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instruction Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8f0;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
 
-### 1. **Конвертация в PDF и встраивание**
-   - Конвертируйте PPTX в PDF, а затем используйте элемент `<iframe>` для отображения PDF файла.
-   ```html
-   <iframe src="path/to/yourfile.pdf" width="100%" height="600px"></iframe>
-   ```
+        header {
+            background-color: #2e8b57;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
 
-### 2. **Использование сторонних сервисов**
-   Вы можете использовать сторонние сервисы для встраивания презентаций, например:
-   
-   - **Google Slides**:
-     1. Загрузите презентацию в Google Slides.
-     2. Выберите "Файл" → "Опубликовать в интернете" → "Встраивание".
-     3. Скопируйте и вставьте предоставленный код.
-     ```html
-     <iframe src="https://docs.google.com/presentation/d/YOUR_FILE_ID/embed" frameborder="0" width="100%" height="600px"></iframe>
-     ```
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
 
-   - **SlideShare**: Если вы загружаете презентацию на SlideShare, вы можете получить код для встраивания презентации на ваш сайт.
+        nav {
+            margin-top: 20px;
+            text-align: center;
+        }
 
-### 3. **Использование JavaScript-библиотеки**
-   Вы можете использовать JavaScript-библиотеки, такие как **PptxGenJS** или **Reveal.js**, которые позволяют создавать и отображать слайды прямо в браузере.
+        nav a {
+            color: #2e8b57;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.2em;
+        }
 
-   Например, `PptxGenJS` позволяет создавать презентации с помощью JavaScript:
-   ```html
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.7.1/pptxgen.min.js"></script>
-   <script>
-     var pptx = new PptxGenJS();
-     var slide = pptx.addSlide();
-     slide.addText('Hello World!', { x:1, y:1, fontSize:18 });
-     pptx.writeFile('SamplePresentation.pptx');
-   </script>
-   ```
+        nav a:hover {
+            text-decoration: underline;
+        }
 
-### 4. **Конвертация в изображения**
-   Вы можете конвертировать каждый слайд PPTX в изображение (PNG или JPG) и отобразить их как набор `<img>` на HTML-странице:
-   ```html
-   <img src="path/to/slide1.png" alt="Slide 1">
-   <img src="path/to/slide2.png" alt="Slide 2">
-   ```
+        section {
+            margin-top: 40px;
+        }
 
-### 5. **Office Web Viewer**
-   Используйте Office Web Viewer для встраивания презентации:
-   ```html
-   <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=URL_Вашей_Презентации" width="100%" height="600px"></iframe>
-   ```
+        section h2 {
+            color: #2e8b57;
+        }
 
-Вам нужно будет выбрать подходящий метод в зависимости от вашего проекта.
+        section p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 10px;
+            background-color: #2e8b57;
+            color: white;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #2e8b57;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1em;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #256b44;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Company Instruction Manual</h1>
+</header>
+
+<nav>
+    <a href="#introduction">Introduction</a>
+    <a href="#steps">Steps</a>
+    <a href="#conclusion">Conclusion</a>
+</nav>
+
+<section id="introduction">
+    <h2>Introduction</h2>
+    <p>Welcome to the instruction manual for our company's procedures. In this guide, you will find step-by-step instructions on how to complete various tasks effectively and efficiently.</p>
+</section>
+
+<section id="steps">
+    <h2>Steps</h2>
+    <p>Here are the steps you need to follow to achieve your goal:</p>
+    <ul>
+        <li>Step 1: Begin by gathering all necessary resources.</li>
+        <li>Step 2: Follow the guidelines provided in the company manual.</li>
+        <li>Step 3: Ensure compliance with all safety protocols.</li>
+        <li>Step 4: Report any issues to your supervisor immediately.</li>
+    </ul>
+</section>
+
+<section id="conclusion">
+    <h2>Conclusion</h2>
+    <p>Thank you for following this instruction manual. If you have any questions or need further assistance, feel free to reach out to the support team.</p>
+    <a href="#" class="btn">Contact Support</a>
+</section>
+
+<footer>
+    <p>&copy; 2024 Company Name. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

@@ -1,100 +1,30 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Проект Инвентаризация имущества Банка</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #ffffff;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        .header {
-            background-color: #007f39;
-            padding: 20px;
-            color: white;
-            text-align: center;
-            border-radius: 8px;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-        .content {
-            margin: 20px 0;
-            text-align: center;
-        }
-        .content img {
-            max-width: 100%;
-            height: auto;
-        }
-        .section {
-            margin-top: 40px;
-        }
-        .section h1 {
-            color: #008f4c;
-            font-size: 24px;
-        }
-        .section p {
-            font-size: 16px;
-            line-height: 1.5;
-        }
-        .highlight {
-            color: red;
-        }
-        .bold-text {
-            font-weight: bold;
-            color: #008f4c;
-        }
-        .footer {
-            text-align: left;
-            font-size: 14px;
-            margin-top: 20px;
-        }
-        .footer a {
-            color: #007f39;
-            text-decoration: none;
-            margin-right: 10px;
-        }
-    </style>
-</head>
-<body>
+Чтобы разместить два изображения друг над другом на веб-странице, можно использовать HTML и CSS. Вот простой способ сделать это:
 
-<div class="container">
-    <!-- Первый слайд -->
-    <div class="header">
-        <h1>Проект «Инвентаризация имущества Банка с использованием мобильного приложения»</h1>
-    </div>
-
-    <div class="content">
-        <p>Сентябрь 2024 г.<br>Исполнитель: Хван О.В.</p>
-        <img src="image1.png" alt="Иллюстрация проекта">
-    </div>
-
-    <!-- Второй слайд -->
-    <div class="section">
-        <h1>Что такое инвентаризация?</h1>
-        <p>Это процесс проверки фактического наличия и состояния имущества с данными бухгалтерского учета.</p>
-        <p>Инвентаризации подлежит все имущество независимо от его местонахождения, а также не принадлежащее Банку, но числящееся в бухгалтерском учете (находящееся на ответственном хранении, арендованное согласно договору), <span class="highlight">а также имущество, не учтенное по каким-либо причинам (излишки).</span></p>
-        <p class="bold-text">Инвентаризация является обязательным ежегодным процессом, который закреплен на законодательном уровне и также правилами инвентаризации банка.</p>
-
-        <img src="image2.png" alt="Иллюстрация процесса инвентаризации" style="max-width: 100%; height: auto;">
-    </div>
-
-    <!-- Футер -->
-    <div class="footer">
-        <a href="https://halykbank.kz">halykbank.kz</a>
-        <a href="https://facebook.com/halykbank">facebook.com/halykbank</a>
-    </div>
+### HTML:
+```html
+<div class="image-stack">
+    <img src="image1.jpg" alt="Image 1" class="image">
+    <img src="image2.jpg" alt="Image 2" class="image">
 </div>
+```
 
-</body>
-</html>
+### CSS:
+```css
+.image-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* По желанию, чтобы изображения были по центру */
+}
+
+.image {
+    width: 100%; /* Настройте ширину изображения, если нужно */
+    margin-bottom: 10px; /* Добавьте расстояние между изображениями, если нужно */
+}
+```
+
+### Пояснение:
+- Контейнер с классом `image-stack` используется для размещения изображений.
+- Свойство `flex-direction: column;` заставляет изображения располагаться вертикально.
+- Свойство `margin-bottom` в классе `.image` добавляет отступ между изображениями (по желанию).
+
+Если хотите использовать другие стили или эффекты, такие как центрирование или изменение размеров изображений, можно настроить CSS по вашему усмотрению.

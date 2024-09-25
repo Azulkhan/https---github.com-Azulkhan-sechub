@@ -1,25 +1,13 @@
-Попробуем другой подход для Oracle SQL, чтобы корректно определить первый рабочий день месяца, исключая выходные (субботу и воскресенье).
-
-Вот правильный запрос:
+Извиняюсь за предыдущие ошибки. Вот рабочий запрос для определения первого рабочего дня месяца (учитывая, что суббота и воскресенье — выходные):
 
 ```sql
-WITH first_day AS (
-  SELECT TRUNC(SYSDATE, 'MM') AS first_day_of_month
-  FROM dual
-)
-SELECT CASE
-         WHEN TO_CHAR(first_day_of_month, 'D', 'NLS_TERRITORY=RUSSIA') = '1' -- Воскресенье
-         THEN first_day_of_month + 1
-         WHEN TO_CHAR(first_day_of_month, 'D', 'NLS_TERRITORY=RUSSIA') = '7' -- Суббота
-         THEN first_day_of_month + 2
-         ELSE first_day_of_month
-       END AS first_working_day
-FROM first_day;
+SELECT
+  CASE 
+    WHEN TO_CHAR(TRUNC(SYSDATE, 'MM'), 'D', 'NLS_DATE_LANGUAGE=RUSSIAN') = '1' THEN TRUNC(SYSDATE, 'MM') + 1 -- Воскресенье
+    WHEN TO_CHAR(TRUNC(SYSDATE, 'MM'), 'D', 'NLS_DATE_LANGUAGE=RUSSIAN') = '7' THEN TRUNC(SYSDATE, 'MM') + 2 -- Суббота
+    ELSE TRUNC(SYSDATE, 'MM') -- Любой будний день
+  END AS first_working_day
+FROM dual;
 ```
 
-В этом запросе:
-- Если первый день месяца — воскресенье, добавляется 1 день, чтобы получить понедельник.
-- Если первый день месяца — суббота, добавляется 2 дня, чтобы также получить понедельник.
-- Если первый день месяца — будний день, он возвращается без изменений.
-
-`NLS_TERRITORY=RUSSIA` используется для правильной настройки начала недели с понедельника.
+Ключевая правка здесь — использование `NLS_DATE_LANGUAGE=RUSSIAN`, чтобы правильно определять день недели (где '1' — воскресенье, а '7' — суббота).

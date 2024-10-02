@@ -1,6 +1,12 @@
-=ЕСЛИ(D4=""; "--";
-   ЕСЛИ(ДЛСТР(D4)=5; "(000" & D4 & "),";
-   ЕСЛИ(ДЛСТР(D4)=4; "(0000" & D4 & "),";
-   ЕСЛИ(ДЛСТР(D4)=3; "(00000" & D4 & "),";
-   "(" & D4 & "),")))
-)
+function sleep(ms)
+  local t0 = os.clock()
+  while os.clock() - t0 <= ms / 1000 do end  -- переводим миллисекунды в секунды
+end
+
+for i = 1, 1000 do
+  print(i)
+  if i == 500 then
+    print("Pause for 500 milliseconds")
+    sleep(500)  -- пауза на 500 миллисекунд
+  end
+end

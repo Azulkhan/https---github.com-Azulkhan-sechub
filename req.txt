@@ -1,23 +1,18 @@
-В Angular можно последовательно вызвать две функции, используя промисы или async/await, чтобы убедиться, что первая функция завершится до вызова второй. Пример с использованием async/await:
-
-```typescript
-async onButtonClick() {
-  await this.firstFunction();
-  this.secondFunction();
+onButtonClick() {
+  this.firstFunction().then(() => {
+    this.secondFunction();
+  });
 }
 
 firstFunction(): Promise<void> {
   return new Promise((resolve) => {
-    // Действия первой функции
-    console.log("Первая функция выполнена");
-    resolve();
+    setTimeout(() => {
+      console.log('Первая асинхронная функция выполнена');
+      resolve(); // Уведомляем, что первая функция завершена
+    }, 1000); // Например, имитация задержки 1 секунда
   });
 }
 
 secondFunction() {
-  // Действия второй функции
-  console.log("Вторая функция выполнена");
+  console.log('Вторая функция выполнена после первой');
 }
-```
-
-В этом примере первая функция возвращает промис, который разрешается после завершения её действий. После этого вызывается вторая функция.

@@ -31,3 +31,23 @@ firstFunction() {
 secondFunction() {
   console.log('Вторая функция выполнена');
 }
+
+
+onButtonClick() {
+  this.firstFunction().then(() => {
+    this.secondFunction();
+  });
+}
+
+firstFunction(): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log('Первая функция завершена');
+      resolve();
+    }, 1000); // Задержка в 1 секунду
+  });
+}
+
+secondFunction() {
+  console.log('Вторая функция выполнена');
+}

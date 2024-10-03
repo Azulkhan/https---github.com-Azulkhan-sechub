@@ -16,3 +16,18 @@ firstFunction(): Promise<void> {
 secondFunction() {
   console.log('Вторая функция выполнена после первой');
 }
+
+
+
+onButtonClick() {
+  this.firstFunction();
+  this.secondFunction();
+}
+
+firstFunction() {
+  console.log('Первая функция завершена');
+}
+
+secondFunction() {
+  console.log('Вторая функция выполнена');
+}

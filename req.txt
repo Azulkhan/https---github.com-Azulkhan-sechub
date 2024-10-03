@@ -51,3 +51,29 @@ firstFunction(): Promise<void> {
 secondFunction() {
   console.log('Вторая функция выполнена');
 }
+
+
+onButtonClick() {
+  console.log('Кнопка нажата, начинаем выполнение первой функции...');
+  this.firstFunction()
+    .then(() => {
+      console.log('Первая функция завершена, запускаем вторую функцию...');
+      this.secondFunction();
+    })
+    .catch((error) => {
+      console.error('Ошибка в первой функции:', error);
+    });
+}
+
+firstFunction(): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log('Первая функция выполнена');
+      resolve();
+    }, 1000); // Задержка в 1 секунду
+  });
+}
+
+secondFunction() {
+  console.log('Вторая функция выполнена');
+}

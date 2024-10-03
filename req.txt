@@ -1,59 +1,4 @@
 onButtonClick() {
-  this.firstFunction().then(() => {
-    this.secondFunction();
-  });
-}
-
-firstFunction(): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log('Первая асинхронная функция выполнена');
-      resolve(); // Уведомляем, что первая функция завершена
-    }, 1000); // Например, имитация задержки 1 секунда
-  });
-}
-
-secondFunction() {
-  console.log('Вторая функция выполнена после первой');
-}
-
-
-
-onButtonClick() {
-  this.firstFunction();
-  this.secondFunction();
-}
-
-firstFunction() {
-  console.log('Первая функция завершена');
-}
-
-secondFunction() {
-  console.log('Вторая функция выполнена');
-}
-
-
-onButtonClick() {
-  this.firstFunction().then(() => {
-    this.secondFunction();
-  });
-}
-
-firstFunction(): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log('Первая функция завершена');
-      resolve();
-    }, 1000); // Задержка в 1 секунду
-  });
-}
-
-secondFunction() {
-  console.log('Вторая функция выполнена');
-}
-
-
-onButtonClick() {
   console.log('Кнопка нажата, начинаем выполнение первой функции...');
   this.firstFunction()
     .then(() => {
@@ -65,7 +10,7 @@ onButtonClick() {
     });
 }
 
-firstFunction(): Promise<void> {
+firstFunction() {
   return new Promise((resolve) => {
     setTimeout(() => {
       console.log('Первая функция выполнена');

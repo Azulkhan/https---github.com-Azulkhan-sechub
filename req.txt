@@ -1,0 +1,12 @@
+<table>
+  <tr>
+    <td><label for="input1">Label 1</label></td>
+    <td><input type="text" id="input1" /></td>
+    <td><label for="input2">Label 2</label></td>
+    <td><input type="text" id="input2" /></td>
+    <td><label for="input3">Label 3</label></td>
+    <td><input type="text" id="input3" /></td>
+    <td><label for="input4">Label 4</label></td>
+    <td><input type="text" id="input4" /></td>
+  </tr>
+</table>

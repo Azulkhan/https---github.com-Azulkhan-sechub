@@ -1,12 +1,20 @@
+Для того чтобы разместить `label` над каждым `input` без использования CSS, можно применить структуру с таблицей, в которой каждая пара `label` и `input` будет находиться в отдельной ячейке. Вот пример:
+
+```html
 <table>
   <tr>
     <td><label for="input1">Label 1</label></td>
-    <td><input type="text" id="input1" /></td>
     <td><label for="input2">Label 2</label></td>
-    <td><input type="text" id="input2" /></td>
     <td><label for="input3">Label 3</label></td>
-    <td><input type="text" id="input3" /></td>
     <td><label for="input4">Label 4</label></td>
+  </tr>
+  <tr>
+    <td><input type="text" id="input1" /></td>
+    <td><input type="text" id="input2" /></td>
+    <td><input type="text" id="input3" /></td>
     <td><input type="text" id="input4" /></td>
   </tr>
 </table>
+```
+
+Этот код создаёт таблицу, где на первой строке (`<tr>`) расположены `label`, а на второй строке — соответствующие им `input`. В результате `label` будут отображаться над каждым полем ввода.

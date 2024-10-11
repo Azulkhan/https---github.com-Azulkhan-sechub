@@ -1,37 +1,14 @@
-Чтобы достать статус-код в POST-запросе с использованием функции `http.request`, вот пример кода, который делает это:
+Вот пример использования цикла `while` в Lua:
 
 ```lua
-local http = require("socket.http")  -- или твой модуль pkg/http
-local ltn12 = require("ltn12")
+local count = 1
 
--- Данные для POST-запроса
-local request_body = "param1=value1&param2=value2"
-local response_body = {}
+while count <= 5 do
+    print("Счетчик: " .. count)
+    count = count + 1  -- Увеличиваем счетчик на 1
+end
 
--- Выполнение POST-запроса
-local result, status_code, headers = http.request{
-    url = "http://example.com",
-    method = "POST",
-    source = ltn12.source.string(request_body),
-    headers = {
-        ["content-length"] = tostring(#request_body),
-        ["content-type"] = "application/x-www-form-urlencoded"
-    },
-    sink = ltn12.sink.table(response_body)
-}
-
--- Вывод статус-кода
-print("Status code: ", status_code)
-
--- Вывод ответа
-print("Response body: ", table.concat(response_body))
+print("Цикл завершен.")
 ```
 
-В этом примере:
-- `http.request` возвращает три значения:
-  - `result` — результат запроса (обычно `true` или `nil` в случае ошибки),
-  - `status_code` — статус-код HTTP-ответа,
-  - `headers` — таблица с заголовками ответа.
-- `sink = ltn12.sink.table(response_body)` собирает тело ответа в таблицу `response_body`.
-
-Таким образом, статус-код можно вывести через переменную `status_code`.
+В этом примере переменная `count` инициализируется значением 1. Цикл `while` продолжает выполняться, пока `count` меньше или равен 5. Внутри цикла значение `count` выводится на экран, а затем увеличивается на 1. После завершения цикла выводится сообщение "Цикл завершен".

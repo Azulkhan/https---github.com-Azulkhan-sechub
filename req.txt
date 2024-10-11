@@ -1,1 +1,25 @@
-э
+Для получения статус-кода при выполнении HTTP POST-запроса в Lua с использованием библиотеки `socket.http`, можно сделать так:
+
+```lua
+local http = require("socket.http")
+local ltn12 = require("ltn12")
+
+-- Данные для POST-запроса
+local request_body = "param1=value1&param2=value2"
+local response_body = {}
+
+local res, status_code, headers = http.request{
+    url = "http://example.com",
+    method = "POST",
+    source = ltn12.source.string(request_body),
+    headers = {
+        ["content-length"] = tostring(#request_body),
+        ["content-type"] = "application/x-www-form-urlencoded"
+    },
+    sink = ltn12.sink.table(response_body)
+}
+
+print("Status code: ", status_code)
+```
+
+Этот код выполняет POST-запрос с телом `request_body`, получает статус-код в переменной `status_code` и выводит его.

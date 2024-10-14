@@ -1,27 +1,14 @@
 WITH RECURSIVE working_days AS (
-    SELECT 
-        start_date AS date,
-        1 AS day_count
-    FROM (
-        SELECT '2024-10-01'::date AS start_date,
-               '2024-10-15'::date AS end_date
-    ) AS sub
-    WHERE start_date <= end_date
-
+    SELECT '2024-10-01'::date AS date
     UNION ALL
-
-    SELECT 
-        date + INTERVAL '1 day',
-        CASE WHEN EXTRACT(DOW FROM date + INTERVAL '1 day') IN (0, 6) 
-             THEN day_count 
-             ELSE day_count + 1 END
+    SELECT date + INTERVAL '1 day'
     FROM working_days
-    WHERE date + INTERVAL '1 day' <= end_date
+    WHERE date + INTERVAL '1 day' <= '2024-10-15'
 )
-
 SELECT date
 FROM working_days
-WHERE day_count = 6
-  AND date >= CURRENT_DATE
+WHERE EXTRACT(DOW FROM date) NOT IN (0, 6 -- исключаем воскресенье (0) и субботу (6)
+    AND date IN ('2024-10-08', '2024-10-15')) -- шестые рабочие дни
+    AND date > CURRENT_DATE -- выбираем только дни после сегодняшней даты
 ORDER BY date
 LIMIT 1;

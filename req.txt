@@ -1,28 +1,20 @@
 WITH RECURSIVE working_days AS (
     SELECT 
-        '2024-10-01'::date AS date
+        start_date AS date,
+        1 AS day_count
+    FROM (SELECT '2024-10-01'::date AS start_date) AS sub
+    WHERE start_date <= CURRENT_DATE
+
     UNION ALL
+
     SELECT 
-        date + INTERVAL '1 day'
-    FROM 
-        working_days
-    WHERE 
-        date < '2024-10-15'  -- Конечная дата
-),
-filtered_working_days AS (
-    SELECT 
-        date
-    FROM 
-        working_days
-    WHERE 
-        EXTRACT(DOW FROM date) BETWEEN 1 AND 5  -- Рабочие дни (Пн-Пт)
+        date + INTERVAL '1 day',
+        CASE WHEN EXTRACT(DOW FROM date + INTERVAL '1 day') IN (0, 6) THEN day_count 
+             ELSE day_count + 1 END
+    FROM working_days
+    WHERE day_count < 6
 )
-SELECT 
-    date
-FROM 
-    filtered_working_days
-WHERE 
-    date > CURRENT_DATE  -- Начинаем искать после текущей даты
-ORDER BY 
-    date
-OFFSET 5 LIMIT 1;  -- Пропускаем первые 5 рабочих дней и берем следующий
+
+SELECT date
+FROM working_days
+WHERE day_count = 6;

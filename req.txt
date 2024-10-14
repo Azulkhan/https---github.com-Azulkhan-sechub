@@ -1,19 +1,36 @@
-WITH all_dates AS (
-    SELECT generate_series(
-        '2024-10-01'::date,  -- Начальная дата
-        '2024-10-15'::date   -- Конечная дата
-    ) AS date
+WITH RECURSIVE working_days AS (
+    SELECT 
+        '2024-10-01'::date AS date
+    UNION ALL
+    SELECT 
+        date + interval '1 day'
+    FROM 
+        working_days
+    WHERE 
+        date < '2024-10-15'  -- Ограничиваем конечной датой
 ),
-working_days AS (
-    SELECT date
-    FROM all_dates
-    WHERE EXTRACT(DOW FROM date) BETWEEN 1 AND 5  -- Фильтр по рабочим дням (понедельник-пятница)
+filtered_working_days AS (
+    SELECT 
+        date
+    FROM 
+        working_days
+    WHERE 
+        EXTRACT(DOW FROM date) BETWEEN 1 AND 5  -- Только рабочие дни (понедельник-пятница)
 ),
-sixth_working_days AS (
-    SELECT date,
-           ROW_NUMBER() OVER (ORDER BY date) AS rn
-    FROM working_days
+numbered_days AS (
+    SELECT 
+        date,
+        ROW_NUMBER() OVER (ORDER BY date) AS rn
+    FROM 
+        filtered_working_days
 )
-SELECT date
-FROM sixth_working_days
-WHERE rn = (SELECT COUNT(*) FROM sixth_working_days WHERE date <= '2024-10-14') + 6;  -- Находим шестой рабочий день после текущей даты
+SELECT 
+    date
+FROM 
+    numbered_days
+WHERE 
+    rn = (
+        SELECT rn + 6  -- Ищем шестой рабочий день после текущей даты
+        FROM numbered_days
+        WHERE date = '2024-10-14'  -- Текущая дата
+    );

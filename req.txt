@@ -8,16 +8,14 @@ WITH RECURSIVE working_days AS (
     SELECT date + INTERVAL '1 day'
     FROM working_days
     WHERE date + INTERVAL '1 day' <= '2024-10-15' -- до конечной даты
-)
-
-SELECT date
-FROM (
+),
+numbered_days AS (
     SELECT date,
            ROW_NUMBER() OVER (ORDER BY date) AS rn
     FROM working_days
     WHERE EXTRACT(DOW FROM date) NOT IN (0, 6) -- исключаем выходные (воскресенье и субботу)
-) AS numbered_days
-WHERE rn = 6 -- выбираем шестой рабочий день
-  AND date > CURRENT_DATE -- выбираем только дни после сегодняшней даты
-ORDER BY date
-LIMIT 1;
+)
+SELECT date
+FROM numbered_days
+WHERE rn % 6 = 0 -- выбираем все шестые рабочие дни
+ORDER BY date;

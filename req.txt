@@ -13,18 +13,15 @@ sixth_days AS (
            ROW_NUMBER() OVER (ORDER BY date) AS rn
     FROM working_days
 ),
-result AS (
-    -- Начинаем с первого рабочего дня
-    SELECT MIN(date) AS sixth_working_day
-    FROM sixth_days
-    WHERE rn = 1 -- Первый найденный рабочий день
-    UNION ALL
-    -- Рекурсивно находим каждый следующий шестой рабочий день
-    SELECT date + INTERVAL '7 days' -- Добавляем 7 дней к последнему шестому рабочему дню
-    FROM result
-    WHERE date + INTERVAL '7 days' <= '2024-10-30'::timestamp -- Ограничение по конечной дате
+next_sixth_day AS (
+    -- Находим следующий шестой рабочий день после указанной даты
+    SELECT MIN(date) AS next_sixth_working_day
+    FROM (
+        SELECT date
+        FROM sixth_days
+        WHERE date > CURRENT_DATE -- Замените на нужную вам дату
+    ) AS future_days
+    WHERE (rn - 1) % 6 = 0
 )
-SELECT date
-FROM result
-WHERE date IS NOT NULL
-ORDER BY date;
+SELECT next_sixth_working_day
+FROM next_sixth_day;

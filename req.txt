@@ -9,12 +9,23 @@ WITH RECURSIVE working_days AS (
     WHERE EXTRACT(DOW FROM date) NOT IN (0, 6) -- Исключаем выходные (воскресенье и субботу)
 ),
 sixth_days AS (
-    -- Находим шестые рабочие дни
+    -- Находим шестые рабочие дни, начиная с 1-го рабочего дня
     SELECT date,
            ROW_NUMBER() OVER (ORDER BY date) AS rn
     FROM working_days
+),
+result AS (
+    -- Начинаем с первого найденного рабочего дня
+    SELECT MIN(date) AS sixth_working_day
+    FROM sixth_days
+    WHERE rn = 1 -- Первый найденный рабочий день
+    UNION ALL
+    -- Рекурсивно находим каждый следующий шестой рабочий день
+    SELECT date + INTERVAL '6 days'
+    FROM result
+    WHERE date + INTERVAL '6 days' <= '2024-10-30'::timestamp -- Ограничение по конечной дате
 )
 SELECT date
-FROM sixth_days
-WHERE (rn - 1) % 6 = 0 -- Возвращаем только шестые рабочие дни
+FROM result
+WHERE date IS NOT NULL
 ORDER BY date;

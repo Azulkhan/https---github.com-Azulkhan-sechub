@@ -1,7 +1,7 @@
 WITH all_dates AS (
     SELECT generate_series(
-        CURRENT_DATE,  -- Начальная дата - сегодняшняя
-        '2024-12-31'::date,  -- Конечная дата
+        '2024-10-01'::date,  -- Начальная дата
+        '2024-10-15'::date,  -- Конечная дата
         '1 day'::interval
     ) AS date
 ),
@@ -13,4 +13,4 @@ working_days AS (
 )
 SELECT date
 FROM working_days
-WHERE (rn - 1) % 6 = 0;  -- Каждый шестой рабочий день начиная с текущей даты
+WHERE rn = (SELECT rn FROM working_days WHERE date = CURRENT_DATE) + 6;  -- Находит шестой рабочий день после текущей даты

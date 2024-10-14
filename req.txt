@@ -3,11 +3,11 @@ WITH RECURSIVE working_days AS (
         '2024-10-01'::date AS date
     UNION ALL
     SELECT 
-        date + interval '1 day'
+        date + INTERVAL '1 day'
     FROM 
         working_days
     WHERE 
-        date < '2024-10-15'  -- Ограничиваем конечной датой
+        date < '2024-10-15'  -- Указываем конечную дату
 ),
 filtered_working_days AS (
     SELECT 
@@ -15,7 +15,7 @@ filtered_working_days AS (
     FROM 
         working_days
     WHERE 
-        EXTRACT(DOW FROM date) BETWEEN 1 AND 5  -- Только рабочие дни (понедельник-пятница)
+        EXTRACT(DOW FROM date) BETWEEN 1 AND 5  -- Рабочие дни (Пн-Пт)
 ),
 numbered_days AS (
     SELECT 
@@ -29,8 +29,4 @@ SELECT
 FROM 
     numbered_days
 WHERE 
-    rn = (
-        SELECT rn + 6  -- Ищем шестой рабочий день после текущей даты
-        FROM numbered_days
-        WHERE date = '2024-10-14'  -- Текущая дата
-    );
+    rn = (SELECT COUNT(*) FROM numbered_days WHERE date <= '2024-10-14') + 6;  -- Ищем следующий шестой рабочий день

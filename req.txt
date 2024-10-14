@@ -13,8 +13,4 @@ working_days AS (
 )
 SELECT date
 FROM working_days
-WHERE rn = (
-    SELECT rn + 6 
-    FROM working_days 
-    WHERE date = '2024-10-14'  -- Указываем текущую дату
-);
+WHERE (rn - 1) % 6 = 0 AND date > '2024-10-14';  -- Выбираем следующие рабочие дни после 14 октября

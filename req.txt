@@ -13,15 +13,24 @@ sixth_days AS (
            ROW_NUMBER() OVER (ORDER BY date) AS rn
     FROM working_days
 ),
+all_sixth_days AS (
+    -- Находим все шестые рабочие дни
+    SELECT date
+    FROM sixth_days
+    WHERE (rn - 1) % 6 = 0
+),
 next_sixth_day AS (
     -- Находим следующий шестой рабочий день после указанной даты
     SELECT MIN(date) AS next_sixth_working_day
-    FROM (
-        SELECT date
-        FROM sixth_days
-        WHERE date > CURRENT_DATE -- Замените на нужную вам дату
-    ) AS future_days
-    WHERE (rn - 1) % 6 = 0
+    FROM all_sixth_days
+    WHERE date > CURRENT_DATE -- Замените на нужную вам дату
 )
+SELECT date AS sixth_working_day
+FROM all_sixth_days
+
+UNION ALL
+
 SELECT next_sixth_working_day
-FROM next_sixth_day;
+FROM next_sixth_day
+WHERE next_sixth_working_day IS NOT NULL
+ORDER BY sixth_working_day;

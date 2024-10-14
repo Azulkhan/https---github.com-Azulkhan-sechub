@@ -19,7 +19,7 @@ FROM (
     FROM working_days
     WHERE EXTRACT(DOW FROM date) NOT IN (0, 6) -- исключаем выходные (воскресенье и субботу)
 ) AS numbered_days
-WHERE rn = 6 -- шестой рабочий день
-  AND date >= CURRENT_DATE -- выбираем только дни после сегодняшней даты
+WHERE rn = 6 -- выбираем шестой рабочий день
+  AND date > CURRENT_DATE -- выбираем только дни после сегодняшней даты
 ORDER BY date
 LIMIT 1;

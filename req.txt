@@ -1,15 +1,16 @@
 WITH all_dates AS (
     SELECT generate_series(
-        '2024-10-01'::date,  -- Ваша начальная дата
+        CURRENT_DATE,  -- Начальная дата - сегодняшняя
         '2024-12-31'::date,  -- Конечная дата
         '1 day'::interval
     ) AS date
-)
-SELECT date
-FROM (
+),
+working_days AS (
     SELECT date, 
            ROW_NUMBER() OVER (ORDER BY date) AS rn
     FROM all_dates
     WHERE EXTRACT(DOW FROM date) BETWEEN 1 AND 5  -- Только рабочие дни (понедельник-пятница)
-) AS numbered_days
-WHERE rn = 6;  -- Шестой рабочий день
+)
+SELECT date
+FROM working_days
+WHERE rn = 6;  -- Находит 6-й рабочий день от сегодня

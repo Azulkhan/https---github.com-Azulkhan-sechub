@@ -1,12 +1,15 @@
-CREATE TABLE work_days (
-    work_date DATE PRIMARY KEY
-);
-
-WITH numbered_days AS (
-    SELECT work_date, 
-           ROW_NUMBER() OVER (ORDER BY work_date) AS rn
-    FROM work_days
+WITH all_dates AS (
+    SELECT generate_series(
+        '2024-01-01'::date,  -- Замените на вашу начальную дату
+        '2024-12-31'::date,  -- Замените на вашу конечную дату
+        '1 day'::interval
+    ) AS date
 )
-SELECT work_date
-FROM numbered_days
-WHERE rn % 6 = 0;
+SELECT date
+FROM (
+    SELECT date, 
+           ROW_NUMBER() OVER (ORDER BY date) AS rn
+    FROM all_dates
+    WHERE EXTRACT(DOW FROM date) BETWEEN 1 AND 5  -- Только рабочие дни (понедельник-пятница)
+) AS numbered_days
+WHERE (rn - 1) % 6 = 0;  -- Каждый шестой рабочий день

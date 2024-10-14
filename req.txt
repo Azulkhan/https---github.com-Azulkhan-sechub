@@ -13,4 +13,4 @@ working_days AS (
 )
 SELECT date
 FROM working_days
-WHERE rn = 6;  -- Находит 6-й рабочий день от сегодня
+WHERE (rn - 1) % 6 = 0;  -- Каждый шестой рабочий день начиная с текущей даты

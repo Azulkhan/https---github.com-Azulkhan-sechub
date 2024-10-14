@@ -7,7 +7,7 @@ WITH RECURSIVE working_days AS (
     FROM 
         working_days
     WHERE 
-        date < '2024-10-15'  -- Указываем конечную дату
+        date < '2024-10-15'  -- Конечная дата
 ),
 filtered_working_days AS (
     SELECT 
@@ -16,21 +16,13 @@ filtered_working_days AS (
         working_days
     WHERE 
         EXTRACT(DOW FROM date) BETWEEN 1 AND 5  -- Рабочие дни (Пн-Пт)
-),
-numbered_days AS (
-    SELECT 
-        date,
-        ROW_NUMBER() OVER (ORDER BY date) AS rn
-    FROM 
-        filtered_working_days
 )
 SELECT 
     date
 FROM 
-    numbered_days
+    filtered_working_days
 WHERE 
-    rn = (
-        SELECT COUNT(*) 
-        FROM numbered_days 
-        WHERE date <= '2024-10-14'  -- Текущая дата
-    ) + 6;  -- Находим следующий шестой рабочий день
+    date > CURRENT_DATE  -- Начинаем искать после текущей даты
+ORDER BY 
+    date
+OFFSET 5 LIMIT 1;  -- Пропускаем первые 5 рабочих дней и берем следующий

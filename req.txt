@@ -1,11 +1,10 @@
 WITH RECURSIVE working_days AS (
     -- Начальная дата
-    SELECT start_date AS date
-    FROM (SELECT '2024-10-01'::timestamp AS start_date) AS params
+    SELECT '2024-10-01'::timestamp AS date
 
     UNION ALL
 
-    -- Генерация следующих дней
+    -- Генерация рабочих дней до конечной даты
     SELECT date + INTERVAL '1 day'
     FROM working_days
     WHERE date < '2024-10-30'::timestamp -- Ограничение до конечной даты
@@ -15,8 +14,14 @@ filtered_days AS (
            ROW_NUMBER() OVER (ORDER BY date) AS rn
     FROM working_days
     WHERE EXTRACT(DOW FROM date) NOT IN (0, 6) -- Исключаем выходные (воскресенье и субботу)
+),
+sixth_days AS (
+    SELECT date,
+           rn,
+           (rn - 1) / 6 AS group_num -- Группируем по каждые 6 рабочих дней
+    FROM filtered_days
 )
-SELECT date
-FROM filtered_days
-WHERE rn % 6 = 0 -- Получаем только шестые рабочие дни
-ORDER BY date;
+SELECT MIN(date) AS sixth_working_day
+FROM sixth_days
+GROUP BY group_num
+ORDER BY sixth_working_day;

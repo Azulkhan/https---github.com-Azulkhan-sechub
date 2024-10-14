@@ -1,6 +1,6 @@
 WITH all_dates AS (
     SELECT generate_series(
-        CURRENT_DATE,  -- Сегодняшняя дата
+        '2024-10-01'::date,  -- Ваша начальная дата
         '2024-12-31'::date,  -- Конечная дата
         '1 day'::interval
     ) AS date

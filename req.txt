@@ -29,4 +29,8 @@ SELECT
 FROM 
     numbered_days
 WHERE 
-    rn = (SELECT COUNT(*) FROM numbered_days WHERE date <= '2024-10-14') + 6;  -- Ищем следующий шестой рабочий день
+    rn = (
+        SELECT COUNT(*) 
+        FROM numbered_days 
+        WHERE date <= '2024-10-14'  -- Текущая дата
+    ) + 6;  -- Находим следующий шестой рабочий день

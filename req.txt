@@ -2,19 +2,26 @@ WITH RECURSIVE working_days AS (
     SELECT 
         start_date AS date,
         1 AS day_count
-    FROM (SELECT '2024-10-01'::date AS start_date) AS sub
-    WHERE start_date <= CURRENT_DATE
+    FROM (
+        SELECT '2024-10-01'::date AS start_date,
+               '2024-10-15'::date AS end_date
+    ) AS sub
+    WHERE start_date <= end_date
 
     UNION ALL
 
     SELECT 
         date + INTERVAL '1 day',
-        CASE WHEN EXTRACT(DOW FROM date + INTERVAL '1 day') IN (0, 6) THEN day_count 
+        CASE WHEN EXTRACT(DOW FROM date + INTERVAL '1 day') IN (0, 6) 
+             THEN day_count 
              ELSE day_count + 1 END
     FROM working_days
-    WHERE day_count < 6
+    WHERE date + INTERVAL '1 day' <= end_date
 )
 
 SELECT date
 FROM working_days
-WHERE day_count = 6;
+WHERE day_count = 6
+  AND date >= CURRENT_DATE
+ORDER BY date
+LIMIT 1;

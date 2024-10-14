@@ -1,14 +1,11 @@
-WITH RECURSIVE working_days AS (
-    SELECT '2024-10-01'::date AS date
-    UNION ALL
-    SELECT date + INTERVAL '1 day'
-    FROM working_days
-    WHERE date + INTERVAL '1 day' <= '2024-10-15'
-)
 SELECT date
-FROM working_days
-WHERE EXTRACT(DOW FROM date) NOT IN (0, 6 -- исключаем воскресенье (0) и субботу (6)
-    AND date IN ('2024-10-08', '2024-10-15')) -- шестые рабочие дни
-    AND date > CURRENT_DATE -- выбираем только дни после сегодняшней даты
+FROM (
+    SELECT '2024-10-01'::date + (n * INTERVAL '1 day') AS date
+    FROM generate_series(0, 14) AS n -- генерируем дни от 0 до 14 (15 дней)
+) AS days
+WHERE date BETWEEN '2024-10-01' AND '2024-10-15' -- ограничиваем диапазон
+  AND EXTRACT(DOW FROM date) NOT IN (0, 6) -- исключаем выходные (воскресенье и субботу)
+  AND date IN ('2024-10-08', '2024-10-15') -- берем только шестые рабочие дни
+  AND date > CURRENT_DATE -- выбираем только дни после сегодняшней даты
 ORDER BY date
 LIMIT 1;

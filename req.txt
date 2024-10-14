@@ -16,28 +16,5 @@ FROM working_days
 WHERE rn = (
     SELECT rn + 6 
     FROM working_days 
-    WHERE date = '2024-10-14'  -- Здесь указываем текущую дату
-);
-
-
-
-WITH all_dates AS (
-    SELECT generate_series(
-        '2024-10-01'::date,  -- Начальная дата
-        '2024-10-15'::date,  -- Конечная дата
-        '1 day'::interval
-    ) AS date
-),
-working_days AS (
-    SELECT date,
-           ROW_NUMBER() OVER (ORDER BY date) AS rn
-    FROM all_dates
-    WHERE EXTRACT(DOW FROM date) BETWEEN 1 AND 5  -- Только рабочие дни (понедельник-пятница)
-)
-SELECT date
-FROM working_days
-WHERE rn = (
-    SELECT rn + 6 
-    FROM working_days 
     WHERE date = '2024-10-14'  -- Указываем текущую дату
-) AND rn <= (SELECT COUNT(*) FROM working_days);  -- Убедимся, что не превышаем количество рабочих дней
+);

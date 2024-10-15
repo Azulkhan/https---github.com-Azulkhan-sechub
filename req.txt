@@ -1,30 +1,21 @@
-WITH RECURSIVE working_days AS (
-    -- Генерация всех рабочих дней между заданными датами
-    SELECT date
-    FROM generate_series(
-        '2024-10-01'::timestamp, 
-        '2024-10-30'::timestamp, 
-        '1 day'::interval
-    ) AS date
-    WHERE EXTRACT(DOW FROM date) NOT IN (0, 6) -- Исключаем выходные (воскресенье и субботу)
-),
-sixth_days AS (
-    SELECT date,
-           ROW_NUMBER() OVER (ORDER BY date) AS rn
-    FROM working_days
-),
-result AS (
-    -- Начинаем с первого рабочего дня
-    SELECT MIN(date) AS sixth_working_day
-    FROM sixth_days
-    WHERE rn = 1 -- Первый найденный рабочий день
-    UNION ALL
-    -- Рекурсивно находим каждый следующий шестой рабочий день
-    SELECT date + INTERVAL '7 days' -- Добавляем 7 дней к последнему шестому рабочему дню
-    FROM result
-    WHERE date + INTERVAL '7 days' <= '2024-10-30'::timestamp -- Ограничение по конечной дате
-)
-SELECT date
-FROM result
-WHERE date IS NOT NULL
-ORDER BY date;
+Чтобы просмотреть изменения в объектах базы данных Oracle, можно воспользоваться следующими методами:
+
+1. **Системные представления (Dictionary Views):**
+   - `USER_OBJECTS` или `ALL_OBJECTS`: Эти представления позволяют увидеть изменения в объектах, такие как дата последней модификации.
+     ```sql
+     SELECT OBJECT_NAME, OBJECT_TYPE, LAST_DDL_TIME 
+     FROM USER_OBJECTS
+     WHERE OBJECT_TYPE IN ('TABLE', 'VIEW', 'PROCEDURE', 'PACKAGE');
+     ```
+   - `DBA_OBJECTS`: Аналогично предыдущим, но с доступом к объектам всех пользователей.
+
+2. **Системные журналы (Audit Logs):**
+   - Если включен аудит изменений, можно проверить таблицы аудита (`DBA_AUDIT_TRAIL`), которые фиксируют изменения на уровне DDL (например, `CREATE`, `ALTER`, `DROP`).
+
+3. **Oracle Flashback:**
+   - Если включены функции Flashback, можно использовать их для просмотра изменений данных или откатов к определенным точкам во времени.
+
+4. **Oracle LogMiner:**
+   - Для отслеживания изменений на более низком уровне можно использовать утилиту `LogMiner` для анализа архивных журналов redo.
+
+Каждый из этих методов можно настроить в зависимости от того, какой тип изменений вас интересует (структурные, данные или оба).

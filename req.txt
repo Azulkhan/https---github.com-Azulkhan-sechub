@@ -1,5 +1,4 @@
-SELECT *
-FROM (
-  SELECT 'Ваш текст' -- или другой SELECT запрос
-) AS subquery,
-generate_series(1, 3075);
+SELECT owner, name, type, line, text
+FROM all_source
+WHERE UPPER(text) LIKE UPPER('%ваше_значение%')
+ORDER BY owner, name, line;

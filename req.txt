@@ -1,5 +1,5 @@
-local socket = require("socket")
-
-function sleep(ms)
-    socket.sleep(ms / 1000) -- Использует системный сон, что более эффективно
-end
+SELECT *
+FROM (
+  SELECT 'Ваш текст' -- или другой SELECT запрос
+) AS subquery,
+generate_series(1, 3075);

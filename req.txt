@@ -1,4 +1,3 @@
-SELECT owner, name, type, line, text
-FROM all_source
-WHERE UPPER(text) LIKE UPPER('%ваше_значение%')
-ORDER BY owner, name, line;
+go.dev | Go Modules Reference. Vendoring — о директории vendor на официальном сайте Go.
+Dave Cheney's Blog | Use internal packages to reduce your public API surface — о том, зачем нужна директория internal, на сайте одного из самых известных Go-разработчиков. Советуем добавить блог Дейва Чейни в избранные и следить за его публикациями и выступлениями.
+GitHub | Standard Go Project Layout — рекомендации по структуре проектов от Go-сообщества.

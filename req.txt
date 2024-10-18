@@ -1,135 +1,16 @@
+Чтобы сделать текст в `ASPxLabel` жирным в DevExpress 11.1, вы можете использовать свойство `Font.Bold`. Вот пример кода:
 
+```aspx
+<dx:ASPxLabel ID="ASPxLabel1" runat="server" Text="Ваш текст здесь">
+    <Font Bold="true" />
+</dx:ASPxLabel>
+```
 
-### **Lua:**
-1. **Замыкания**:
-   ```lua
-   function makeCounter()
-       local count = 0
-       return function()
-           count = count + 1
-           return count
-       end
-   end
+Если вы хотите задать это свойство программно в коде C#, вы можете сделать так:
 
-   local counter = makeCounter()
-   print(counter())  -- 1
-   print(counter())  -- 2
-   ```
+```csharp
+ASPxLabel1.Text = "Ваш текст здесь";
+ASPxLabel1.Font.Bold = true;
+```
 
-2. **Метатаблицы (перегрузка операторов)**:
-   ```lua
-   local mt = {
-       __add = function(a, b)
-           return a.value + b.value
-       end
-   }
-
-   local t1 = {value = 5}
-   local t2 = {value = 10}
-   setmetatable(t1, mt)
-   setmetatable(t2, mt)
-
-   print(t1 + t2)  -- 15
-   ```
-
-3. **Корутины**:
-   ```lua
-   function foo()
-       for i = 1, 3 do
-           print("foo", i)
-           coroutine.yield()
-       end
-   end
-
-   co = coroutine.create(foo)
-   coroutine.resume(co)  -- foo 1
-   coroutine.resume(co)  -- foo 2
-   ```
-
-### **Java:**
-1. **Lambda-выражения (Java 8 и выше)**:
-   ```java
-   List<String> names = Arrays.asList("John", "Paul", "George", "Ringo");
-   names.forEach(name -> System.out.println(name));
-   ```
-
-2. **Потоки (Streams)**:
-   ```java
-   List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
-   int sum = numbers.stream()
-       .filter(n -> n % 2 == 0)
-       .mapToInt(Integer::intValue)
-       .sum();
-   System.out.println(sum);  // 6
-   ```
-
-3. **Использование CompletableFuture**:
-   ```java
-   CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-       try {
-           Thread.sleep(1000);
-           System.out.println("Async task completed");
-       } catch (InterruptedException e) {
-           e.printStackTrace();
-       }
-   });
-
-   future.join();  // Дождаться завершения задачи
-   ```
-
-### **PostgreSQL:**
-1. **Рекурсивные запросы (CTE)**:
-   ```sql
-   WITH RECURSIVE subordinates AS (
-       SELECT employee_id, name, manager_id
-       FROM employees
-       WHERE employee_id = 1
-       UNION
-       SELECT e.employee_id, e.name, e.manager_id
-       FROM employees e
-       INNER JOIN subordinates s ON s.employee_id = e.manager_id
-   )
-   SELECT * FROM subordinates;
-   ```
-
-2. **JSON-функции**:
-   ```sql
-   SELECT jsonb_build_object('name', 'Alice', 'age', 25);
-   ```
-
-3. **Upsert (INSERT ON CONFLICT)**:
-   ```sql
-   INSERT INTO employees (id, name, position)
-   VALUES (1, 'John Doe', 'Manager')
-   ON CONFLICT (id) 
-   DO UPDATE SET name = EXCLUDED.name;
-   ```
-
-### **Oracle:**
-1. **CONNECT BY для иерархических запросов**:
-   ```sql
-   SELECT employee_id, name, manager_id
-   FROM employees
-   START WITH manager_id IS NULL
-   CONNECT BY PRIOR employee_id = manager_id;
-   ```
-
-2. **MERGE для обновления или вставки данных**:
-   ```sql
-   MERGE INTO employees e
-   USING (SELECT 1 AS id, 'John' AS name FROM dual) src
-   ON (e.id = src.id)
-   WHEN MATCHED THEN
-       UPDATE SET e.name = src.name
-   WHEN NOT MATCHED THEN
-       INSERT (id, name) VALUES (src.id, src.name);
-   ```
-
-3. **Запрос с аналитической функцией**:
-   ```sql
-   SELECT employee_id, salary, 
-          RANK() OVER (ORDER BY salary DESC) as salary_rank
-   FROM employees;
-   ```
-
-Эти команды могут быть полезны для изучения или работы с соответствующими технологиями!
+Эти методы позволят вам отобразить текст в `ASPxLabel` жирным шрифтом. Если у вас есть другие вопросы по DevExpress, дайте знать!

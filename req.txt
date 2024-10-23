@@ -1,43 +1,46 @@
-To open a file in the terminal in Linux (CentOS or other distributions), you can use various commands depending on what you want to do with the file (view, edit, etc.). Here are some common commands:
+Чтобы посмотреть дату создания файлов в Linux, можно использовать несколько способов, так как файловые системы Linux чаще работают с датами изменения и доступа к файлам, а не с датой создания. Однако, если файловая система поддерживает атрибуты даты создания (например, **ext4** или **btrfs**), можно использовать следующие методы:
 
-### 1. **Opening a file for viewing:**
+### 1. **Команда `stat`:**
+   Команда `stat` может показать подробную информацию о файле, включая дату создания (если поддерживается):
+   ```bash
+   stat filename
+   ```
+   В выводе вы увидите:
+   - **Access** – дата последнего доступа.
+   - **Modify** – дата последнего изменения.
+   - **Change** – дата последнего изменения метаданных (например, прав).
+   - **Birth** – дата создания файла (если файловая система поддерживает).
 
-- **Using `cat`:** Displays the entire content of the file.
-  ```bash
-  cat filename
-  ```
+   Пример вывода:
+   ```
+   File: filename
+   Size: 1234       Blocks: 8          IO Block: 4096   regular file
+   Device: 802h/2050d    Inode: 12345678    Links: 1
+   Access: 2024-10-21 10:45:36.000000000 +0300
+   Modify: 2024-10-21 10:46:10.000000000 +0300
+   Change: 2024-10-21 10:46:10.000000000 +0300
+   Birth: 2024-10-20 09:15:02.000000000 +0300
+   ```
 
-- **Using `less`:** Allows you to scroll through the file. Press `q` to quit.
-  ```bash
-  less filename
-  ```
+### 2. **Использование `debugfs` (для ext4):**
+   Если вы используете файловую систему ext4 и хотите узнать дату создания файла, вы можете использовать утилиту `debugfs`:
+   - Откройте терминал и выполните следующую команду:
+     ```bash
+     sudo debugfs /dev/sdX
+     ```
+     где `/dev/sdX` — это ваш раздел (например, `/dev/sda1`).
+   - После входа в `debugfs`, выполните команду:
+     ```bash
+     stat /путь/к/файлу
+     ```
+     Это покажет информацию о файле, включая дату создания, если она доступна.
 
-- **Using `more`:** Similar to `less`, but with less functionality. Also scrolls page by page.
-  ```bash
-  more filename
-  ```
+### 3. **Использование `ls` для изменения и доступа:**
+   Если вам нужна информация о дате последнего изменения или последнего доступа:
+   ```bash
+   ls -l filename  # Дата изменения
+   ls -lu filename # Дата последнего доступа
+   ls -lc filename # Дата изменения метаданных
+   ```
 
-### 2. **Opening a file for editing:**
-
-- **Using `nano`:** Simple text editor in the terminal.
-  ```bash
-  nano filename
-  ```
-
-- **Using `vim`:** Powerful text editor (more complex than `nano`).
-  ```bash
-  vim filename
-  ```
-  - To enter **insert mode** in `vim`, press `i`.
-  - To **save and exit**, press `Esc`, type `:wq`, then press Enter.
-
-- **Using `vi`:** Similar to `vim`, if `vim` is not installed by default.
-  ```bash
-  vi filename
-  ```
-
-### 3. **Opening a file in GUI from the terminal:**
-
-If you are using a graphical desktop environment, you can open the file in a GUI text editor (like `gedit`, `kate`, etc.):
-
-```
+Если ваша файловая система не поддерживает дату создания, то получить её напрямую не получится.

@@ -1,56 +1,43 @@
-Чтобы отслеживать HTTP-запросы и все, что происходит на веб-сервере в CentOS, можно использовать несколько подходов, в зависимости от того, какой веб-сервер вы используете (Apache, Nginx и т. д.). 
+To open a file in the terminal in Linux (CentOS or other distributions), you can use various commands depending on what you want to do with the file (view, edit, etc.). Here are some common commands:
 
-### 1. **Apache (httpd):**
-Если у вас установлен Apache, журналы запросов хранятся в `/var/log/httpd/`.
+### 1. **Opening a file for viewing:**
 
-- **Журнал доступа (access log):** здесь хранятся все запросы к серверу.
+- **Using `cat`:** Displays the entire content of the file.
   ```bash
-  tail -f /var/log/httpd/access_log
+  cat filename
   ```
 
-- **Журнал ошибок (error log):** здесь содержится информация о любых ошибках.
+- **Using `less`:** Allows you to scroll through the file. Press `q` to quit.
   ```bash
-  tail -f /var/log/httpd/error_log
+  less filename
   ```
 
-Команда `tail -f` выводит последние строки файла и автоматически обновляет вывод, когда появляются новые записи.
-
-### 2. **Nginx:**
-Для Nginx журналы находятся в `/var/log/nginx/`.
-
-- **Журнал доступа (access log):**
+- **Using `more`:** Similar to `less`, but with less functionality. Also scrolls page by page.
   ```bash
-  tail -f /var/log/nginx/access.log
+  more filename
   ```
 
-- **Журнал ошибок (error log):**
+### 2. **Opening a file for editing:**
+
+- **Using `nano`:** Simple text editor in the terminal.
   ```bash
-  tail -f /var/log/nginx/error.log
+  nano filename
   ```
 
-### 3. **Использование `tcpdump` для мониторинга HTTP-трафика:**
-Если вы хотите отслеживать все HTTP-запросы на уровне сети, можно использовать `tcpdump`. Пример команды для захвата трафика на порту 80 (HTTP):
-```bash
-sudo tcpdump -i any -n port 80
+- **Using `vim`:** Powerful text editor (more complex than `nano`).
+  ```bash
+  vim filename
+  ```
+  - To enter **insert mode** in `vim`, press `i`.
+  - To **save and exit**, press `Esc`, type `:wq`, then press Enter.
+
+- **Using `vi`:** Similar to `vim`, if `vim` is not installed by default.
+  ```bash
+  vi filename
+  ```
+
+### 3. **Opening a file in GUI from the terminal:**
+
+If you are using a graphical desktop environment, you can open the file in a GUI text editor (like `gedit`, `kate`, etc.):
+
 ```
-
-Это захватит весь HTTP-трафик на порту 80. Для HTTPS (порт 443):
-```bash
-sudo tcpdump -i any -n port 443
-```
-
-### 4. **Использование `ngrep` для фильтрации HTTP-запросов:**
-`ngrep` (Network grep) — это утилита, которая позволяет фильтровать HTTP-запросы по ключевым словам.
-
-Чтобы установить `ngrep`, выполните:
-```bash
-sudo yum install ngrep
-```
-
-Пример команды для просмотра всех HTTP-запросов:
-```bash
-sudo ngrep -d any -W byline 'GET|POST' tcp port 80
-```
-
-### 5. **Журналы приложений:**
-Если у вас веб-приложение, которое пишет собственные логи, эти файлы журналов можно найти в его каталоге или в системных логах (например, `/var/log`).
